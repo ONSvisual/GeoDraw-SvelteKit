@@ -1,4 +1,3 @@
-import {onDestroy} from 'svelte';
 import {get} from 'svelte/store';
 import {
   mapobject,
@@ -14,9 +13,7 @@ import {
 import {bboxToTile} from '@mapbox/tilebelt';
 // import { LngLat, LngLatBounds} from 'maplibre-gl';
 // turf does not compile with sveltekit
-import {default as union} from '@turf/union'
-
-
+import {default as union} from '@turf/union';
 
 var simplify = {};
 
@@ -40,14 +37,18 @@ export async function init_draw () {
 
   get (mapobject).addLayer ({
     id: 'draw_layer',
-    type: 'line',
+    // type: 'line',
+    type:'fill',
     source: 'drawsrc',
-    paint: {
-      'line-color': '#222',
-      'line-width': 5,
-      'line-dasharray': [2, 1],
-
-    },
+    // paint: {
+    //   'line-color': '#222',
+    //   'line-width': 5,
+    //   'line-dasharray': [2, 1],
+    // },
+    paint:{
+      'fill-color': 'coral',
+      'fill-opacity': 0.5,
+    }
   });
 
   get (mapobject).addLayer ({
@@ -64,10 +65,11 @@ export async function init_draw () {
     },
   });
 
-  
   // clear coordinates each time we change
-  draw_type.subscribe (() => {coordinates = [];
-  circle_paint(clear=get(draw_type)!='radius') 
+  draw_type.subscribe (() => {
+    coordinates = [];
+    add_mode.set(true);
+    circle_paint ((clear = get (draw_type) != 'radius'));
   });
   // set default
   draw_type.set ('radius');
@@ -75,27 +77,15 @@ export async function init_draw () {
   radiusInKm.subscribe (circle_paint);
 
   get (mapobject).on ('click', 'bounds', function boundclick (e) {
-    // console.warn(get(mapobject).querySourceFeatures(e.lngLat,'msoa'))
-
-    // if (get(draw_enabled)===false) {alert('Drawing disabled: Please zoom in a bit. ');return null};
-
-    console.log (e.lngLat, get (draw_type));
-    // const features = get(mapobject).queryRenderedFeatures(e.lngLat,'bounds');
-    // console.warn (e.features[0].properties);
-    // // const features = get(mapobject).querySourceFeatures('centroids')
-    // console.log(get(mapobject).queryRenderedFeatures,'dfdf', get(mapobject).querySourceFeatures)
-    // // const features = get(mapobject).queryRenderedFeatures({geometry:'circle'},'centroids')
-    // console.warn (features);
-
     switch (get (draw_type)) {
       case 'radius':
         draw_radius (e.lngLat);
         // circle_fast (e.lngLat);
         break;
-      case 'poly':
+      case 'polygon':
         draw_polygon (e.lngLat);
         break;
-      case 'click':
+      case 'select':
         draw_point (e);
         break;
     }
@@ -113,7 +103,7 @@ export async function init_draw () {
       case 'radius':
         circle_fast (e.lngLat);
         break;
-      case 'poly':
+      case 'polygon':
         polygon_fast (e.lngLat);
         break;
       // case 'click':
@@ -129,14 +119,32 @@ export async function init_draw () {
 //   console.error (callback);
 // }
 
+export function savepoly(){
+  var co =  {
+    lng: coordinates[0][0],
+    lat: coordinates[0][1],
+  }
+  console.warn('savetrigger',co)
+  // get(mapobject).fire('click', co)
+  draw_polygon(co)
+
+};
+
+
+
 function clear () {
+  coordinates=[];
   change_data ('drawsrc', {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [],
-    },
-  });
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [],
+      }
+    
+})}
+
+export function clearpoly(){
+  clear()
 }
 
 export function change_data (layer, data) {
@@ -147,25 +155,25 @@ export function change_data (layer, data) {
 // Click Tool
 ////////////////////
 
-
-
-
 ////////////////////
 // Matching Utilities
 ////////////////////
 
-function update (coordinates) {
+export function update (coordinates) {
   // update the selection
 
   const bbox = getbbox (coordinates);
 
-  // get (mapobject).fitBounds (bbox);
+  
+
+
 
   const features = get (mapobject).queryRenderedFeatures (
     bbox.map (d => get (mapobject).project (d)),
     {layers: ['centroids']}
   );
 
+  console.error ('---features', features);
   const oa = features
     .filter (i => inPolygon (coordinates, i.geometry.coordinates))
     .map (d => d.properties.id);
@@ -177,6 +185,8 @@ function update (coordinates) {
     last.lat.push (d[1]);
     last.lng.push (d[0]);
   });
+
+  // get (mapobject).fitBounds (bbox);
 
   if (get (add_mode)) {
     current.push ({
@@ -192,8 +202,16 @@ function update (coordinates) {
     });
   }
 
+  var items = current[current.length - 1];
+  // we cannot strigify sets....
+  // items.oa = [...items.oa]
+  items = JSON.stringify (
+    items,
+    (_key, value) => (value instanceof Set ? [...value] : value)
+  );
+  localStorage.setItem ('draw_data', items);
+
   selected.set (current);
-  console.warn ('updated---', get (selected), get (add_mode));
 }
 
 function draw_point (e) {
@@ -220,6 +238,7 @@ function draw_point (e) {
 
 function inPolygon (polygon, point) {
   // check if existing
+
   if (!polygon.length) return false;
   var n = polygon.length,
     p = polygon[n - 1],
@@ -300,12 +319,15 @@ function circle_fast (center) {
 }
 
 /// Scale Calulation Function.
-function circle_paint (clear=false) {
-  console.warn('-circle',clear)
+function circle_paint (clear = false) {
+  console.warn ('-circle', clear);
   if (mapobject) {
-
-    if (clear==true){
-      return get (mapobject).setPaintProperty ('circle_layer', 'circle-radius', 5);
+    if (clear == true) {
+      return get (mapobject).setPaintProperty (
+        'circle_layer',
+        'circle-radius',
+        5
+      );
     }
 
     const m2p = (meters, latitude) =>
@@ -326,6 +348,7 @@ function circle_paint (clear=false) {
 ////////////////////
 
 function draw_polygon (e) {
+  // console.warn('dp',e)
   if (coordinates.length) {
     if (geomean (coordinates[0], [e.lng, e.lat])) {
       // if we close the polygon
@@ -391,11 +414,10 @@ export async function simplify_query () {
   if (simplify[tile]) {
     var simple = simplify[tile];
   } else {
-    var simple = await fetch (
-      `${server}/encoding/${tile}.json`
-    ).then (d => d.json ());
+    var simple = await fetch (`${server}/encoding/${tile}.json`).then (d =>
+      d.json ()
+    );
     simple.lsoa = simple.lsoa.map (d => {
-      // console.log('simplify data',d)
       d[1] = new Set (d[1]);
       return d;
     });
@@ -426,43 +448,49 @@ export async function simplify_query () {
   oa = [...oa].filter (e => !rm.has (e));
   lsoa = [...lsoa].filter (e => !rmlsoa.has (e));
   msoa = msoa.map (d => d[0]);
-  
-  console.warn('lsoa',tile,msoa,oa,lsoa,last.oa)
 
-  
+  console.warn ('lsoa', tile, msoa, oa, lsoa, last.oa);
 
+  // return the simplified query - it would be quicker to not do this each change, but hey.
+  get (mapobject).fitBounds (bbox, {
+    padding: 200,
+    animation: false,
+    linear: true,
+    duration: 200,
+  });
+  const oalist = [...last.oa];
 
-  // return the simplified query - it would be quicker to not do this each change, but hey. 
-  get(mapobject).fitBounds(bbox,{padding: 200,animation:false,linear:true,duration:200})
-  const oalist = [...last.oa]
+  await new Promise (res => setTimeout (res, 500));
 
+  const features = get (mapobject)
+    .queryRenderedFeatures ({
+      layers: ['bounds'],
+    })
+    .filter (d => oalist.includes (d.properties.oa)); //.map(d=>d.properties.oa)
 
-  await new Promise((res) => setTimeout(res, 500));
+  console.warn (
+    'features',
+    features,
+    get (mapobject).queryRenderedFeatures ({
+      layers: ['bounds'],
+    })
+  );
 
-
-  const features = get(mapobject).queryRenderedFeatures({
-    layers: ['bounds'],
-    }).filter(d=>oalist.includes(d.properties.oa))//.map(d=>d.properties.oa)
-
-  console.warn('features',features,get(mapobject).queryRenderedFeatures({
-    layers: ['bounds'],
-    }))
-
-  if (!features.length) { return false}
-
-  let merge = features[0]
-  for (let i = 1; i < features.length; i++) {
-   merge = union(merge,features[i])
+  if (!features.length) {
+    return false;
   }
 
-  merge.properties = {tile, msoa, oa, lsoa, original:oalist.length}
-  console.log('---merge---',merge)
+  let merge = features[0];
+  for (let i = 1; i < features.length; i++) {
+    merge = union (merge, features[i]);
+  }
 
+  merge.properties = {tile, msoa, oa, lsoa, original: oalist.length};
+  console.log ('---merge---', merge);
 
   // 2732 character
 
-
-  return merge
+  return merge;
 }
 
 // function sliceencode(str){
@@ -473,9 +501,7 @@ export async function simplify_query () {
 // }
 // }
 
-
-
-function extent(values, valueof) {
+function extent (values, valueof) {
   let min;
   let max;
   if (valueof === undefined) {
@@ -492,7 +518,7 @@ function extent(values, valueof) {
   } else {
     let index = -1;
     for (let value of values) {
-      if ((value = valueof(value, ++index, values)) != null) {
+      if ((value = valueof (value, ++index, values)) != null) {
         if (min === undefined) {
           if (value >= value) min = max = value;
         } else {
