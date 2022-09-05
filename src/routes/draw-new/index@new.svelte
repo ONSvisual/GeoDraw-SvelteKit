@@ -7,6 +7,8 @@
   import Icon from '$lib/ui/Icon.svelte';
   import {get} from 'svelte/store';
   import {default as AreaMap} from '$lib/draw/AreaMap.svelte';
+  
+  import '$lib/draw/css/mapbox-gl.css';
   import {onMount} from 'svelte';
   let webgl_canvas;
   let width = '100%';
@@ -34,7 +36,7 @@
     server,
   } from '$lib/draw/mapstore.js';
 
-  import {simplify_query, savepoly, clearpoly} from '$lib/draw/MapDraw.js';
+  import {simplify_query, clearpoly} from '$lib/draw/MapDraw.js';
   import {mode} from 'd3';
 
   const modes = [
@@ -158,16 +160,27 @@
           linear: true,
         });
       }
-    });
-  } //endinit
 
-  onMount(init);
+
+
+  })
+
+// lets start with a polygon tool 
+
+return Promise.resolve().finally(()=>{document.getElementById('init_polygon').click()
+$draw_type='polygon'});
+
+
+}  //endinit
+
+  onMount(init)
 </script>
 
 <nav>
   <div class="nav-left" style="z-index:99;">
     {#each modes as mode}
       <label
+      id={'init_'+mode.key}
         class:active={state.mode == mode.key}
         title={mode.label}
         on:click={function () {
@@ -180,6 +193,7 @@
           bind:group={state.mode}
           name="mode"
           value={mode.key}
+          
         />
 
         <Icon type={mode.key} />
@@ -297,13 +311,13 @@
         />
         <Icon type="subtract" />
       </label>
-    </div>
+  
 
     <!-- save -->
-
+<!-- 
     {#if state.mode == 'polygon'}
-	<div style = 'float:left'>
-      <span>Polygon Options </span>
+	<div style = 'float:left;filter:invert(1);opacity:0.7'>
+      <span>  </span>
       <label title="Clear (selection only)" use:tooltip on:click={()=>clearpoly()}>
         <input
           type="button"
@@ -312,17 +326,18 @@
           
         />
         <Icon type="clear" />
-      </label>
-      <label title="Save (selection only)" use:tooltip on:click={()=>savepoly()}>
+      </label> -->
+      <!-- <label title="Save (selection only)" use:tooltip on:click={()=>savepoly()}>
         <input
           type="button"
           name="save_coordinates"
           value="save_coordinates"
         />
         <Icon type="download" />
-      </label>
-	</div>
-    {/if}
+      </label> -->
+	<!-- </div>
+    {/if} -->
+  </div>
   </nav>
 {/if}
 <div id="map">
@@ -330,7 +345,7 @@
 </div>
 <aside class="info-box" style:top="{showTray || state.showSave ? 146 : 104}px">
   <div class="search">
-    <Select mode="search" placeholder="Find an area or postcode" />
+    <Select mode="search" placeholder="Change area or postcode" />
     <button title="Upload a saved area" use:tooltip>
       <Icon type="upload" />
     </button>
@@ -342,4 +357,14 @@
 	nav input{
 		width:0;
 	}
+
+  div.maplibregl-control-container{
+    position:absolute;
+    z-index: 999999;
+    bottom:0;
+  }
+
+  #map{
+    height:90vh!important;
+  top:0}
 </style>
