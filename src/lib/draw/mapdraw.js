@@ -25,6 +25,7 @@ export let coordinates = [];
 ////////////////////
 ///////////////////
 
+
 export async function init_draw() {
   get(mapobject).addSource('drawsrc', {
     type: 'geojson',
