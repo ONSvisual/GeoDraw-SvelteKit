@@ -33,7 +33,7 @@
     server,
   } from '$lib/draw/mapstore.js';
 
-  import {simplify_query, clearpoly} from '$lib/draw/mapdraw.js';
+  import {simplify_query, clearpoly} from '$lib/draw/MapDraw.js';
   import {mode} from 'd3';
 
   const modes = [
