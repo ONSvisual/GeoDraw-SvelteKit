@@ -458,9 +458,9 @@ export async function simplify_query() {
   const last = get(selected)[get(selected).length - 1];
   // get parent tile from drawing bounding box
   const bbox = [last.lng[0], last.lat[0], last.lng[1], last.lat[1]];
-  
+
   const [x, y, z] = bboxToTile(bbox);
-  console.warn('bbox',bbox,'last',last,'xyz',x,y,z);
+  console.warn('bbox', bbox, 'last', last, 'xyz', x, y, z);
 
 
   if (z === 28) return null;
@@ -468,7 +468,7 @@ export async function simplify_query() {
   var tile = `${z}/${x}/${y}`;
 
   if (x < 7.) {
-   alert(`Total area selected exceeds allowed limit (zoom level ${z}). Please click undo to continue. Parent Data Tile ${tile}`)
+    alert(`Total area selected exceeds allowed limit (zoom level ${z}). Please click undo to continue. Parent Data Tile ${tile}`)
     return {
       error_title: 'Total area selected exceeds allowed limit. Please use the undo button to reduce area size.',
       error: `Parent Data Tile ${tile}`,
