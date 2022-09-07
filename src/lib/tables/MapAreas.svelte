@@ -21,7 +21,7 @@ onMount(async ()=>{
         "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
         {
             maxZoom: 20,
-            attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Office for National Statistics UK'
+            attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | ONSvisual'
         }
     );
 
@@ -66,7 +66,7 @@ $: update_map(minimap)
 
 </script>
 
-<main><div id="lmap" style = 'height:{height}; width:100%' /></main>
+<div id="lmap" style = 'height:{height}; width:100%' />
 
 <style>
   @import 'https://unpkg.com/leaflet@1.8.0/dist/leaflet.css';

@@ -3,7 +3,7 @@
 	<!-- <LibLoader
 		url="https://cdn.jsdelivr.net/npm/danfojs@1.1.0/lib/bundle.min.js"
 	/>-->
-	<LibLoader url="https://rawgit.com/duhaime/minhash/master/minhash.min.js" /> 
+	<!-- <LibLoader url="https://rawgit.com/duhaime/minhash/master/minhash.min.js" />  -->
 </svelte:head>
 
 <script>
@@ -30,6 +30,10 @@
 	);
 
 	import * as dfd from 'danfojs'
+	import {Minhash}  from 'minhash'
+	import html2canvas from 'html2canvas'
+
+let includemap= true;
 
 	const topics = [
 		{ key: "population", label: "Population" },
@@ -100,7 +104,7 @@
 	let store;
 	async function init() {
 		store = JSON.parse(localStorage.getItem("onsbuild"));
-		console.warn("build", store);
+		console.warn("build-", store);
 		// dfd = (await import('https://cdn.jsdelivr.net/npm/danfojs@1.1.0/lib/bundle.min.js')).default
 		console.log(store)
 		state.start=true
@@ -237,6 +241,7 @@
 							}
 						});
 
+
 						cache[table["Nomis table"]] = {
 							name: table["Table name"],
 							data: lists,
@@ -252,13 +257,13 @@
 								],
 							},
 						};
-						console.error("talbe"), cache[table["Nomis table"]];
+						console.error("talbe", cache[table["Nomis table"]])
 						return cache[table["Nomis table"]];
 					});
 			}
 		});
-		console.log(rtn);
-		return rtn;
+		console.log('rtnn',rtn);
+		return await Promise.all(rtn);
 	}
 </script>
 
@@ -283,7 +288,7 @@
 		</button>
 	</div>
 </nav>
-{#if state.showSave}
+{#if state.start}
 	<nav class="tray">
 		<div />
 		<div class="save-buttons">
@@ -305,6 +310,18 @@
 	<aside class="topics-box">
 		<h2>Name your area</h2>
 		<input type="text" bind:value={state.name} placeholder="Type a name" />
+
+		<label>
+			<input
+				type="checkbox"
+				name="includemap"
+				bind:checked={includemap}
+				
+			/>
+			Include Map
+		</label>
+
+
 		<h2>Select topics</h2>
 		<input
 			type="text"
@@ -335,37 +352,53 @@
 		<div class="embed">
 			<h3>{state.name}</h3>
 
+		{#if state.start}
 			{#await get_data(state.topics) then tables}
 				<Cards>
-					<!-- {#if includemap}
+					{#if includemap}
     <Card title={'Area map'}>
-      <MapAreas minimap={coordinates} />
+      <MapAreas minimap={JSON.stringify(store.geometry)} />
     </Card>
-    {/if} -->
-
+    {/if}
 					{#each tables as tab}
 						<Card title={tab.name}>
 							<!-- <svelte:component this={charts[tab.meta.chart]} data={tab.data} suffix={tab.meta.unit} format={format(tab.meta.format)}/> -->
 							<!-- {JSON.stringify(tab.data)} -->
-<!-- 
+
 							<BarChart
 								xKey="pc"
 								yKey="column"
 								zKey="z"
 								data={tab.data}
-							/> -->
+							/>
 						</Card>
 					{/each}
 
 					<br />
 				</Cards>
 			{/await}
+			{/if}
 		</div>
 		<div class="embed-actions">
-			<button>Show Embed code</button>
-			<button>Download PNG</button>
-			<button>Download Data</button>
+			<button disabled=true>Show Embed code</button>
+			<button on:click={async function aspng(){
+				console.log('pngbtn')
+				html2canvas(document.querySelector(".embed")).then(canvas => {
+					const base64 = canvas.toDataURL();
+					console.log(canvas)
+  const a = document.createElement("a");
+  a.href = base64;
+  a.download = state.name.replace(/\s+/g, "_") + ".png";
+  a.click();
+//   document.body.append(canvas)
+
+});
+
+
+			}}>Download PNG</button>
+			<button disabled=true>Download Data</button>
 		</div>
+
 	</article>
 </div>
 
@@ -375,9 +408,22 @@
 	}
 	.embed {
 		display: block;
-		width: 100%;
-		height: 400px;
+		width: auto;
+		height: auto;
+		padding:30px;
 		margin-bottom: 10px;
-		background-color: lightgrey;
+		background-color: rgba(119, 136, 153, 0.105);
+
 	}
+	.container{
+		margin-right:16px;
+		max-width: none;
+	}
+
+	:global(#lmap){
+		filter:invert(0.9);
+		opacity:0.9
+	}
+
+
 </style>

@@ -252,7 +252,7 @@ $draw_type='polygon'});
           .then((rdir) => {
             
             if (rdir) {
-              
+              console.clear();
               goto(`${base}/build-new`);
             }
           });

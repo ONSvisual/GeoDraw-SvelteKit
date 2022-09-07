@@ -60,7 +60,7 @@ export async function init_draw() {
     source: 'drawsrc',
     paint: {
       'circle-radius': {
-        base: 2,
+        base: 0,
         stops: [[0, 0], [22, 180]],
       },
       'circle-color': 'coral',
@@ -125,7 +125,7 @@ export async function init_draw() {
 
 
   // set default
-  draw_type.set('radius');
+  draw_type.set('polygon');
   // update circle tool each radius change
   radiusInKm.subscribe(circle_paint);
 
