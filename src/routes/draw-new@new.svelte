@@ -13,8 +13,6 @@
   let webgl_canvas;
   let width = '100%';
   let height = '100%';
-  //   let pending = new Set([]);
-  let error = false;
   let speak = false;
   import {
     // select,
@@ -32,7 +30,6 @@
     add_mode,
     radiusInKm,
     selected,
-    query,
     server,
   } from '$lib/draw/mapstore.js';
 
@@ -210,7 +207,6 @@ $draw_type='polygon'});
       use:tooltip
       on:click={function clear_selection() {
         selected.set([{oa: new Set(), lat: [], lng: []}]);
-        query.set({error: false});
         localStorage.clear();
       }}
     >
@@ -234,14 +230,17 @@ $draw_type='polygon'});
           .then((q) => {
             if (q) {
               console.warn('---req  ', q);
-              query.set(q);
+              
               const items = $selected[$selected.length - 1];
 
               if (items.oa.size > 0) {
                 //   items.oa = [...items.oa]; // we can't encode sets
                 // //   localStorage.setItem('draw_data', JSON.stringify(items));
 
+                if (q.error) return false;
+
                 console.log('buildpage', q);
+                localStorage.setItem('onsbuild',JSON.stringify(q));
 
                 return true;
               }
@@ -251,7 +250,11 @@ $draw_type='polygon'});
             }
           })
           .then((rdir) => {
-            if (rdir) goto(`${base}/build-new`);
+            
+            if (rdir) {
+              
+              goto(`${base}/build-new`);
+            }
           });
       }}
     >

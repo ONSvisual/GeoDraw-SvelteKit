@@ -6,7 +6,6 @@ import {
   selected,
   add_mode,
   draw_enabled,
-  query,
   server,
 } from './mapstore.js';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -76,7 +75,7 @@ export async function init_draw() {
 
   Draw = new MapboxDraw(
     {
-      draw: ["draw_polygon"], 
+      draw: ["draw_polygon"],
       displayControlsDefault: false,
       controls: {
         polygon: false,
@@ -96,22 +95,22 @@ export async function init_draw() {
       // }]
 
     });
-  
+
   get(mapobject).addControl(Draw, 'top-right');
 
 
   get(mapobject).on('draw.selectionchange', drawPoly);
   Draw.deleteAll()
 
-  async function  drawPoly(e) {
+  async function drawPoly(e) {
     var data = Draw.getAll();
     var coords = await data.features[0].geometry.coordinates[0]
-    console.log(data,coords)
-    
+    console.log(data, coords)
+
     update(coords)
     clearpoly();
   }
-  
+
 
   // clear coordinates each time we change
   draw_type.subscribe((dt) => {
@@ -120,7 +119,7 @@ export async function init_draw() {
     circle_paint((clear = get(draw_type) != 'radius'));
     Draw.deleteAll();
     // console.warn(dt)
-    if (dt==='polygon') Draw.changeMode('draw_polygon', {})
+    if (dt === 'polygon') Draw.changeMode('draw_polygon', {})
 
   });
 
@@ -224,7 +223,7 @@ export function update(coordinates) {
   const bbox = getbbox(coordinates);
 
 
-  console.error('bb',bbox)
+  console.error('bb', bbox)
 
 
   const features = get(mapobject).queryRenderedFeatures(
@@ -458,16 +457,22 @@ export async function simplify_query() {
   const last = get(selected)[get(selected).length - 1];
   // get parent tile from drawing bounding box
   const bbox = [last.lng[0], last.lat[0], last.lng[1], last.lat[1]];
+  
   const [x, y, z] = bboxToTile(bbox);
+  console.warn('bbox',bbox,'last',last,'xyz',x,y,z);
+
+
   if (z === 28) return null;
 
   var tile = `${z}/${x}/${y}`;
 
-  if (z < 7)
+  if (x < 7.) {
+   alert(`Total area selected exceeds allowed limit (zoom level ${z}). Please click undo to continue. Parent Data Tile ${tile}`)
     return {
       error_title: 'Total area selected exceeds allowed limit. Please use the undo button to reduce area size.',
       error: `Parent Data Tile ${tile}`,
-    };
+    }
+  }
 
   // get the data from the tile
   if (simplify[tile]) {
