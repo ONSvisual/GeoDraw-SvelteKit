@@ -1,5 +1,4 @@
-import {onDestroy} from 'svelte';
-import {get} from 'svelte/store';
+import { get } from 'svelte/store';
 import {
   mapobject,
   radiusInKm,
@@ -7,18 +6,18 @@ import {
   selected,
   add_mode,
   draw_enabled,
-  query,
   server,
 } from './mapstore.js';
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 // import {extent} from 'd3-array';
-import {bboxToTile} from '@mapbox/tilebelt';
+import { bboxToTile } from '@mapbox/tilebelt';
 // import { LngLat, LngLatBounds} from 'maplibre-gl';
 // turf does not compile with sveltekit
-import {default as union} from '@turf/union'
-
-
+import { default as union } from '@turf/union';
+import { draw } from 'svelte/transition';
 
 var simplify = {};
+export var Draw;
 
 // import {LngLatBounds} from "maplibre-gl";
 export let coordinates = [];
@@ -26,8 +25,8 @@ export let coordinates = [];
 ////////////////////
 ///////////////////
 
-export async function init_draw () {
-  get (mapobject).addSource ('drawsrc', {
+export async function init_draw() {
+  get(mapobject).addSource('drawsrc', {
     type: 'geojson',
     data: {
       type: 'Feature',
@@ -38,87 +37,133 @@ export async function init_draw () {
     },
   });
 
-  get (mapobject).addLayer ({
+  get(mapobject).addLayer({
     id: 'draw_layer',
-    type: 'line',
+    // type: 'line',
+    type: 'fill',
     source: 'drawsrc',
+    // paint: {
+    //   'line-color': '#222',
+    //   'line-width': 5,
+    //   'line-dasharray': [2, 1],
+    // },
     paint: {
-      'line-color': '#222',
-      'line-width': 5,
-      'line-dasharray': [2, 1],
+      'fill-color': 'coral',
+      'fill-opacity': 0.5,
 
-    },
+    }
   });
 
-  get (mapobject).addLayer ({
+  get(mapobject).addLayer({
     id: 'circle_layer',
     type: 'circle',
     source: 'drawsrc',
     paint: {
       'circle-radius': {
-        base: 2,
+        base: 0,
         stops: [[0, 0], [22, 180]],
       },
       'circle-color': 'coral',
       'circle-opacity': 0.5,
+      // 'stroke-color': '#222',
+      // 'stroke-width': 2,
+      // 'stroke-opacity': 0.5,
+      // 'stroke-dasharray': [2, 4],
     },
   });
 
-  
+
+  Draw = new MapboxDraw(
+    {
+      draw: ["draw_polygon"],
+      displayControlsDefault: false,
+      controls: {
+        polygon: false,
+        trash: false
+      },
+      userProperties: true,
+      // styles: [{
+      //   'id': 'gl-draw-polygon-fill',
+      //   'type': 'fill',
+      //   'paint': {
+      //     'fill-color': "#222",
+      //     'fill-outline-color': '#222',
+      //     'fill-opacity': 0.5,
+      //     'fill-outline-dasharray': [2, 4],
+
+      //   }
+      // }]
+
+    });
+
+  get(mapobject).addControl(Draw, 'top-right');
+
+
+  get(mapobject).on('draw.selectionchange', drawPoly);
+  Draw.deleteAll()
+
+  async function drawPoly(e) {
+    var data = Draw.getAll();
+    var coords = await data.features[0].geometry.coordinates[0]
+    console.log(data, coords)
+
+    update(coords)
+    clearpoly();
+  }
+
+
   // clear coordinates each time we change
-  draw_type.subscribe (() => {coordinates = [];
-  circle_paint(clear=get(draw_type)!='radius') 
+  draw_type.subscribe((dt) => {
+    coordinates = [];
+    add_mode.set(true);
+    circle_paint((clear = get(draw_type) != 'radius'));
+    Draw.deleteAll();
+    // console.warn(dt)
+    if (dt === 'polygon') Draw.changeMode('draw_polygon', {})
+
   });
+
+
   // set default
-  draw_type.set ('radius');
+  draw_type.set('polygon');
   // update circle tool each radius change
-  radiusInKm.subscribe (circle_paint);
+  radiusInKm.subscribe(circle_paint);
 
-  get (mapobject).on ('click', 'bounds', function boundclick (e) {
-    // console.warn(get(mapobject).querySourceFeatures(e.lngLat,'msoa'))
-
-    // if (get(draw_enabled)===false) {alert('Drawing disabled: Please zoom in a bit. ');return null};
-
-    console.log (e.lngLat, get (draw_type));
-    // const features = get(mapobject).queryRenderedFeatures(e.lngLat,'bounds');
-    // console.warn (e.features[0].properties);
-    // // const features = get(mapobject).querySourceFeatures('centroids')
-    // console.log(get(mapobject).queryRenderedFeatures,'dfdf', get(mapobject).querySourceFeatures)
-    // // const features = get(mapobject).queryRenderedFeatures({geometry:'circle'},'centroids')
-    // console.warn (features);
-
-    switch (get (draw_type)) {
+  get(mapobject).on('click', 'bounds', function boundclick(e) {
+    switch (get(draw_type)) {
       case 'radius':
-        draw_radius (e.lngLat);
+        draw_radius(e.lngLat);
         // circle_fast (e.lngLat);
         break;
-      case 'poly':
-        draw_polygon (e.lngLat);
-        break;
-      case 'click':
-        draw_point (e);
+      // case 'polygon':
+      //   draw_polygon(e.lngLat);
+      //   break;
+      case 'select':
+        draw_point(e);
         break;
     }
   });
 
-  get (mapobject).on ('zoomend', function () {
-    draw_enabled.set (get (mapobject).getZoom () < 10);
+  get(mapobject).on('zoomend', function () {
+    draw_enabled.set(get(mapobject).getZoom() < 10);
   });
 
   // on move events
-  get (mapobject).on ('mousemove', 'bounds', function move (e) {
+  get(mapobject).on('mousemove', 'bounds', function move(e) {
     // console.log (e.lngLat, get (draw_type));
 
-    switch (get (draw_type)) {
-      case 'radius':
-        circle_fast (e.lngLat);
-        break;
-      case 'poly':
-        polygon_fast (e.lngLat);
-        break;
-      // case 'click':
-      // break;
-    }
+    if (get(draw_type) == 'radius') circle_fast(e.lngLat)
+
+    // switch (get(draw_type)) {
+    //   case 'radius':
+    //     circle_fast(e.lngLat);
+    //     break;
+    // case 'polygon':
+    // polygon_fast(e.lngLat);
+    // break;
+    // case 'click':
+    // break;
+    // }
   });
 }
 /// UPDATE FUNCTIONS
@@ -129,97 +174,129 @@ export async function init_draw () {
 //   console.error (callback);
 // }
 
-function clear () {
-  change_data ('drawsrc', {
+// export function savepoly() {
+//   var co = {
+//     lng: coordinates[0][0],
+//     lat: coordinates[0][1],
+//   }
+//   console.warn('savetrigger', co)
+//   // get(mapobject).fire('click', co)
+//   draw_polygon(co)
+
+// };
+
+
+
+function clear() {
+  coordinates = [];
+  change_data('drawsrc', {
     type: 'Feature',
     geometry: {
       type: 'Polygon',
       coordinates: [],
-    },
-  });
+    }
+
+  })
 }
 
-export function change_data (layer, data) {
-  get (mapobject).getSource (layer).setData (data);
+export function clearpoly() {
+  // clear()
+  Draw.deleteAll();
+  Draw.changeMode('draw_polygon', {});
+}
+
+export function change_data(layer, data) {
+  get(mapobject).getSource(layer).setData(data);
 }
 
 ////////////////////
 // Click Tool
 ////////////////////
 
-
-
-
 ////////////////////
 // Matching Utilities
 ////////////////////
 
-function update (coordinates) {
+export function update(coordinates) {
   // update the selection
 
-  const bbox = getbbox (coordinates);
+  const bbox = getbbox(coordinates);
+
+
+  console.error('bb', bbox)
+
+
+  const features = get(mapobject).queryRenderedFeatures(
+    bbox.map(d => get(mapobject).project(d)),
+    { layers: ['centroids'] }
+  );
+
+  console.error('---features', features);
+  const oa = features
+    .filter(i => inPolygon(coordinates, i.geometry.coordinates))
+    .map(d => d.properties.id);
+
+  var current = get(selected);
+  var last = current[current.length - 1];
+
+  bbox.map(d => {
+    last.lat.push(d[1]);
+    last.lng.push(d[0]);
+  });
 
   // get (mapobject).fitBounds (bbox);
 
-  const features = get (mapobject).queryRenderedFeatures (
-    bbox.map (d => get (mapobject).project (d)),
-    {layers: ['centroids']}
-  );
-
-  const oa = features
-    .filter (i => inPolygon (coordinates, i.geometry.coordinates))
-    .map (d => d.properties.id);
-
-  var current = get (selected);
-  var last = current[current.length - 1];
-
-  bbox.map (d => {
-    last.lat.push (d[1]);
-    last.lng.push (d[0]);
-  });
-
-  if (get (add_mode)) {
-    current.push ({
-      oa: new Set ([...last.oa, ...oa]),
-      lng: extent (last.lng),
-      lat: extent (last.lat),
+  if (get(add_mode)) {
+    current.push({
+      oa: new Set([...last.oa, ...oa]),
+      lng: extent(last.lng),
+      lat: extent(last.lat),
     });
   } else {
-    current.push ({
-      oa: new Set ([...last.oa].filter (x => !new Set (oa).has (x))),
-      lng: extent (last.lng),
-      lat: extent (last.lat),
+    current.push({
+      oa: new Set([...last.oa].filter(x => !new Set(oa).has(x))),
+      lng: extent(last.lng),
+      lat: extent(last.lat),
     });
   }
 
-  selected.set (current);
-  console.warn ('updated---', get (selected), get (add_mode));
+  var items = current[current.length - 1];
+  // we cannot strigify sets....
+  // items.oa = [...items.oa]
+  items = JSON.stringify(
+    items,
+    (_key, value) => (value instanceof Set ? [...value] : value)
+  );
+  localStorage.setItem('draw_data', items);
+
+  selected.set(current);
 }
 
-function draw_point (e) {
-  const oalist = new Set (e.features.map (d => d.properties.oa));
-  const current = get (selected);
-  var last = Object.assign ({}, current[current.length - 1]);
+function draw_point(e) {
+  const oalist = new Set(e.features.map(d => d.properties.oa));
+  const current = get(selected);
+  var last = Object.assign({}, current[current.length - 1]);
 
-  last.lat.push (e.lngLat.lat);
-  last.lng.push (e.lngLat.lng);
+  last.lat.push(e.lngLat.lat);
+  last.lng.push(e.lngLat.lng);
   last = {
-    oa: new Set (last.oa),
-    lat: extent (last.lat),
-    lng: extent (last.lng),
+    oa: new Set(last.oa),
+    lat: extent(last.lat),
+    lng: extent(last.lng),
   };
 
   // console.log('--clicked',oalist,last);
-  [...oalist].forEach (
-    oa => (last.oa.has (oa) ? last.oa.delete (oa) : last.oa.add (oa))
+  [...oalist].forEach(
+    oa => (last.oa.has(oa) ? last.oa.delete(oa) : last.oa.add(oa))
   );
 
-  current.push (last);
-  selected.set (current);
+  current.push(last);
+  selected.set(current);
 }
 
-function inPolygon (polygon, point) {
+function inPolygon(polygon, point) {
   // check if existing
+
   if (!polygon.length) return false;
   var n = polygon.length,
     p = polygon[n - 1],
@@ -239,19 +316,19 @@ function inPolygon (polygon, point) {
   return inside;
 }
 
-function geomean (c1, c2, thresh = 30) {
-  c1 = get (mapobject).project (c1);
-  c2 = get (mapobject).project (c2);
+function geomean(c1, c2, thresh = 30) {
+  c1 = get(mapobject).project(c1);
+  c2 = get(mapobject).project(c2);
 
-  return Math.sqrt ((c1.x - c2.x) ** 2 + (c1.y - c2.y) ** 2) < thresh;
+  return Math.sqrt((c1.x - c2.x) ** 2 + (c1.y - c2.y) ** 2) < thresh;
 }
 
-function getbbox (coords) {
-  var lat = coords.map (p => p[1]);
-  var lng = coords.map (p => p[0]);
+function getbbox(coords) {
+  var lat = coords.map(p => p[1]);
+  var lng = coords.map(p => p[0]);
 
-  var min_coords = [Math.min.apply (null, lng), Math.min.apply (null, lat)];
-  var max_coords = [Math.max.apply (null, lng), Math.max.apply (null, lat)];
+  var min_coords = [Math.min.apply(null, lng), Math.min.apply(null, lat)];
+  var max_coords = [Math.max.apply(null, lng), Math.max.apply(null, lat)];
 
   return [min_coords, max_coords];
 }
@@ -260,7 +337,7 @@ function getbbox (coords) {
 // Circle Tools
 ////////////////////
 
-function draw_radius (center, points = 20) {
+function draw_radius(center, points = 20) {
   // if(!points) points = 64;
   var coords = {
     latitude: center.lat,
@@ -269,25 +346,25 @@ function draw_radius (center, points = 20) {
 
   // clear ();
 
-  var km = get (radiusInKm) / 2;
+  var km = get(radiusInKm) / 2;
 
   var coordinates = [];
-  var distanceX = km / (111.32 * Math.cos (coords.latitude * Math.PI / 180));
+  var distanceX = km / (111.32 * Math.cos(coords.latitude * Math.PI / 180));
   var distanceY = km / 110.574;
 
   var theta, x, y;
   for (var i = 0; i < points; i++) {
     theta = i / points * (2 * Math.PI);
-    x = distanceX * Math.cos (theta);
-    y = distanceY * Math.sin (theta);
-    coordinates.push ([coords.longitude + x, coords.latitude + y]);
+    x = distanceX * Math.cos(theta);
+    y = distanceY * Math.sin(theta);
+    coordinates.push([coords.longitude + x, coords.latitude + y]);
   }
-  coordinates.push (coordinates[0]);
-  update (coordinates);
+  coordinates.push(coordinates[0]);
+  update(coordinates);
 }
 
 /// Fast Circle on-move Function
-function circle_fast (center) {
+function circle_fast(center) {
   var geo = {
     type: 'Feature',
     geometry: {
@@ -295,27 +372,30 @@ function circle_fast (center) {
       coordinates: [center.lng, center.lat],
     },
   };
-  change_data ('drawsrc', geo);
+  change_data('drawsrc', geo);
   return geo;
 }
 
 /// Scale Calulation Function.
-function circle_paint (clear=false) {
-  console.warn('-circle',clear)
+function circle_paint(clear = false) {
+  console.warn('-circle', clear);
   if (mapobject) {
-
-    if (clear==true){
-      return get (mapobject).setPaintProperty ('circle_layer', 'circle-radius', 5);
+    if (clear == true) {
+      return get(mapobject).setPaintProperty(
+        'circle_layer',
+        'circle-radius',
+        5
+      );
     }
 
     const m2p = (meters, latitude) =>
-      meters / 0.075 / Math.cos (latitude * Math.PI / 180);
+      meters / 0.075 / Math.cos(latitude * Math.PI / 180);
 
-    get (mapobject).setPaintProperty ('circle_layer', 'circle-radius', {
+    get(mapobject).setPaintProperty('circle_layer', 'circle-radius', {
       base: 2,
       stops: [
         [0, 0],
-        [22, m2p (get (radiusInKm) * 2000, get (mapobject).getCenter ().lat)],
+        [22, m2p(get(radiusInKm) * 2000, get(mapobject).getCenter().lat)],
       ],
     });
   }
@@ -325,82 +405,88 @@ function circle_paint (clear=false) {
 // Polygon
 ////////////////////
 
-function draw_polygon (e) {
-  if (coordinates.length) {
-    if (geomean (coordinates[0], [e.lng, e.lat])) {
-      // if we close the polygon
-      coordinates.push (coordinates[0]);
+// function draw_polygon(e) {
+//   // console.warn('dp',e)
+//   if (coordinates.length) {
+//     if (geomean(coordinates[0], [e.lng, e.lat])) {
+//       // if we close the polygon
+//       coordinates.push(coordinates[0]);
 
-      update (coordinates);
+//       update(coordinates);
 
-      console.log ('--saving polygon', get (selected));
+//       console.log('--saving polygon', get(selected));
 
-      coordinates = [];
-      // clear ();
-      return 1;
-    }
-  }
+//       coordinates = [];
+//       // clear ();
+//       return 1;
+//     }
+//   }
 
-  coordinates.push ([e.lng, e.lat]);
+//   coordinates.push([e.lng, e.lat]);
 
-  var geo = {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [coordinates],
-    },
-  };
-  console.error (geo);
-  change_data ('drawsrc', geo);
-}
+//   var geo = {
+//     type: 'Feature',
+//     geometry: {
+//       type: 'Polygon',
+//       coordinates: [coordinates],
+//     },
+//   };
+//   console.error(geo);
+//   change_data('drawsrc', geo);
+// }
 
-function polygon_fast (e) {
-  var temp = [...coordinates, [e.lng, e.lat]];
-  var geo = {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [temp],
-    },
-  };
-  change_data ('drawsrc', geo);
-}
+// function polygon_fast(e) {
+//   var temp = [...coordinates, [e.lng, e.lat]];
+//   var geo = {
+//     type: 'Feature',
+//     geometry: {
+//       type: 'Polygon',
+//       coordinates: [temp],
+//     },
+//   };
+//   change_data('drawsrc', geo);
+// }
 
 ////////////////////
 // Query
 ////////////////////
 
-export async function simplify_query () {
+export async function simplify_query() {
   /* A function using the bounding box to query the database and return the simplified polygons */
 
-  const last = get (selected)[get (selected).length - 1];
+  const last = get(selected)[get(selected).length - 1];
   // get parent tile from drawing bounding box
   const bbox = [last.lng[0], last.lat[0], last.lng[1], last.lat[1]];
-  const [x, y, z] = bboxToTile (bbox);
+  
+  const [x, y, z] = bboxToTile(bbox);
+  console.warn('bbox',bbox,'last',last,'xyz',x,y,z);
+
+
   if (z === 28) return null;
 
   var tile = `${z}/${x}/${y}`;
 
-  if (z < 7)
+  if (x < 7.) {
+   alert(`Total area selected exceeds allowed limit (zoom level ${z}). Please click undo to continue. Parent Data Tile ${tile}`)
     return {
       error_title: 'Total area selected exceeds allowed limit. Please use the undo button to reduce area size.',
       error: `Parent Data Tile ${tile}`,
-    };
+    }
+  }
 
   // get the data from the tile
   if (simplify[tile]) {
     var simple = simplify[tile];
   } else {
-    var simple = await fetch (
-      `${server}/encoding/${tile}.json`
-    ).then (d => d.json ());
-    simple.lsoa = simple.lsoa.map (d => {
-      // console.log('simplify data',d)
-      d[1] = new Set (d[1]);
+    var simple = await fetch(`${server}/encoding/${tile}.json`).then(d =>
+      d.json()
+    );
+    simple.lsoa = simple.lsoa.map(d => {
+      d[1] = new Set(d[1]);
       return d;
     });
-    simple.msoa = simple.msoa.map (d => {
-      d[1] = new Set (d[1]);
+    simple.msoa = simple.msoa.map(d => {
+      d[1] = new Set(d[1]);
       return d;
     });
     simplify[tile] = simple;
@@ -409,60 +495,66 @@ export async function simplify_query () {
   // simplify the query
   var rm = [];
   var oa = last.oa;
-  var lsoa = simple.lsoa.filter (
-    d => ![...d[1]].filter (x => !oa.has (x)).length
+  var lsoa = simple.lsoa.filter(
+    d => ![...d[1]].filter(x => !oa.has(x)).length
   );
-  lsoa = new Set (
-    lsoa.map (e => {
-      rm.push ([...e[1]]);
+  lsoa = new Set(
+    lsoa.map(e => {
+      rm.push([...e[1]]);
       return e[0];
     })
   );
-  var msoa = simple.msoa.filter (
-    d => ![...d[1]].filter (x => !lsoa.has (x)).length
+  var msoa = simple.msoa.filter(
+    d => ![...d[1]].filter(x => !lsoa.has(x)).length
   );
-  rm = new Set (rm.flat ());
-  var rmlsoa = new Set (msoa.map (d => d[1]).flat ());
-  oa = [...oa].filter (e => !rm.has (e));
-  lsoa = [...lsoa].filter (e => !rmlsoa.has (e));
-  msoa = msoa.map (d => d[0]);
-  
-  console.warn('lsoa',tile,msoa,oa,lsoa,last.oa)
+  rm = new Set(rm.flat());
+  var rmlsoa = new Set(msoa.map(d => d[1]).flat());
+  oa = [...oa].filter(e => !rm.has(e));
+  lsoa = [...lsoa].filter(e => !rmlsoa.has(e));
+  msoa = msoa.map(d => d[0]);
 
-  
+  console.warn('lsoa', tile, msoa, oa, lsoa, last.oa);
 
+  // return the simplified query - it would be quicker to not do this each change, but hey.
+  get(mapobject).fitBounds(bbox, {
+    padding: 200,
+    animation: false,
+    linear: true,
+    duration: 200,
+  });
+  const oalist = [...last.oa];
 
-  // return the simplified query - it would be quicker to not do this each change, but hey. 
-  get(mapobject).fitBounds(bbox,{padding: 200,animation:false,linear:true,duration:200})
-  const oalist = [...last.oa]
+  await new Promise(res => setTimeout(res, 500));
 
+  const features = get(mapobject)
+    .queryRenderedFeatures({
+      layers: ['bounds'],
+    })
+    .filter(d => oalist.includes(d.properties.oa)); //.map(d=>d.properties.oa)
 
-  await new Promise((res) => setTimeout(res, 500));
+  console.warn(
+    'features',
+    features,
+    get(mapobject).queryRenderedFeatures({
+      layers: ['bounds'],
+    })
+  );
 
-
-  const features = get(mapobject).queryRenderedFeatures({
-    layers: ['bounds'],
-    }).filter(d=>oalist.includes(d.properties.oa))//.map(d=>d.properties.oa)
-
-  console.warn('features',features,get(mapobject).queryRenderedFeatures({
-    layers: ['bounds'],
-    }))
-
-  if (!features.length) { return false}
-
-  let merge = features[0]
-  for (let i = 1; i < features.length; i++) {
-   merge = union(merge,features[i])
+  if (!features.length) {
+    return false;
   }
 
-  merge.properties = {tile, msoa, oa, lsoa, original:oalist.length}
-  console.log('---merge---',merge)
+  let merge = features[0];
+  for (let i = 1; i < features.length; i++) {
+    merge = union(merge, features[i]);
+  }
 
+  merge.properties = { tile, msoa, oa, lsoa, original: oalist.length };
+  console.log('---merge---', merge);
 
   // 2732 character
 
-
-  return merge
+  return merge;
 }
 
 // function sliceencode(str){
@@ -472,8 +564,6 @@ export async function simplify_query () {
 //     // do whatever
 // }
 // }
-
-
 
 function extent(values, valueof) {
   let min;

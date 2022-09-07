@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
+html, body {
+	position: relative;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+	color: #333;
+}
+
+a {
+	color: rgb(0,100,200);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: rgb(0,80,160);
+}
+
+label {
+	display: block;
+}
+
+input, button, select, textarea {
+	font-family: inherit;
+	font-size: inherit;
+	-webkit-padding: 0.4em 0;
+	padding: 0.4em;
+	margin: 0 0 0.5em 0;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+
+input:disabled {
+	color: #ccc;
+}
+
+button {
+	color: #333;
+	background-color: #f4f4f4;
+	outline: none;
+}
+
+button:disabled {
+	color: #999;
+}
+
+button:not(:disabled):active {
+	background-color: #ddd;
+}
+
+button:focus {
+	border-color: #666;
+}
+
+h2 {
+  font-size: 1.3em;
+  margin: 20px 0 5px;
+}
+main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+}
+header {
+  height: 46px;
+}
+
+.container {
+  display: flex;
+  direction: row;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  width: calc(100% - 32px);
+  max-width: 980px;
+  margin: 0 auto 0 16px;
+}
+nav {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  min-width: 100%;
+  overflow-x: auto;
+  background-color: #333A45;
+  scrollbar-width: none;
+}
+nav::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
+nav > div {
+  display: flex;
+  flex-direction: row;
+}
+nav label input {
+  position: absolute;
+  opacity: 0;
+}
+nav button, nav label, aside.info-box button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background-color: #333A45;
+  color: white;
+  cursor: pointer;
+}
+nav button:disabled {
+  opacity: 0.3;
+}
+nav button:disabled:hover {
+  cursor: default;
+  color: white;
+  background-color: #333A45 !important;
+}
+.nav-left > button, .nav-left > label {
+  border-right: 1px solid rgba(255,255,255,0.3);
+}
+.nav-right > button {
+  border-left: 1px solid rgba(255,255,255,0.3);
+}
+nav button:hover, nav label:hover, aside.info-box button:hover {
+  background-color: #F5F5F5CC !important;
+  color: #333A45;
+}
+nav button:focus, nav label:focus-within, aside.info-box button:focus {
+  outline: 3px solid orange;
+  outline-offset: -3px;
+}
+nav button.active, nav label.active {
+  background-color: #F5F5F5;
+  color: #333A45;
+}
+nav button.alert {
+  background-color: #D0021B;
+}
+nav button.text {
+  width: auto !important;
+  max-width: auto !important;
+  padding: 0 0.5em;
+  white-space: nowrap;
+}
+nav button.text > span {
+  padding: 0 0.4em;
+}
+nav button.confirm {
+  background-color: #0F8243;
+}
+nav input {
+  height: 36px;
+  margin: auto 4px;
+}
+aside.info-box {
+  position: absolute;
+  left: 16px;
+  width: 300px;
+  background-color: rgba(255,255,255,0.9);
+}
+aside.info-box button {
+  border-left: 1px solid white;
+}
+aside.info-box > .search {
+  display: flex;
+  flex-direction: row;
+}
+aside.info-box > .message {
+  padding: 16px;
+}
+aside.topics-box {
+  padding-right: 20px;
+}
+nav.tray {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  top: 88px;
+  width: 100%;
+  height: 42px;
+  background: rgba(255,255,255,0.8);
+}
+nav.tray > div + div.select-mode {
+  border-left: 1px solid lightgrey;
+  margin-left: 12px;
+}
+nav.tray label, nav.tray button {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border: 1.5px solid #333A45;
+}
+.slider, .select-mode {
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+}
+.slider {
+  --track-bg: #E0E0E0;
+  --progress-bg: black;
+  --thumb-bg: black;
+}
+.slider span {
+  padding: 0 8px;
+}
+.slider input[type=text] {
+  width: 50px;
+  margin: 0 4px 0 8px;
+}
+input[type=text]:focus {
+  outline: 3px solid orange;
+  border-color: black;
+}
+.select-mode {
+  display: inline-flex;
+  flex-grow: 1;
+}
+.save-buttons {
+  display: inline-flex;
+}
+.save-buttons > * {
+  margin: auto 4px auto 0;
+}
+.select-mode > span {
+  padding: 0 8px;
+}
+#map {
+  flex-grow: 1;
+  background-color: #ddd;
+}

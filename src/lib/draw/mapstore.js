@@ -14,21 +14,8 @@ export const mapfunctions = writable([]);
 export const mapobject = writable(undefined); // the mapbox 'map' object
 export let add_mode = writable(true);
 export let draw_enabled = writable(false);
-export let query = writable({error:false});
-
-
-//export const coordinates = writable({});
 export const radiusInKm = writable(5);
-// export const selected = writable(new Set([]))
 
-// export const level = writable('oa'); // which level are we currently showing. 
-// export const levels = writable([]); // center of map
-// export const zoomed = writable(false); // center of map
-
-
-export const store1 = writable({});
-export const store2 = writable({});
-export const store3 = writable({});
 
 // map constants
 
