@@ -29,8 +29,6 @@
 		"carbon-components-svelte": "^0.62.3",
 		"d3": "^7.5.0",
 		"d3-tile": "^1.0.0",
-		"danfo": "^0.2.34",
-		"danfojs": "^1.1.1",
 		"html2canvas": "^1.4.1",
 		"leaflet": "^1.8.0",
 		"maplibre-gl": "^2.1.9",
