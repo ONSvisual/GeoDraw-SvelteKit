@@ -29,7 +29,7 @@
 		new Map(dataset_keys.map((d) => [datasets[d]["Table name"], d]))
 	);
 
-	import * as dfd from 'danfojs'
+	// import * as dfd from 'danfojs'
 	import {Minhash}  from 'minhash'
 	import html2canvas from 'html2canvas'
 
