@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
   import 'carbon-components-svelte/css/white.css';
   import {Button} from 'carbon-components-svelte';
   import {hash, drawhash, embedurl} from '$lib/examplehash.js';
@@ -6,7 +6,7 @@
   import OpenGraph from '$lib/OpenGraph.svelte';
 import { onMount } from 'svelte';
 import { base } from "$app/paths";
-import {csv} from 'd3'
+// import {csv} from 'd3-csv'
 
 
 let places;
@@ -107,4 +107,4 @@ onMount(async ()=>
   a {
     color: aliceblue;
   }
-</style>
+</style> -->
