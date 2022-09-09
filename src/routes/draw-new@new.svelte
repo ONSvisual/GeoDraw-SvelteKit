@@ -34,7 +34,7 @@
   } from '$lib/draw/mapstore.js';
 
   import {simplify_query, clearpoly} from '$lib/draw/MapDraw.js';
-  import {mode} from 'd3';
+  
 
   const modes = [
     {key: 'move', label: 'Pan and zoom'},
