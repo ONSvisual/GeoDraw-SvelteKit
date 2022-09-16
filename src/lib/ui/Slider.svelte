@@ -2,7 +2,7 @@
 	import { onMount } from "svelte";
 	
 	export let min = 0.2;
-	export let max = 30;
+	export let max = 10;
 	export let step = 0.1;
 	export let value = 5;
 	export let width = 200;

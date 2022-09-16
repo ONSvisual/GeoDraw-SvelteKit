@@ -1,80 +1,81 @@
 <script>
-import {onMount} from 'svelte';
-import 'leaflet/dist/leaflet.css';
+	import maplibre from 'maplibre-gl';
+	import bbox from '@turf/bbox';
+	import { onMount } from 'svelte';
 
-export let height = '400px'
-export let minimap;
-let map = false;
+	const style = "https://bothness.github.io/ons-basemaps/data/style-outdoor.json";
 
-onMount(async ()=>{
-   
-    const L = await import('leaflet');
-
-    map = L.map("lmap", {
-        center: [0., 52.].reverse(),
-        zoom: 5
-        // dragging:false
-    });
-
-
-    var CyclOSM = L.tileLayer(
-        "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
-        {
-            maxZoom: 20,
-            attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | ONSvisual'
-        }
-    );
-
-    
-    map.addLayer(CyclOSM);
-    // console.log('aa')
-    await map.on('load',()=>update_map(minimap));
-    // console.log('aa')
-    // map.on('loading',()=>setTimeout(update_map(minimap),1000))
-    // await mymap.whenReady(()=>update_map(minimap));
-
-    // console.log('mmm',miniap)
-    update_map(minimap)
-
-})
-
-
-function update_map(coordinates){
-
-    console.log('dd',  coordinates.length, typeof coordinates,(typeof coordinates === 'string' || coordinates instanceof String) )
-    if (coordinates.length<1 | !map){
-        console.log(map)
-        return; 
-    }
-
-    if (typeof coordinates === 'string' || coordinates instanceof String){
-    var geojson = JSON.parse(coordinates);console.log('yay?',geojson)}else{
-        var geojson = coordinates;
-    }
-
-
-    console.error('ggg',geojson)
-    var geo = L.geoJSON(geojson, {
-        style:{color: "red"}
-
-    })
-    geo.addTo(map);
-    map.fitBounds(geo.getBounds(), { padding: [14, 14] });
-    }
-
-$: update_map(minimap)
-
+	export let geojson = null;
+	export let color = "#206095";
+	export let lineWidth = 2.5;
+	export let fillOpacity = 0.2;
+	
+	let map;
+	let container;
+	let w;
+	
+	onMount(() => {
+		map = new maplibre.Map({
+			container,
+			style,
+			bounds,
+			interactive: false,
+    		preserveDrawingBuffer: true
+		});
+		
+		map.on('load', () => {
+			map.addSource('boundary', {type: 'geojson', data});
+			map.addLayer({
+				'id': 'boundary-fill',
+				'type': 'fill',
+				'source': 'boundary',
+				'layout': {},
+				'paint': {
+					'fill-color': color,
+					'fill-opacity': fillOpacity
+				}
+			});
+			map.addLayer({
+				'id': 'boundary-line',
+				'type': 'line',
+				'source': 'boundary',
+				'layout': {},
+				'paint': {
+					'line-color': color,
+					'line-width': lineWidth
+				}
+			});
+		});
+	});
+	
+	function fitBounds(bounds, w) {
+		if (map) map.fitBounds(bounds, {padding: 20, animate: false});
+	}
+	
+	function setData(data) {
+		if (map) map.getSource('boundary').setData(data);
+	}
+	
+	$: bounds = geojson ? bbox(geojson) : [[-9, 49], [2, 61]];
+	$: data = geojson ? geojson : {'type': 'Polygon', 'coordinates': []};
+	$: setData(data);
+	$: fitBounds(bounds, w);
 </script>
 
-<div id="lmap" style = 'height:{height}; width:100%' />
+<svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css"
+	/>
+</svelte:head>
+
+<div id="map" bind:this={container} bind:clientWidth={w}/>
 
 <style>
-  @import 'https://unpkg.com/leaflet@1.8.0/dist/leaflet.css';
-  /* main #lmap {
-    height: 800px;
-  } */
-    #lmap {
-        display:inline-block;
-        position: relative;
-    }
+	#map {
+		width: 100%;
+		height: 300px;
+		margin: 0;
+		padding: 0;
+	}
 </style>

@@ -1,198 +1,123 @@
+<script context="module">
+  // Functions etc to retreive data from ONS Linked Geography API
+	import bbox from '@turf/bbox';
+	import wellknown from 'wellknown';
+
+	// API URL for ONS linked geographic data service
+	const apiurl = 'https://pmd3-production-drafter-onsgeo.publishmydata.com/v1/sparql/live?query=';
+
+	async function getData(url) {
+    let df = await dfd.readCSV(url, {skipEmptyLines: true});
+		return dfd.toJSON(df);
+	}
+
+	export async function getPlaces() {
+		const query = `PREFIX entity: <http://statistics.data.gov.uk/id/statistical-entity/>
+	PREFIX entdef: <http://statistics.data.gov.uk/def/statistical-entity#>
+	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+	PREFIX foi: <http://publishmydata.com/def/ontology/foi/>
+	PREFIX statdef: <http://statistics.data.gov.uk/def/statistical-geography#>
+	SELECT DISTINCT ?areacd ?areanm ?group
+	WHERE {
+		VALUES ?types { entity:E06 entity:E07 entity:E08 entity:E09 entity:E10 entity:E14 entity:E30 entity:E34 entity:E35 entity:W06 entity:W07 entity:W22 entity:W37 entity:W38 entity:K01 entity:K05 entity:K06 }
+		?area entdef:code ?types ;
+					statdef:status "live" ;
+					foi:code ?areacd ;
+					statdef:officialname ?areanm ;
+					foi:memberOf ?type .
+		?type rdfs:label ?group .
+	}
+	LIMIT 10000`;
+		let data = await getData(apiurl + encodeURIComponent(query));
+		data.forEach(d => { d.group = d.group.substring(4) })
+		data.sort((a, b) => a.areanm.localeCompare(b.areanm));
+		return data;
+	}
+
+	// Get boundary, bbox and output area lookup
+	export async function getPlace(code) {
+		// Get boundary in WKT format
+		const query_geo = `SELECT ?areanm ?geometry
+WHERE {
+  <http://statistics.data.gov.uk/id/statistical-geography/${code}> <http://www.opengis.net/ont/geosparql#hasGeometry> ?geom ;
+  <http://statistics.data.gov.uk/def/statistical-geography#officialname> ?areanm .
+  ?geom <http://www.opengis.net/ont/geosparql#asWKT> ?geometry .
+}
+LIMIT 1`;
+    let geo = await getData(apiurl + encodeURIComponent(query_geo));
+    
+    if (geo[0]) {
+      // Convert polygon from WKT to geojson format
+      let geojson = wellknown.parse(geo[0].geometry);
+
+      // Get the lon/lat bounding box of the polygon
+      let bounds = bbox(geojson);
+
+      // Get output area lookup for selected geography
+      const query_lookup = `SELECT DISTINCT ?areacd
+WHERE {
+  ?pcode <http://publishmydata.com/def/ontology/foi/within> <http://statistics.data.gov.uk/id/statistical-geography/${code}> ;
+  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://statistics.data.gov.uk/def/postcode/unit> ;
+  <http://statistics.data.gov.uk/def/spatialrelations/within#outputarea> ?area .
+  ?area <http://publishmydata.com/def/ontology/foi/code> ?areacd ;
+  <http://statistics.data.gov.uk/def/statistical-geography#status> "live" ;
+}`;
+      let lookup = await getData(apiurl + encodeURIComponent(query_lookup));
+
+      return {
+        type: 'place',
+        areanm: geo[0].areanm,
+        areacd: code,
+        geometry: geojson,
+        bbox: bounds,
+        codes: lookup.map(d => d.areacd)
+      };
+    } else {
+      return {type: null};
+    }
+	}
+</script>
 <script>
-	import { onMount, createEventDispatcher } from "svelte";
-	import Select from "svelte-select";
-	const searchIcon = `<svg viewBox="0 0 20 20" fill-rule="evenodd"><path d="M0,8a8,8,0,1,0,16,0a8,8,0,1,0,-16,0ZM3,8a5,5,0,1,0,10,0a5,5,0,1,0,-10,0Z"/><path d="M18,20L20,18L14,12L12,14Z"/></svg>`;
-	const chevronIcon = `<svg viewBox="0 0 20 20"><path d="M1,6L19,6L10,15Z"/></svg>`;
-	const dispatch = createEventDispatcher();
+  import { onMount, createEventDispatcher } from "svelte";
+	import Select from "./SelectInner.svelte";
 
-	export let id = "";
-	export let container = undefined;
-	export let mode = "default";
-	export let items;
-	export let placeholder = "Select one...";
-	export let value = null;
-	export let filterText = "";
-	export let isSearchable = true;
-	export let isClearable = true;
-	export let autoClear = false;
-	export let idKey = "value";
-	export let labelKey = "label";
-	export let groupKey = null;
-	export let groupItems = false;
-	export let loadOptions = undefined;
-	export let fontSize = "1em";
-	export let height = 42;
-	export let isMulti = false;
-	export let maxSelected = 4;
-	export let colors = ["#206095", "#a8bd3a", "#871a5b", "#27a0cc"];
-	export let darkMode = false;
-	export let borderColor = darkMode ? "white" : "#206095";
+  const dispatch = createEventDispatcher();
 	
-	const getOptionLabel = groupKey && !groupItems ? (option) => `${option[labelKey]} <span class="group">${option[groupKey]}</span>` : (option) => option[labelKey];
-	export let getSelectionLabel = (option) => {
-		if (option) return getOptionLabel(option)
-		else return null;
-	};
-	const groupBy = groupItems && groupKey ? (item) => item[groupKey] : undefined;
-	const indicatorSvg = mode == "search" ? searchIcon : chevronIcon;
-	const containerStyles = `--inputFontSize: ${fontSize}; --groupTitleFontSize: ${fontSize}; --height: ${height}px; font-size: ${fontSize};`;
+	// Data and state for select box
+	let items;
+	const placeholder = "Find an area or postcode";
+	let filterText;
 	
-	const ariaValues = (values) => `${values}, selected.`;
-	const ariaListOpen = (label, count) => `You are currently focused on ${label}. There are ${count} results available.`;
-	const ariaFocused = () => `Select is focused, type to refine list, press down to open the menu.`;
-	
-	$: noOptionsMessage = isWaiting ? "Loading..." : mode == "search" && filterText.length < 3 ? "Enter 3 or more characters for suggestions" : `No results match ${filterText}`;
-	$: itemFilter = (Array.isArray(value) && value.length >= maxSelected) || mode == "search" && filterText.length < 3
-	? (label, filterText, option) => false
-	: (label, filterText, option) => `${label}`.split("<")[0].toLowerCase().slice(0, filterText.length) == filterText.toLowerCase();
-	
-	let el;
-	let isFocused;
-	let listOpen;
-	let isWaiting;
-	let handleClear;
-	
-	const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
+  // Function for select box
+	async function getOptions(filterText) {
+		if (filterText.length > 2 && /\d/.test(filterText)) {
+			let res = await fetch(`https://api.postcodes.io/postcodes/${filterText}/autocomplete`);
+			let json = await res.json();
+			return json.result ? json.result.map(d => ({areacd: d, areanm: d, group: '', postcode: true})) : [];
+		} else if (filterText.length > 2) {
+			return items.filter(p => p.areanm.toLowerCase().slice(0, filterText.length) == filterText.toLowerCase());
+		}
+		return [];
+	}
 	async function doSelect(e) {
-		dispatch("select", e.detail);
-		if (autoClear) {
-			handleClear();
-		} else if (isClearable) {
-			// Hack to allow selection to be cleared by keyboard
-			await sleep(10);
-			let clearSelect = el.getElementsByClassName("clearSelect")[0];
-			if (clearSelect) {
-				clearSelect.tabIndex = 0;
-				clearSelect.onkeypress = (e) => { if (e.key == "Enter") handleClear() };
-				clearSelect.removeAttribute("aria-hidden");
-				clearSelect.setAttribute("aria-label", "Clear selection");
+		if (e.detail.postcode) {
+			let res = await fetch(`https://api.postcodes.io/postcodes/${e.detail.areacd}`);
+			let json = await res.json();
+			if (json.result) {
+        dispatch('select', {
+					type: "postcode",
+					postcode: json.result.postcode,
+					center: [json.result.longitude, json.result.latitude]
+        })
 			}
+		} else {
+      dispatch('select', await getPlace(e.detail.areacd));
 		}
 	}
-	
-	onMount(() => {
-		let style = el.style;
-		style.setProperty("--firstItem", colors[0 % colors.length]);
-		style.setProperty("--secondItem", colors[1 % colors.length]);
-		style.setProperty("--thirdItem", colors[2 % colors.length]);
-		style.setProperty("--fourthItem", colors[3 % colors.length]);
-		style.setProperty("--borderColor", borderColor);
-	});
+  
+	onMount(async () => items = await getPlaces());
 </script>
 
-<div class="selectbox" class:multi-selected={value && isMulti} class:focused={isFocused} class:selected={value && !listOpen && !isMulti} bind:this={el}>
-	<Select
-		{id} {container} {items} {placeholder} {isMulti} {isSearchable}
-		{groupBy} {loadOptions} {getSelectionLabel} {getOptionLabel} {itemFilter}
-		{ariaValues} {ariaListOpen} {ariaFocused} {noOptionsMessage} {indicatorSvg}
-		{containerStyles}
-		optionIdentifier={idKey}
-		bind:isFocused bind:value bind:listOpen bind:filterText bind:isWaiting bind:handleClear
-		on:select={doSelect} on:clear on:loaded on:error
-		showIndicator isClearable={!isClearable ? false : !isMulti}/>
-</div>
-
-<style>
-	.selectbox {
-		width: 100%;
-		box-sizing: border-box;
-		margin: 0;
-		border: 0;
-	}
-	.selectbox {
-    --border: 2px solid var(--borderColor, #206095);
-    --borderRadius: 0;
-		--listBorderRadius: 0;
-		--itemFirstBorderRadius: 0;
-		--multiItemBorderRadius: 0;
-		--padding: 0 8px;
-		--multiSelectPadding: 0 8px;
-		--clearSelectBottom: auto;
-		--clearSelectRight: 8px;
-		--clearSelectTop: auto;
-		--clearSelectWidth: 24px;
-		--clearSelectColor: #206095;
-		--borderHoverColor: var(--borderColor, #206095);
-		--borderFocusColor: var(--borderColor, #206095);
-		--inputColor: #206095;
-		--itemColor: #206095;
-		--placeholderColor: #206095;
-		--itemIsActiveBG: #206095;
-		--itemHoverBG: #3875d7;
-		--itemHoverColor: white;
-		--clearSelectColor: white;
-		--clearSelectFocusColor: white;
-		--clearSelectHoverColor: white;
-		--indicatorColor: white;
-		--multiItemActiveColor: white;
-		--multiClearFill: white;
-		--multiClearBG: none;
-		--multiClearHoverBG: none;
-		--multiItemBG: grey;
-		--multiItemActiveBG: grey;
-		--spinnerColor: rgba(255,255,255,0);
-  }
-	:global(.selectbox, .selectbox input, .selectbox .item, .selectbox svg) {
-		cursor: pointer !important;
-	}
-	:global(.selectbox input:focus) {
-		cursor: default !important;
-	}
-	:global(.selectbox > .selectContainer) {
-		box-shadow: inset -40px 0px #206095;
-	}
-	:global(.selectbox.multi-selected > .selectContainer) {
-		box-shadow: none !important;
-	}
-	:global(.selectbox.focused > .selectContainer) {
-		outline: 4px solid orange;
-	}
-	:global(.selectbox.selected > .selectContainer) {
-		background-color: #206095 !important;
-	}
-	:global(.selectbox.selected .selectedItem) {
-		color: white !important;
-		font-weight: bold;
-	}
-	:global(.selectbox .selectedItem .group) {
-		display: none;
-	}
-	:global(.selectbox .item > .group) {
-		font-size: smaller;
-		opacity: 0.7;
-	}
-	:global(.selectbox .selectContainer > .multiSelectItem) {
-		color: white !important;
-		font-weight: bold;
-	}
-	:global(.selectbox .selectContainer > .multiSelectItem:nth-of-type(1)) {
-		background-color: var(--firstItem) !important;
-	}
-	:global(.selectbox .selectContainer > .multiSelectItem:nth-of-type(2)) {
-		background-color: var(--secondItem) !important;
-	}
-	:global(.selectbox .selectContainer > .multiSelectItem:nth-of-type(3)) {
-		background-color: var(--thirdItem) !important;
-	}
-	:global(.selectbox .selectContainer > .multiSelectItem:nth-of-type(4)) {
-		background-color: var(--fourthItem) !important;
-	}
-	:global(.selectbox .indicator svg) {
-		fill: white;
-	}
-	:global(.selectbox .clearSelect) {
-		height: 24px;
-	}
-	:global(.selectbox .clearSelect:focus) {
-		outline: 4px solid orange;
-	}
-	:global(.selectbox .indicator) {
-		width: 20px;
-		height: 20px;
-		line-height: 1;
-	}
-	:global(.selectbox .multiSelectItem .group) {
-		display: none;
-	}
-</style>
+{#if items}
+<Select id="select" mode="search" idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} bind:filterText loadOptions={getOptions} on:select={doSelect} autoClear/>
+{/if}

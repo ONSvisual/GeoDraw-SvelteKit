@@ -14,7 +14,7 @@ export const mapfunctions = writable([]);
 export const mapobject = writable(undefined); // the mapbox 'map' object
 export let add_mode = writable(true);
 export let draw_enabled = writable(false);
-export const radiusInKm = writable(5);
+export const radiusInKm = writable(2);
 
 
 // map constants
@@ -30,17 +30,17 @@ export let location = {
     ], // England & Wales bounding box
 
 };
-export let maxbounds = null;
-[
-    [-9, 47],
-    [5, 57]
+export let maxbounds = [
+    [-9, 49.5],
+    [3.5, 61]
 ];
 
 export const server = 'https://onsvisual.github.io/ONS_CensusDraw_TileGen/geodraw_tileset'
 
 //http://localhost:7113
-export const mapstyle = `/css/style-omt.json`
+export const mapstyle = `https://bothness.github.io/ons-basemaps/data/style-outdoor.json`
 // `https://bothness.github.io/ons-basemaps/data/style-omt.json`
+// `/css/style-omt.json`
 //'https://api.mapbox.com/styles/v1/carbondesignsystem/ck7c8ce1y05h61ipb2fixfe76?access_token=pk.eyJ1IjoibWJvc3RvY2siLCJhIjoiY2s5ZWRqb2w1MDBnYjNmbzcxb2xxaGZjeSJ9.ZOeAUq-8dsbN7zqgG7vkdQ'
 //"https://bothness.github.io/ons-basemaps/data/style-omt.json";
 

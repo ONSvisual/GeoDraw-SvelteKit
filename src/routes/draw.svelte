@@ -2,12 +2,11 @@
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import tooltip from '$lib/ui/tooltip';
-  import Select from '$lib/ui/Select.svelte';
+  import Select, {getPlace} from '$lib/ui/Select.svelte';
   import Slider from '$lib/ui/Slider.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import {get} from 'svelte/store';
-  import {default as AreaMap} from '$lib/draw/AreaMap.svelte';
-  
+  import AreaMap from '$lib/draw/AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount} from 'svelte';
   let webgl_canvas;
@@ -33,7 +32,8 @@
     server,
   } from '$lib/draw/mapstore.js';
 
-  import {simplify_query, clearpoly} from '$lib/draw/MapDraw.js';
+  import {simplify_query, update, clearpoly} from '$lib/draw/MapDraw.js';
+    import bbox from '@turf/bbox';
   
 
   const modes = [
@@ -47,18 +47,29 @@
     mode: 'move',
     radius: 5,
     select: 'add',
-    name: '',
+    name: 'Area Name',
     showSave: false,
     topics: [],
     topicsExpand: false,
     topicsFilter: '',
   };
 
+  let zoom; // prop bound to map zoom level
+
   $: showTray = ['polygon', 'radius'].includes(state.mode);
+
+  function setDrawData() {
+    let items = $selected[$selected.length - 1];
+    items = JSON.stringify(
+      items,
+      (_key, value) => (value instanceof Set ? [...value] : value)
+    );
+    localStorage.setItem('draw_data', items);
+  }
 
   async function init() {
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
-    console.clear();
+    // console.clear();
 
     // map setup and vars
     $mapsource = {
@@ -77,7 +88,7 @@
         type: 'fill',
         paint: {
           'fill-color': 'transparent',
-          'fill-opacity': 0.7,
+          'fill-opacity': 1,
           'fill-outline-color': 'steelblue',
         },
       },
@@ -127,7 +138,7 @@
         'match',
         ['get', 'oa'],
         ['literal', ...items.oa],
-        'orange',
+        'rgba(32, 96, 149, 0.4)',
         'transparent',
       ]);
     }
@@ -135,7 +146,24 @@
     $mapobject.on('load', async () => {
       selected.subscribe(recolour);
 
-      if (localStorage.getItem('draw_data') || false) {
+      let hash = window.location.hash;
+      if (hash.length == 10) {
+        let code = hash.slice(1);
+        let data = await getPlace(code);
+
+        selected.set([{oa: new Set(), lat: [], lng: []}]);
+        localStorage.clear();
+
+        if (data.type == 'place') {
+          let bbox = data.bbox;
+          $selected = [$selected, {oa: new Set(data.codes), lat: [bbox[1], bbox[3]], lng: [bbox[0], bbox[2]]}];
+          $mapobject.fitBounds(bbox, {padding: 20});
+          state.name = data.areanm;
+        }
+        setDrawData();
+        history.replaceState(null, null, ' ');
+
+      } else if (localStorage.getItem('draw_data') || false) {
         var q;
         q = await JSON.parse(localStorage.getItem('draw_data'));
 
@@ -150,27 +178,31 @@
 
         q.oa = new Set(q.oa);
         selected.set([q]);
-      } else {
-        // move mapobject to location
-        $mapobject.fitBounds(location.bounds, {
-          padding: 20,
-          linear: true,
-        });
+      // } else {
+      //   // move mapobject to location
+      //   $mapobject.fitBounds(location.bounds, {
+      //     padding: 20,
+      //     linear: true,
+      //   });
       }
 
-
-
-  })
+      // Keep track of map zoom level
+      zoom = $mapobject.getZoom();
+      $mapobject.on("moveend", () => zoom = $mapobject.getZoom());
+  });
 
 // lets start with a polygon tool 
 
-return Promise.resolve().finally(()=>{document.getElementById('init_polygon').click()
-$draw_type='polygon'});
-
+// return Promise.resolve().finally(()=>{document.getElementById('init_polygon').click()
+// $draw_type='polygon'});
 
 }  //endinit
 
-  onMount(init)
+  onMount(() => {
+    init();
+    console.log(window.location.hash);
+    getPlace('E06000001').then(data => console.log(data));
+  });
 </script>
 
 <nav>
@@ -179,6 +211,7 @@ $draw_type='polygon'});
       <label
       id={'init_'+mode.key}
         class:active={state.mode == mode.key}
+        class:disabled={zoom < 9}
         title={mode.label}
         on:click={function () {
           $draw_type = mode.key == 'move' ? null : mode.key;
@@ -190,23 +223,30 @@ $draw_type='polygon'});
           bind:group={state.mode}
           name="mode"
           value={mode.key}
-          
+		      disabled={zoom < 9}
         />
-
         <Icon type={mode.key} />
       </label>
     {/each}
   </div>
   <div class="nav-right">
-    <button title="Undo last action" disabled use:tooltip>
+    <button
+	  title="Undo last action"
+	  use:tooltip
+	  disabled={$selected.length < 2}
+	  on:click={() => {
+		$selected = $selected.slice(0, -1);
+		setDrawData();
+	  }}>
       <Icon type="undo" />
     </button>
     <button
       class="alert"
       title="Clear all areas"
       use:tooltip
-      on:click={function clear_selection() {
+      on:click={() => {
         selected.set([{oa: new Set(), lat: [], lng: []}]);
+        state.name = "Area Name";
         localStorage.clear();
       }}
     >
@@ -229,6 +269,7 @@ $draw_type='polygon'});
         simplify_query()
           .then((q) => {
             if (q) {
+              q.properties.name = state.name;
               console.warn('---req  ', q);
               
               const items = $selected[$selected.length - 1];
@@ -252,8 +293,8 @@ $draw_type='polygon'});
           .then((rdir) => {
             
             if (rdir) {
-              console.clear();
-              goto(`${base}/build-new`);
+            //   console.clear();
+              goto(`${base}/build`);
             }
           });
       }}
@@ -281,7 +322,7 @@ $draw_type='polygon'});
       <div class="slider">
         <span>Radius</span>
         <Slider bind:value={$radiusInKm} />
-        <input type="text" bind:value={$radiusInKm} />km
+        <input type="text" bind:value="{$radiusInKm}" />km
       </div>
     {/if}
     <div class="select-mode">
@@ -346,28 +387,65 @@ $draw_type='polygon'});
 <div id="map">
   <AreaMap drawing_tools={true} />
 </div>
-<aside class="info-box" style:top="{showTray || state.showSave ? 146 : 104}px">
+<aside class="info-box" style:top="{showTray || state.showSave ? 200 : 158}px">
   <div class="search">
-    <Select mode="search" placeholder="Change area or postcode" />
+    <Select on:select={e => {
+      selected.set([{oa: new Set(), lat: [], lng: []}]);
+      localStorage.clear();
+      if (e.detail.type == 'place') {
+        let bbox = e.detail.bbox;
+        $selected = [$selected, {oa: new Set(e.detail.codes), lat: [bbox[1], bbox[3]], lng: [bbox[0], bbox[2]]}];
+        $mapobject.fitBounds(bbox, {padding: 20});
+        state.name = e.detail.areanm;
+      } else if (e.detail.type == 'postcode') {
+        let center = e.detail.center;
+        $mapobject.flyTo({center: center, zoom: 14});
+        $mapobject.once("moveend", () => {
+          let coords = $mapobject.project(center);
+          let features = $mapobject.queryRenderedFeatures([coords.x, coords.y], {layers: ['bounds']});
+          $selected = [$selected, {oa: new Set(features.map(f => f.properties.oa)), lat: [coords.y], lng: [coords.x]}];
+        });
+      }
+      setDrawData();
+    }}/>
     <button title="Upload a saved area" use:tooltip>
       <Icon type="upload" />
     </button>
   </div>
-  <div class="message">Zoom in to start drawing a custom area.</div>
+  <div class="message">
+	{#if !zoom || zoom < 9}
+    {#if $selected[$selected.length - 1].lat[1]}
+    <strong>Zoom in to continue</strong><br/>
+    You can <button class="btn-link" on:click={() => {
+      let q = $selected[$selected.length - 1];
+      let bbox = [q.lng[0], q.lat[0], q.lng[1], q.lat[1]];
+      $mapobject.fitBounds(bbox, {padding: 20});
+    }}>click here</button> to return to the area you have drawn.
+    {:else}
+	  <strong>How to get started</strong><br/>
+	  Zoom in to the map to start drawing a custom area, or use the search box above to find an existing area.
+    {/if}
+	{:else if state.mode == 'polygon'}
+	<strong>Draw a polygon mode</strong><br/>
+	Click on the map to draw a polygon. Click again on the first or last point to close the polygon.
+	{:else if state.mode == 'radius'}
+	<strong>Draw a radius mode</strong><br/>
+	Select a radius in kilometres from the menu, then click on the map to draw a circle.
+	{:else if state.mode == 'select'}
+	<strong>Click and select mode</strong><br/>
+	Click an individual area to add or remove it from your selection.
+	{:else}
+	<strong>Pan and zoom mode</strong><br/>
+	Explore the map to find a location of interest, then select a drawing tool from the menu.
+	{/if}
+  </div>
 </aside>
 
 <style>
-	nav input{
-		width:0;
-	}
 
   div.maplibregl-control-container{
     position:absolute;
     z-index: 999999;
     bottom:0;
   }
-
-  #map{
-    height:90vh!important;
-  top:0}
 </style>
