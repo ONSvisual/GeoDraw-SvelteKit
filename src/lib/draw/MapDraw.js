@@ -221,19 +221,33 @@ function roundAll(arr, decimals) {
 	return newarr;
 }
 
-function makeBoundary(geojson) {
+export function simplify_geo(geometry) {
+  // Simplifies a geojson geometry
+  let simple;
+  let length = 3000;
+  let precision = 5;
+
+  while (length >= 3000 && precision >= 2) {
+    simple = turf_simplify(geometry, {highQuality: true, tolerance: Math.pow(10, -precision)});
+    simple.coordinates = roundAll(simple.coordinates, Math.ceil(precision));
+    length = JSON.stringify(simple).length;
+    precision -= 0.5;
+  }
+  console.log('simplified polygon', `string length: ${length}, precision: ${precision}`);
+  return simple;
+}
+
+function makeBoundary(geojson, simplify = false) {
 	let dissolved = dissolve(geojson);
 
 	let simple;
-	let length = 3000;
-    let precision = 5;
-    while (length >= 3000 && precision >= 2) {
-      simple = turf_simplify(dissolved.geometry, {highQuality: true, tolerance: Math.pow(10, -precision)});
-      simple.coordinates = roundAll(simple.coordinates, Math.ceil(precision));
-      length = JSON.stringify(simple).length;
-      precision -= 0.5;
-    }
-	console.log('simplified polygon', `string length: ${length}, precision: ${precision}`);
+  if (simplify) {
+    simple = simplify_geo(dissolved.geometry);
+  } else {
+    simple = dissolved.geometry;
+    simple.coordinates = roundAll(simple.coordinates, 6);
+  }
+	
 	return {type: 'Feature', geometry: simple};
 }
 
@@ -527,7 +541,7 @@ function circle_fast(clear = false, center = radius_center) {
 // Query
 ////////////////////
 
-export async function simplify_query() {
+export async function simplify_query(name = 'Area Name', options = {simplify_geo: false}) {
   /* A function using the bounding box to query the database and return the simplified polygons */
 
   const last = get(selected)[get(selected).length - 1];
@@ -620,14 +634,24 @@ export async function simplify_query() {
     return false;
   }
 
-  let merge = makeBoundary({type: "FeatureCollection", features});
+  let merge = makeBoundary({type: "FeatureCollection", features}, options.simplify_geo);
 
-  merge.properties = { tile, msoa, oa, lsoa, original: oalist.length };
+  merge.properties = { name, bbox, tile, oa, lsoa, msoa, oa_all: oalist, original: oalist.length };
   console.log('---merge---', merge);
 
   // 2732 character
 
   return merge;
+}
+
+export function geo_blob(q) {
+  q.properties = {
+    name: q.properties.name,
+    bbox: q.properties.bbox,
+    codes: q.properties.oa_all,
+    codes_compressed: {oa: q.properties.oa, lsoa: q.properties.lsoa, msoa: q.properties.msoa}
+  }
+  return new Blob([JSON.stringify(q)], { type: "application/geo+json;charset=utf-8" });
 }
 
 // function sliceencode(str){

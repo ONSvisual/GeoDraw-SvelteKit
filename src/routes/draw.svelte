@@ -5,6 +5,7 @@
   import Select, {getPlace} from '$lib/ui/Select.svelte';
   import Slider from '$lib/ui/Slider.svelte';
   import Icon from '$lib/ui/Icon.svelte';
+  import { download, clip } from "$lib/util/functions.js";
   import {get} from 'svelte/store';
   import AreaMap from '$lib/draw/AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
@@ -32,8 +33,9 @@
     server,
   } from '$lib/draw/mapstore.js';
 
-  import {simplify_query, update, clearpoly} from '$lib/draw/MapDraw.js';
+  import {simplify_query, geo_blob, update, clearpoly} from '$lib/draw/MapDraw.js';
     import bbox from '@turf/bbox';
+    import { stringify } from 'postcss';
   
 
   const modes = [
@@ -257,6 +259,7 @@
       use:tooltip
       on:click={() => (state.showSave = !state.showSave)}
       class:active={state.showSave}
+      disabled={!$selected[$selected.length - 1].oa.size > 0}
     >
       <Icon
         type={state.showSave ? 'add' : 'download'}
@@ -265,11 +268,11 @@
     </button>
     <button
       class="text confirm"
+      disabled={!$selected[$selected.length - 1].oa.size > 0}
       on:click={() => {
-        simplify_query()
+        simplify_query(state.name)
           .then((q) => {
             if (q) {
-              q.properties.name = state.name;
               console.warn('---req  ', q);
               
               const items = $selected[$selected.length - 1];
@@ -308,16 +311,20 @@
     <div />
     <div class="save-buttons">
       <input type="text" bind:value={state.name} placeholder="Type a name" />
-      <button class="text">
-        <Icon type="download" /><span>Save area codes</span>
+      <button class="text" on:click={async () => {
+        let geo = await simplify_query(state.name);
+        let blob = geo_blob(geo);
+        download(blob, `${state.name}.json`);
+      }}>
+        <Icon type="download" /><span>Save geography</span>
       </button>
-      <button class="text">
-        <Icon type="download" /><span>Save boundary</span>
+      <button class="text" on:click={() => clip(Array.from($selected[$selected.length - 1].oa).join(','), 'Copied output area codes to clipboard')}>
+        <Icon type="copy"/><span>Copy area codes</span>
       </button>
     </div>
   </nav>
 {:else if showTray}
-  <nav class="tray" style="z-index:9;">
+  <nav class="tray">
     {#if state.mode == 'radius'}
       <div class="slider">
         <span>Radius</span>
@@ -414,7 +421,7 @@
   </div>
   <div class="message">
 	{#if !zoom || zoom < 9}
-    {#if $selected[$selected.length - 1].lat[1]}
+    {#if $selected[$selected.length - 1].oa.size > 0}
     <strong>Zoom in to continue</strong><br/>
     You can <button class="btn-link" on:click={() => {
       let q = $selected[$selected.length - 1];

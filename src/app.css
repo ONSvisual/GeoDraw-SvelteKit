@@ -192,6 +192,7 @@ aside.topics-box {
   padding-right: 20px;
 }
 nav.tray {
+  z-index: 9;
   position: absolute;
   display: flex;
   flex-direction: row;

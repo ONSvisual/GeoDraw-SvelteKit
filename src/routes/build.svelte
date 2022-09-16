@@ -7,6 +7,8 @@
 	import Icon from "$lib/ui/Icon.svelte";
 
 	import { default as datasets } from "$lib/util/custom_profiles_tables.json";
+  import { simplify_geo, geo_blob } from "$lib/draw/MapDraw.js";
+  import { download, clip } from "$lib/util/functions";
 	import { onMount } from "svelte";
 	let dataset_keys = Object.keys(datasets);
 	dataset_keys = dataset_keys.filter(
@@ -20,6 +22,7 @@
 	import {Minhash}  from 'minhash'
 
   let pym_parent; // Variabl for pym
+  let geojson; // Simplified geojson boundary for map
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
@@ -96,6 +99,7 @@
 		store = JSON.parse(localStorage.getItem("onsbuild"));
 		console.warn("build-", store);
 		// dfd = (await import('https://cdn.jsdelivr.net/npm/danfojs@1.1.0/lib/bundle.min.js')).default
+    geojson = simplify_geo(store.geometry);
     state.name = store.properties.name;
 		state.start = true;
 
@@ -260,7 +264,7 @@
     if (start) {
       tables = await get_data(data);
 
-      embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(JSON.stringify(tables).replaceAll('CustomArea', name))}${includemap ? `&poly=${btoa(JSON.stringify(store.geometry))}` : ''}`;
+      embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(JSON.stringify(tables).replaceAll('CustomArea', name))}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
       if (!pym_parent) {
         pym_parent = new pym.Parent("embed", '/embed/' + embed_hash, { name: "embed", id: "iframe" });
       } else {
@@ -308,11 +312,14 @@
 				bind:value={state.name}
 				placeholder="Type a name"
 			/>
-			<button class="text">
-				<Icon type="download" /><span>Save area codes</span>
+			<button class="text" on:click={async () => {
+        let blob = geo_blob(store);
+        download(blob, `${state.name}.json`);
+      }}>
+				<Icon type="download" /><span>Save geography</span>
 			</button>
-			<button class="text">
-				<Icon type="download" /><span>Save boundary</span>
+			<button class="text" on:click={() => clip(store.properties.oa_all.join(','), 'Copied output area codes to clipboard')}>
+				<Icon type="copy" /><span>Copy area codes</span>
 			</button>
 		</div>
 	</nav>
