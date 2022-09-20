@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import mproj from 'mproj';
 import iconv from 'iconv-lite';
-import Flatbush from 'flatbush';
+// import Flatbush from 'flatbush';
 
 var utils = /*#__PURE__*/Object.freeze({
   __proto__: null,

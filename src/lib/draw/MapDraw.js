@@ -18,7 +18,7 @@ import circle from '@turf/circle';
 import turf_simplify from '@turf/simplify';
 import turf_bbox from '@turf/bbox';
 import turf_inpolygon from '@turf/boolean-point-in-polygon';
-import { dissolve } from 'https://cdn.jsdelivr.net/npm/mapshaper-with-patch@0.4.155/mapshaper.min.js';//'$lib/mapshaper';
+import { dissolve } from '$lib/mapshaper';
 // import { draw } from 'svelte/transition';
 
 var simplify = {};
