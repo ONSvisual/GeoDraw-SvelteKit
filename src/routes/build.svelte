@@ -1,25 +1,14 @@
-<svelte:head>
-	<!-- <script	src="https://cdn.jsdelivr.net/npm/danfojs@1.1.0/lib/bundle.min.js"></script> -->
-	<!-- <LibLoader
-		url="https://cdn.jsdelivr.net/npm/danfojs@1.1.0/lib/bundle.min.js"
-	/>-->
-	<!-- <LibLoader url="https://rawgit.com/duhaime/minhash/master/minhash.min.js" />  -->
-</svelte:head>
-
 <script>
 	import { goto } from "$app/navigation";
 	import { base } from "$app/paths";
+  import pym from "pym.js";
+
 	import tooltip from "$lib/ui/tooltip";
 	import Icon from "$lib/ui/Icon.svelte";
-	import LibLoader from "$lib/LibLoader.svelte";
-
-	import Cards from "$lib/layout/Cards.svelte";
-	import Card from "$lib/layout/partial/Card.svelte";
-
-	import BarChart from "$lib/tables/BarChart.svelte";
-	import MapAreas from "$lib/tables/MapAreas.svelte";
 
 	import { default as datasets } from "$lib/util/custom_profiles_tables.json";
+  import { simplify_geo, geo_blob } from "$lib/draw/MapDraw.js";
+  import { download, clip } from "$lib/util/functions";
 	import { onMount } from "svelte";
 	let dataset_keys = Object.keys(datasets);
 	dataset_keys = dataset_keys.filter(
@@ -31,9 +20,12 @@
 
 	// import * as dfd from 'danfojs'
 	import {Minhash}  from 'minhash'
-	import html2canvas from 'html2canvas'
 
-let includemap= true;
+  let pym_parent; // Variabl for pym
+  let geojson; // Simplified geojson boundary for map
+  let embed_hash; // Variable for embed hash string
+  let tables = []; // Array to hold table data
+  let includemap = true;
 
 	const topics = [
 		{ key: "population", label: "Population" },
@@ -63,9 +55,10 @@ let includemap= true;
 		mode: "move",
 		radius: 5,
 		select: "add",
-		name: "Unnamed Custom Area",
+		name: "Area Name",
 		showSave: false,
-		topics: [topics[0]],
+    showEmbed: false,
+		topics: [topics[1], topics[2]],
 		topicsExpand: false,
 		topicsFilter: "",
 	};
@@ -106,10 +99,11 @@ let includemap= true;
 		store = JSON.parse(localStorage.getItem("onsbuild"));
 		console.warn("build-", store);
 		// dfd = (await import('https://cdn.jsdelivr.net/npm/danfojs@1.1.0/lib/bundle.min.js')).default
-		console.log(store)
-		state.start=true
+    geojson = simplify_geo(store.geometry);
+    state.name = store.properties.name;
+		state.start = true;
 
-		let props = store.properties
+		let props = store.properties;
 		state.compressed = Object.values({...props.msoa,...props.lsoa,...props.msoa,...props.oa}).flat().join(';');
 
 		// var senddata = {
@@ -257,20 +251,41 @@ let includemap= true;
 								],
 							},
 						};
-						console.error("talbe", cache[table["Nomis table"]])
+						console.error("table", cache[table["Nomis table"]])
 						return cache[table["Nomis table"]];
 					});
 			}
 		});
-		console.log('rtnn',rtn);
+		console.log('rtn',rtn);
 		return await Promise.all(rtn);
 	}
+
+  async function update_profile(start, name, data, includemap) {
+    if (start) {
+      tables = await get_data(data);
+
+      embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(JSON.stringify(tables).replaceAll('CustomArea', name))}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
+      if (!pym_parent) {
+        pym_parent = new pym.Parent("embed", '/embed/' + embed_hash, { name: "embed", id: "iframe" });
+      } else {
+        document.getElementById("iframe").contentWindow.location.hash = embed_hash;
+      }
+    }
+  }
+  $: update_profile(state.start, state.name, state.topics, includemap);
+
+  function makeEmbed(embed_hash) {
+    let url = `/embed/${embed_hash}`;
+    return `<div id="profile"></div>
+<script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
+<script>var pymParent = new pym.Parent("profile", "${url}", {name: "profile"});<\/script>`;
+  } 
 </script>
 
 
 <nav>
 	<div class="nav-left">
-		<button class="text" on:click={() => goto(`${base}/draw-new`)}>
+		<button class="text" on:click={() => goto(`${base}/draw`)}>
 			<Icon type="chevron" rotation={180} /><span>Edit area</span>
 		</button>
 	</div>
@@ -288,7 +303,7 @@ let includemap= true;
 		</button>
 	</div>
 </nav>
-{#if state.start}
+{#if state.showSave}
 	<nav class="tray">
 		<div />
 		<div class="save-buttons">
@@ -297,11 +312,14 @@ let includemap= true;
 				bind:value={state.name}
 				placeholder="Type a name"
 			/>
-			<button class="text">
-				<Icon type="download" /><span>Save area codes</span>
+			<button class="text" on:click={async () => {
+        let blob = geo_blob(store);
+        download(blob, `${state.name}.json`);
+      }}>
+				<Icon type="download" /><span>Save geography</span>
 			</button>
-			<button class="text">
-				<Icon type="download" /><span>Save boundary</span>
+			<button class="text" on:click={() => clip(store.properties.oa_all.join(','), 'Copied output area codes to clipboard')}>
+				<Icon type="copy" /><span>Copy area codes</span>
 			</button>
 		</div>
 	</nav>
@@ -349,22 +367,20 @@ let includemap= true;
 	</aside>
 	<article class="profile">
 		<h2>Profile preview</h2>
-		<div class="embed">
+    
+    <div id="embed"/>
+		<!-- <div class="embed">
 			<h3>{state.name}</h3>
 
 		{#if state.start}
-			{#await get_data(state.topics) then tables}
 				<Cards>
 					{#if includemap}
     <Card title={'Area map'}>
-      <MapAreas minimap={JSON.stringify(store.geometry)} />
+      <MapAreas geojson={store.geometry} />
     </Card>
     {/if}
 					{#each tables as tab}
 						<Card title={tab.name}>
-							<!-- <svelte:component this={charts[tab.meta.chart]} data={tab.data} suffix={tab.meta.unit} format={format(tab.meta.format)}/> -->
-							<!-- {JSON.stringify(tab.data)} -->
-
 							<BarChart
 								xKey="pc"
 								yKey="column"
@@ -376,27 +392,20 @@ let includemap= true;
 
 					<br />
 				</Cards>
-			{/await}
 			{/if}
-		</div>
+		</div> -->
 		<div class="embed-actions">
-			<button disabled=true>Show Embed code</button>
-			<button on:click={async function aspng(){
-				console.log('pngbtn')
-				html2canvas(document.querySelector(".embed")).then(canvas => {
-					const base64 = canvas.toDataURL();
-					console.log(canvas)
-  const a = document.createElement("a");
-  a.href = base64;
-  a.download = state.name.replace(/\s+/g, "_") + ".png";
-  a.click();
-//   document.body.append(canvas)
-
-});
-
-
-			}}>Download PNG</button>
+			<button on:click={() => state.showEmbed = !state.showEmbed}>
+        {state.showEmbed ? 'Hide embed code' : 'Show embed code'}
+      </button>
+			<button on:click={() => pym_parent.sendMessage('makePNG', null)}>
+        Download PNG
+      </button>
 			<button disabled=true>Download Data</button>
+      {#if embed_hash && state.showEmbed}
+      <p style:margin-bottom={0}>Embed code</p>
+      <textarea>{makeEmbed(embed_hash)}</textarea>
+      {/if}
 		</div>
 
 	</article>
@@ -425,5 +434,10 @@ let includemap= true;
 		opacity:0.9
 	}
 
+  .embed-actions textarea {
+    width: 100%;
+    height: 100px;
+    resize: none;
+  }
 
 </style>

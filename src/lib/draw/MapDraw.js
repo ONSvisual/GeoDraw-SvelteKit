@@ -13,14 +13,22 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { bboxToTile } from '@mapbox/tilebelt';
 // import { LngLat, LngLatBounds} from 'maplibre-gl';
 // turf does not compile with sveltekit
-import { default as union } from '@turf/union';
-import { draw } from 'svelte/transition';
+// import { default as union } from '@turf/union';
+import circle from '@turf/circle';
+import turf_simplify from '@turf/simplify';
+import turf_bbox from '@turf/bbox';
+import turf_inpolygon from '@turf/boolean-point-in-polygon';
+import { dissolve } from '$lib/mapshaper';
+// import { draw } from 'svelte/transition';
 
 var simplify = {};
 export var Draw;
 
 // import {LngLatBounds} from "maplibre-gl";
 export let coordinates = [];
+
+// keep track of coordinates of centre of radius drawing tool
+let radius_center = null;
 
 ////////////////////
 ///////////////////
@@ -48,30 +56,36 @@ export async function init_draw() {
     //   'line-width': 5,
     //   'line-dasharray': [2, 1],
     // },
-    paint: {
-      'fill-color': 'coral',
-      'fill-opacity': 0.5,
-
-    }
+    paint: {"fill-color":"#fbb03b","fill-outline-color":"#fbb03b","fill-opacity":.1}
   });
 
   get(mapobject).addLayer({
-    id: 'circle_layer',
-    type: 'circle',
+    id: 'draw_outline',
+    type: 'line',
     source: 'drawsrc',
-    paint: {
-      'circle-radius': {
-        base: 0,
-        stops: [[0, 0], [22, 180]],
-      },
-      'circle-color': 'coral',
-      'circle-opacity': 0.5,
-      // 'stroke-color': '#222',
-      // 'stroke-width': 2,
-      // 'stroke-opacity': 0.5,
-      // 'stroke-dasharray': [2, 4],
-    },
+    layout:{"line-cap":"round","line-join":"round"},
+	paint:{"line-color":"#fbb03b","line-dasharray":[.2,2],"line-width":2}
   });
+
+  
+
+//   get(mapobject).addLayer({
+//     id: 'circle_layer',
+//     type: 'circle',
+//     source: 'drawsrc',
+//     paint: {
+//       'circle-radius': {
+//         base: 0,
+//         stops: [[0, 0], [22, 180]],
+//       },
+//       'circle-color': 'coral',
+//       'circle-opacity': 0.5,
+//       // 'stroke-color': '#222',
+//       // 'stroke-width': 2,
+//       // 'stroke-opacity': 0.5,
+//       // 'stroke-dasharray': [2, 4],
+//     },
+//   });
 
 
   Draw = new MapboxDraw(
@@ -105,8 +119,7 @@ export async function init_draw() {
 
   async function drawPoly(e) {
     var data = Draw.getAll();
-    var coords = await data.features[0].geometry.coordinates[0]
-    console.log(data, coords)
+    var coords = await data.features[0].geometry.coordinates[0];
 
     update(coords)
     clearpoly();
@@ -117,18 +130,20 @@ export async function init_draw() {
   draw_type.subscribe((dt) => {
     coordinates = [];
     add_mode.set(true);
-    circle_paint((clear = get(draw_type) != 'radius'));
+    circle_fast((clear = get(draw_type) != 'radius'));
     Draw.deleteAll();
     // console.warn(dt)
     if (dt === 'polygon') Draw.changeMode('draw_polygon', {})
 
   });
 
-
   // set default
-  draw_type.set('polygon');
+  radius_center = null;
+  circle_fast((clear = true));
+  draw_type.set('move');
+
   // update circle tool each radius change
-  radiusInKm.subscribe(circle_paint);
+  radiusInKm.subscribe(() => circle_fast());
 
   get(mapobject).on('click', 'bounds', function boundclick(e) {
     switch (get(draw_type)) {
@@ -153,7 +168,7 @@ export async function init_draw() {
   get(mapobject).on('mousemove', 'bounds', function move(e) {
     // console.log (e.lngLat, get (draw_type));
 
-    if (get(draw_type) == 'radius') circle_fast(e.lngLat)
+    if (get(draw_type) == 'radius') circle_fast(false, e.lngLat)
 
     // switch (get(draw_type)) {
     //   case 'radius':
@@ -186,6 +201,55 @@ export async function init_draw() {
 
 // };
 
+function round(num, precision = 0) {
+	const multiplier = Math.pow(10, precision);
+	return Math.round(num * multiplier) / multiplier;
+}
+
+// Recursive function to round numbers in a multi-array (used to round coordinates)
+function roundAll(arr, decimals) {
+	let newarr = [];
+	arr.forEach(d => {
+		if (typeof d == "number") {
+			newarr.push(round(d, decimals));
+		} else if (Array.isArray(d)) {
+			newarr.push(roundAll(d, decimals));
+		} else {
+			newarr.push(d);
+		}
+	});
+	return newarr;
+}
+
+export function simplify_geo(geometry, max_length = 3000) {
+  // Simplifies a geojson geometry
+  let simple;
+  let length = max_length;
+  let precision = 5;
+
+  while (length >= max_length && precision >= 2) {
+    simple = turf_simplify(geometry, {highQuality: true, tolerance: Math.pow(10, -precision)});
+    simple.coordinates = roundAll(simple.coordinates, Math.ceil(precision));
+    length = JSON.stringify(simple).length;
+    precision -= 0.5;
+  }
+  console.log('simplified polygon', `string length: ${length}, precision: ${precision}`);
+  return simple;
+}
+
+function makeBoundary(geojson, simplify = false) {
+	let dissolved = dissolve(geojson);
+
+	let simple;
+  if (simplify) {
+    simple = simplify_geo(dissolved.geometry);
+  } else {
+    simple = dissolved.geometry;
+    simple.coordinates = roundAll(simple.coordinates, 6);
+  }
+	
+	return {type: 'Feature', geometry: simple};
+}
 
 
 function clear() {
@@ -221,11 +285,12 @@ export function change_data(layer, data) {
 export function update(coordinates) {
   // update the selection
 
-  const bbox = getbbox(coordinates);
-
+  // Updated to allow for multipolygon inputs
+  // This is not currently used, but should allow users to upload geojson polygons
+  let bbox = coordinates.type ? turf_bbox(coordinates) : getbbox(coordinates);
+  bbox = bbox.length == 4 ? [[bbox[0], bbox[1]], [bbox[2], bbox[3]]] : bbox;
 
   console.error('bb', bbox)
-
 
   const features = get(mapobject).queryRenderedFeatures(
     bbox.map(d => get(mapobject).project(d)),
@@ -233,9 +298,13 @@ export function update(coordinates) {
   );
 
   console.error('---features', features);
-  const oa = features
-    .filter(i => inPolygon(coordinates, i.geometry.coordinates))
-    .map(d => d.properties.id);
+  const oa = coordinates.type ? 
+    features
+      .filter(i => turf_inpolygon(i, coordinates))
+      .map(d => d.properties.id) :
+    features
+      .filter(i => inPolygon(coordinates, i.geometry.coordinates))
+      .map(d => d.properties.id) ;
 
   var current = get(selected);
   var last = current[current.length - 1];
@@ -338,69 +407,89 @@ function getbbox(coords) {
 // Circle Tools
 ////////////////////
 
-function draw_radius(center, points = 20) {
-  // if(!points) points = 64;
-  var coords = {
-    latitude: center.lat,
-    longitude: center.lng,
-  };
+function draw_radius(center, points = 24) {
+	console.log(center);
+	const options = {steps: points, units: 'kilometers'};
+	let geo = circle([center.lng, center.lat], +get(radiusInKm), options);
+	let coordinates = geo.geometry.coordinates[0];
 
-  // clear ();
+//   // if(!points) points = 64;
+//   var coords = {
+//     latitude: center.lat,
+//     longitude: center.lng,
+//   };
 
-  var km = get(radiusInKm) / 2;
+//   // clear ();
 
-  var coordinates = [];
-  var distanceX = km / (111.32 * Math.cos(coords.latitude * Math.PI / 180));
-  var distanceY = km / 110.574;
+//   var km = get(radiusInKm) / 2;
 
-  var theta, x, y;
-  for (var i = 0; i < points; i++) {
-    theta = i / points * (2 * Math.PI);
-    x = distanceX * Math.cos(theta);
-    y = distanceY * Math.sin(theta);
-    coordinates.push([coords.longitude + x, coords.latitude + y]);
-  }
-  coordinates.push(coordinates[0]);
+//   var coordinates = [];
+//   var distanceX = km / (111.32 * Math.cos(coords.latitude * Math.PI / 180));
+//   var distanceY = km / 110.574;
+
+//   var theta, x, y;
+//   for (var i = 0; i < points; i++) {
+//     theta = i / points * (2 * Math.PI);
+//     x = distanceX * Math.cos(theta);
+//     y = distanceY * Math.sin(theta);
+//     coordinates.push([coords.longitude + x, coords.latitude + y]);
+//   }
+//   coordinates.push(coordinates[0]);
   update(coordinates);
 }
 
 /// Fast Circle on-move Function
-function circle_fast(center) {
-  var geo = {
-    type: 'Feature',
-    geometry: {
-      type: 'Point',
-      coordinates: [center.lng, center.lat],
-    },
-  };
-  change_data('drawsrc', geo);
+function circle_fast(clear = false, center = radius_center) {
+	radius_center = center;
+	let geo;
+	if (center && !clear) {
+		const options = {steps: 24, units: 'kilometers'};
+		geo = circle([center.lng, center.lat], +get(radiusInKm), options);
+//   return geo;
+//   var geo = {
+//     type: 'Feature',
+//     geometry: {
+//       type: 'Point',
+//       coordinates: [center.lng, center.lat],
+//     },
+//   };
+	} else {
+		geo = {"type": "Polygon", "coordinates": []};
+	}
+	change_data('drawsrc', geo);
   return geo;
 }
 
 /// Scale Calulation Function.
-function circle_paint(clear = false) {
-  console.warn('-circle', clear);
-  if (mapobject) {
-    if (clear == true) {
-      return get(mapobject).setPaintProperty(
-        'circle_layer',
-        'circle-radius',
-        5
-      );
-    }
+// function circle_paint(clear = false) {
+//   console.warn('-circle', clear);
+//   if (mapobject) {
+//     if (clear == true) {
+//       return get(mapobject).setPaintProperty(
+//         'circle_layer',
+//         'circle-radius',
+//         5
+//       );
+//     }
 
-    const m2p = (meters, latitude) =>
-      meters / 0.075 / Math.cos(latitude * Math.PI / 180);
+// 	const m2p = (meters, latitude, zoomLevel = 22) => {
+// 		var earthCircumference = 40075017;
+// 		var latitudeRadians = latitude * (Math.PI/180);
+// 		var metersPerPixel = earthCircumference * Math.cos(latitudeRadians) / Math.pow(2, zoomLevel + 8);
+// 		return meters / metersPerPixel;
+// 	};
+//     // const m2p = (meters, latitude) =>
+//     //   (meters / 0.075) / Math.cos(latitude * Math.PI / 180);
 
-    get(mapobject).setPaintProperty('circle_layer', 'circle-radius', {
-      base: 2,
-      stops: [
-        [0, 0],
-        [22, m2p(get(radiusInKm) * 2000, get(mapobject).getCenter().lat)],
-      ],
-    });
-  }
-}
+//     get(mapobject).setPaintProperty('circle_layer', 'circle-radius', {
+//       base: 2,
+//       stops: [
+//         [0, 0],
+//         [22, m2p(+get(radiusInKm) * 1000, get(mapobject).getCenter().lat)],
+//       ],
+//     });
+//   }
+// }
 
 ////////////////////
 // Polygon
@@ -452,7 +541,7 @@ function circle_paint(clear = false) {
 // Query
 ////////////////////
 
-export async function simplify_query() {
+export async function simplify_query(name = 'Area Name', options = {simplify_geo: false}) {
   /* A function using the bounding box to query the database and return the simplified polygons */
 
   const last = get(selected)[get(selected).length - 1];
@@ -518,7 +607,7 @@ export async function simplify_query() {
 
   // return the simplified query - it would be quicker to not do this each change, but hey.
   get(mapobject).fitBounds(bbox, {
-    padding: 200,
+    padding: 20,
     animation: false,
     linear: true,
     duration: 200,
@@ -545,17 +634,24 @@ export async function simplify_query() {
     return false;
   }
 
-  let merge = features[0];
-  for (let i = 1; i < features.length; i++) {
-    merge = union(merge, features[i]);
-  }
+  let merge = makeBoundary({type: "FeatureCollection", features}, options.simplify_geo);
 
-  merge.properties = { tile, msoa, oa, lsoa, original: oalist.length };
+  merge.properties = { name, bbox, tile, oa, lsoa, msoa, oa_all: oalist, original: oalist.length };
   console.log('---merge---', merge);
 
   // 2732 character
 
   return merge;
+}
+
+export function geo_blob(q) {
+  q.properties = {
+    name: q.properties.name,
+    bbox: q.properties.bbox,
+    codes: q.properties.oa_all,
+    codes_compressed: {oa: q.properties.oa, lsoa: q.properties.lsoa, msoa: q.properties.msoa}
+  }
+  return new Blob([JSON.stringify(q)], { type: "application/geo+json;charset=utf-8" });
 }
 
 // function sliceencode(str){
