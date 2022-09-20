@@ -221,13 +221,13 @@ function roundAll(arr, decimals) {
 	return newarr;
 }
 
-export function simplify_geo(geometry) {
+export function simplify_geo(geometry, max_length = 3000) {
   // Simplifies a geojson geometry
   let simple;
-  let length = 3000;
+  let length = max_length;
   let precision = 5;
 
-  while (length >= 3000 && precision >= 2) {
+  while (length >= max_length && precision >= 2) {
     simple = turf_simplify(geometry, {highQuality: true, tolerance: Math.pow(10, -precision)});
     simple.coordinates = roundAll(simple.coordinates, Math.ceil(precision));
     length = JSON.stringify(simple).length;

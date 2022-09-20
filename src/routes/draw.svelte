@@ -10,9 +10,7 @@
   import AreaMap from '$lib/draw/AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount} from 'svelte';
-  let webgl_canvas;
-  let width = '100%';
-  let height = '100%';
+
   let speak = false;
   import {
     // select,
@@ -33,7 +31,7 @@
     server,
   } from '$lib/draw/mapstore.js';
 
-  import {simplify_query, geo_blob, update, clearpoly} from '$lib/draw/MapDraw.js';
+  import {simplify_query, geo_blob, update, clearpoly, simplify_geo} from '$lib/draw/MapDraw.js';
     import bbox from '@turf/bbox';
     import { stringify } from 'postcss';
   
@@ -57,6 +55,7 @@
   };
 
   let zoom; // prop bound to map zoom level
+  let uploader; // DOM element for geojson file upload
 
   $: showTray = ['polygon', 'radius'].includes(state.mode);
 
@@ -191,14 +190,63 @@
       // Keep track of map zoom level
       zoom = $mapobject.getZoom();
       $mapobject.on("moveend", () => zoom = $mapobject.getZoom());
-  });
+    });
+  // lets start with a polygon tool 
 
-// lets start with a polygon tool 
+  // return Promise.resolve().finally(()=>{document.getElementById('init_polygon').click()
+  // $draw_type='polygon'});
 
-// return Promise.resolve().finally(()=>{document.getElementById('init_polygon').click()
-// $draw_type='polygon'});
+  }  //endinit
 
-}  //endinit
+function load_geo() {
+		let file = uploader.files[0] ? uploader.files[0] : null;
+		
+		if (file) {
+      selected.set([{oa: new Set(), lat: [], lng: []}]);
+
+			const reader = new FileReader();
+
+			reader.onload = (e) => {
+				// Read + simplify the boundary
+				let b = JSON.parse(e.target.result);
+
+        if (b.type == "FeatureCollection") {
+          b = b.features[0];
+        } else if (b.type == "Geometry") {
+          b = {type: "Feature", geometry: b};
+        }
+
+        if (b.properties && b.properties.codes) {
+          console.log("reading uploaded codes");
+          let bb = b.properties.bbox ? b.properties.bbox : bbox(boundary);
+          $selected = [$selected, {oa: new Set(b.properties.codes), lat: [bb[1], bb[3]], lng: [bb[0], bb[2]]}];
+          $mapobject.fitBounds(bb, {padding: 20});
+        } else if (b.geometry) {
+          console.log("reading uploaded geometry");
+          if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
+          let bb = bbox(b);
+          let center = [(bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2];
+          $mapobject.flyTo({center, zoom: 9 });
+          $mapobject.once("idle", () => {
+            update(b.geometry);
+            $mapobject.fitBounds(bb, {padding: 20});
+          });
+        } else {
+          b = null;
+          alert('Invalid geography file. Must be geojson format.');
+        }
+
+        if (b) {
+          let props = b.properties;
+          state.name = props && props.areanm ? props.areanm : 
+            props && props.name ? props.name :
+            "Area Name";
+          setDrawData();
+        }
+			};
+			reader.readAsText(file);
+    }
+  }
 
   onMount(() => {
     init();
@@ -407,7 +455,7 @@
       } else if (e.detail.type == 'postcode') {
         let center = e.detail.center;
         $mapobject.flyTo({center: center, zoom: 14});
-        $mapobject.once("moveend", () => {
+        $mapobject.once("idle", () => {
           let coords = $mapobject.project(center);
           let features = $mapobject.queryRenderedFeatures([coords.x, coords.y], {layers: ['bounds']});
           $selected = [$selected, {oa: new Set(features.map(f => f.properties.oa)), lat: [coords.y], lng: [coords.x]}];
@@ -415,23 +463,22 @@
       }
       setDrawData();
     }}/>
-    <button title="Upload a saved area" use:tooltip>
+    <button title="Upload a saved area" use:tooltip on:click={() => uploader.click()}>
       <Icon type="upload" />
     </button>
+    <input type="file" accept=".geojson,.json" style="display:none" bind:this={uploader} on:change={load_geo}>
   </div>
   <div class="message">
-	{#if !zoom || zoom < 9}
-    {#if $selected[$selected.length - 1].oa.size > 0}
-    <strong>Zoom in to continue</strong><br/>
-    You can <button class="btn-link" on:click={() => {
-      let q = $selected[$selected.length - 1];
-      let bbox = [q.lng[0], q.lat[0], q.lng[1], q.lat[1]];
-      $mapobject.fitBounds(bbox, {padding: 20});
-    }}>click here</button> to return to the area you have drawn.
-    {:else}
-	  <strong>How to get started</strong><br/>
-	  Zoom in to the map to start drawing a custom area, or use the search box above to find an existing area.
-    {/if}
+	{#if (!zoom || zoom < 9) && $selected[$selected.length - 1].oa.size > 0}
+  <strong>Zoom in to continue</strong><br/>
+  You can <button class="btn-link" on:click={() => {
+    let q = $selected[$selected.length - 1];
+    let bbox = [q.lng[0], q.lat[0], q.lng[1], q.lat[1]];
+    $mapobject.fitBounds(bbox, {padding: 20});
+  }}>click here</button> to return to the area you have drawn.
+  {:else if !zoom || zoom < 9}
+  <strong>How to get started</strong><br/>
+  Zoom in to an area on the map to start drawing, or use the search box above to find a ready-made area.
 	{:else if state.mode == 'polygon'}
 	<strong>Draw a polygon mode</strong><br/>
 	Click on the map to draw a polygon. Click again on the first or last point to close the polygon.

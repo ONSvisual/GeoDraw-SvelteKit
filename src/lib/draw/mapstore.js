@@ -14,7 +14,7 @@ export const mapfunctions = writable([]);
 export const mapobject = writable(undefined); // the mapbox 'map' object
 export let add_mode = writable(true);
 export let draw_enabled = writable(false);
-export const radiusInKm = writable(2);
+export const radiusInKm = writable(1);
 
 
 // map constants
