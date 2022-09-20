@@ -18,6 +18,7 @@
   {#if path === '/build'}
   <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
   {:else if path === '/draw'}
+  <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatbush"></script>
   {/if}
 
