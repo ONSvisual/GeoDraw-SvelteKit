@@ -8,33 +8,40 @@
 		"deploy": "netlify build && netlify deploy -p "
 	},
 	"devDependencies": {
+		"@mapbox/mapbox-gl-draw": "^1.3.0",
+		"@mapbox/tilebelt": "^1.0.2",
+		"@mapbox/vector-tile": "^1.3.1",
 		"@netlify/functions": "^1.0.0",
 		"@sveltejs/adapter-netlify": "^1.0.0-next.64",
+		"@sveltejs/kit": "^1.0.0-next.350",
+		"@turf/bbox": "^6.5.0",
+		"@turf/boolean-point-in-polygon": "^6.5.0",
+		"@turf/circle": "^6.5.0",
+		"@turf/simplify": "^6.5.0",
+		"@turf/union": "^6.5.0",
 		"autoprefixer": "^10.2.5",
+		"buffer": "^6.0.3",
+		"carbon-components-svelte": "^0.62.3",
+		"d3-tile": "^1.0.0",
+		"flatbush": "^4.0.0",
+		"html2canvas": "^1.4.1",
+		"iconv-lite": "^0.6.3",
+		"leaflet": "^1.8.0",
+		"maplibre-gl": "^2.1.9",
+		"minhash": "^0.0.9",
+		"mproj": "^0.0.35",
+		"parse-color": "^1.0.0",
 		"postcss": "^8.2.8",
+		"pym.js": "^1.3.2",
 		"svelte": "^3.29.0",
+		"svelte-kit": "^1.0.0",
+		"svelte-select": "^4.4.7",
 		"tailwindcss": "^2.0.4",
-		"vite": "^2.1.0"
+		"vite": "^2.1.0",
+		"wellknown": "^0.5.0"
 	},
 	"type": "module",
 	"engines": {
 		"node": ">= 12.17.0"
-	},
-	"dependencies": {
-		"@mapbox/mapbox-gl-draw": "^1.3.0",
-		"@mapbox/tilebelt": "^1.0.2",
-		"@mapbox/vector-tile": "^1.3.1",
-		"@sveltejs/kit": "^1.0.0-next.350",
-		"@turf/union": "^6.5.0",
-		"carbon-components-svelte": "^0.62.3",
-		"d3-tile": "^1.0.0",
-		"html2canvas": "^1.4.1",
-		"leaflet": "^1.8.0",
-		"maplibre-gl": "^2.1.9",
-		"minhash": "^0.0.9",
-		"parse-color": "^1.0.0",
-		"pym.js": "^1.3.2",
-		"svelte-kit": "^1.0.0",
-		"svelte-select": "^4.4.7"
 	}
 }

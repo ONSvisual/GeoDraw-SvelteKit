@@ -33,7 +33,7 @@
 		min-width: 280px;
 	}
 	.middle {
-		height: 100%;
+		height: 46px;
 		display: flex;
 	}
 	.logo-block {

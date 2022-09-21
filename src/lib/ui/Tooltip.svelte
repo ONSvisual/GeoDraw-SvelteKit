@@ -27,6 +27,7 @@
     font-size: 0.85em;
     white-space: nowrap;
 		pointer-events: none;
+		z-index: 9999;
 	}
 	.caret {
 		content: " ";

@@ -1,3 +1,12 @@
+<script context="module">
+    export async function load() {
+        return {
+            status: 302,
+            redirect: "/draw"
+        };
+    }
+</script>
+
 <!-- <script>
   import 'carbon-components-svelte/css/white.css';
   import {Button} from 'carbon-components-svelte';
