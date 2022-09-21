@@ -7,9 +7,6 @@
 
   let path = $page.url.pathname;
 
-  console.error('£££££££££££££££"',path)
-
-
 </script>
 
 

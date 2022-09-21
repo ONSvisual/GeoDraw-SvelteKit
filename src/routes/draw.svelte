@@ -31,6 +31,9 @@
     server,
   } from '$lib/draw/mapstore.js';
 
+
+  console.error('mmmm',get(mapobject))
+
   import {simplify_query, geo_blob, update, clearpoly, simplify_geo} from '$lib/draw/MapDraw.js';
     import bbox from '@turf/bbox';
     import { stringify } from 'postcss';
@@ -318,6 +321,7 @@ function load_geo() {
       class="text confirm"
       disabled={!$selected[$selected.length - 1].oa.size > 0}
       on:click={() => {
+        document.querySelector('#mapcontainer div canvas').style.cursor='wait'
         simplify_query(state.name)
           .then((q) => {
             if (q) {
@@ -338,6 +342,7 @@ function load_geo() {
               }
             } else {
               alert('No features selected.');
+              document.querySelector('#mapcontainer div canvas').style.cursor='auto'
               return false;
             }
           })
