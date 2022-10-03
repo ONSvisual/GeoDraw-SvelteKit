@@ -1,8 +1,9 @@
 {
 	"name": "GeoDraw",
-	"version": "0.6.0",
+	"version": "1.1.0",
 	"scripts": {
 		"dev": "vite dev",
+		"debug": "vite dev --debug",
 		"build": "vite build",
 		"start": "vite preview",
 		"deploy": "netlify build && netlify deploy -p "
