@@ -1,6 +1,6 @@
 .svelte-kit/
-build/
-archive/
+/build/
+/archive/
 
 # Logs
 logs
