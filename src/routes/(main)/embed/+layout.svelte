@@ -1,5 +1,5 @@
 <script>
-  import "../../ons.css";
+  import "../../../ons.css";
 </script>
 
 <slot/>
