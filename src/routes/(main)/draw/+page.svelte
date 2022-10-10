@@ -7,7 +7,7 @@
   import Icon from '$lib/ui/Icon.svelte';
   import { download, clip } from "$lib/util/functions.js";
   import {get} from 'svelte/store';
-  import AreaMap from '$lib/draw/AreaMap.svelte';
+  import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount} from 'svelte';
 
@@ -29,12 +29,16 @@
     radiusInKm,
     selected,
     server,
-  } from '$lib/draw/mapstore.js';
+  } from './mapstore.js';
 
-  import {simplify_query, geo_blob, update, clearpoly, simplify_geo} from '$lib/draw/MapDraw.js';
+  import {simplify_query, geo_blob, update, clearpoly, simplify_geo} from './drawing_utils.js';
     import bbox from '@turf/bbox';
     import { stringify } from 'postcss';
   
+import {GetCentroids} from './centroid_utils.js'
+export const centroids = new GetCentroids('/oa21-data.csv.gz')
+console.warn('cent',centroids)
+
 
   const modes = [
     {key: 'move', label: 'Pan and zoom'},

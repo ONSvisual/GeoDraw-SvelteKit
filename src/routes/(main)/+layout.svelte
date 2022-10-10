@@ -6,6 +6,7 @@
 
 
   let path = $page.url.pathname;
+  console.clear();
   console.warn('path',path)
 
 </script>
