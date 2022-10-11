@@ -29,15 +29,15 @@
     radiusInKm,
     selected,
     server,
+    centroids,
   } from './mapstore.js';
 
-  import {simplify_query, geo_blob, update, clearpoly, simplify_geo} from './drawing_utils.js';
+  import { geo_blob, update, simplify_geo} from './drawing_utils.js';
     import bbox from '@turf/bbox';
     import { stringify } from 'postcss';
   
 import {GetCentroids} from './centroid_utils.js'
-export const centroids = new GetCentroids('/oa21-data.csv.gz')
-console.warn('cent',centroids)
+
 
 
   const modes = [
@@ -73,6 +73,10 @@ console.warn('cent',centroids)
   }
 
   async function init() {
+    // calculate the centroids and simplifications. 
+    centroids.set( await GetCentroids({year:21,dfd:dfd}) )
+    console.log('cent', $centroids)
+
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
     // console.clear();
 
@@ -88,7 +92,7 @@ console.warn('cent',centroids)
       {
         id: 'bounds',
         source: 'area',
-        'source-layer': 'geodraw',
+        'source-layer': 'oa',
         // tileSize: 256,
         type: 'fill',
         paint: {
@@ -97,24 +101,14 @@ console.warn('cent',centroids)
           'fill-outline-color': 'steelblue',
         },
       },
-      {
-        id: 'centroids',
-        source: 'area',
-        'source-layer': 'centroids',
-        type: 'circle', //background?/
-        paint: {
-          'circle-radius': 0.6,
-          'circle-color': 'red',
-          'circle-opacity': 0.2,
-        },
-      },
+
     ];
 
     /// Read out area names
 
     if ('SpeechSynthesisUtterance' in window) {
       var msg = new SpeechSynthesisUtterance();
-      console.error('speech tools enabled');
+      console.debug('speech tools enabled');
     }
 
     $mapfunctions = [
@@ -138,10 +132,10 @@ console.warn('cent',centroids)
     async function recolour() {
       const items = $selected[$selected.length - 1];
 
-      console.warn('---recolour', items.oa);
+      console.debug('---recolour');
       $mapobject.setPaintProperty('bounds', 'fill-color', [
         'match',
-        ['get', 'oa'],
+        ['get', 'areacd'],
         ['literal', ...items.oa],
         'rgba(32, 96, 149, 0.4)',
         'transparent',
@@ -172,9 +166,10 @@ console.warn('cent',centroids)
         var q;
         q = await JSON.parse(localStorage.getItem('draw_data'));
 
-        console.error('q', q);
+        console.debug('q', q);
+        var bbox = get(centroids).bounds([...q.oa])
 
-        $mapobject.fitBounds([q.lng[0], q.lat[0], q.lng[1], q.lat[1]], {
+        $mapobject.fitBounds(bbox, {
           padding: 20,
           linear: true,
         });
@@ -303,7 +298,7 @@ function load_geo() {
       title="Clear all areas"
       use:tooltip
       on:click={() => {
-        selected.set([{oa: new Set(), lat: [], lng: []}]);
+        selected.set([{oa: new Set(), lat: [], lng: [], parents:[]}]);
         state.name = "Area Name";
         localStorage.clear();
       }}
@@ -327,21 +322,19 @@ function load_geo() {
       disabled={!$selected[$selected.length - 1].oa.size > 0}
       on:click={() => {
         document.querySelector('#mapcontainer div canvas').style.cursor='wait'
-        simplify_query(state.name)
+        $centroids.simplify(state.name,$selected[$selected.length-1])
+
           .then((q) => {
             if (q) {
-              console.warn('---req  ', q);
+              console.debug('---req  ', q);
               
               const items = $selected[$selected.length - 1];
 
               if (items.oa.size > 0) {
-                //   items.oa = [...items.oa]; // we can't encode sets
-                // //   localStorage.setItem('draw_data', JSON.stringify(items));
-
                 if (q.error) return false;
 
-                console.log('buildpage', q);
-                localStorage.setItem('onsbuild',JSON.stringify(q));
+                  console.log('buildpage', q);
+                  localStorage.setItem('onsbuild',JSON.stringify(q));
 
                 return true;
               }
@@ -352,9 +345,7 @@ function load_geo() {
             }
           })
           .then((rdir) => {
-            
             if (rdir) {
-            //   console.clear();
               goto(`${base}/build/`);
             }
           });
@@ -370,7 +361,9 @@ function load_geo() {
     <div class="save-buttons">
       <input type="text" bind:value={state.name} placeholder="Type a name" />
       <button class="text" on:click={async () => {
-        let geo = await simplify_query(state.name);
+
+        let geo = $centroids.simplify(state.name,$selected[$selected.length-1]);
+        alert('check here')
         let blob = geo_blob(geo);
         download(blob, `${state.name}.json`);
       }}>
@@ -455,11 +448,13 @@ function load_geo() {
 <aside class="info-box" style:top="{showTray || state.showSave ? 200 : 158}px">
   <div class="search">
     <Select on:select={e => {
-      selected.set([{oa: new Set(), lat: [], lng: []}]);
+      selected.set([{oa: new Set(), lat: [], lng: [],parents:[]}]);
       localStorage.clear();
+
       if (e.detail.type == 'place') {
         let bbox = e.detail.bbox;
-        $selected = [$selected, {oa: new Set(e.detail.codes), lat: [bbox[1], bbox[3]], lng: [bbox[0], bbox[2]]}];
+        let oa = new Set(e.detail.codes)
+        $selected = [$selected, {oa: oa, lat: [bbox[1], bbox[3]], lng: [bbox[0], bbox[2]],parents:[...oa]}];
         $mapobject.fitBounds(bbox, {padding: 20});
         state.name = e.detail.areanm;
       } else if (e.detail.type == 'postcode') {

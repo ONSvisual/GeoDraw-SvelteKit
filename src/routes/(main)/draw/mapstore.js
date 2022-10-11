@@ -15,6 +15,7 @@ export const mapobject = writable(undefined); // the mapbox 'map' object
 export let add_mode = writable(true);
 export let draw_enabled = writable(false);
 export const radiusInKm = writable(1);
+export const centroids = writable();
 
 
 // map constants
@@ -35,7 +36,8 @@ export let maxbounds = [
     [3.5, 61]
 ];
 
-export const server = 'https://onsvisual.github.io/ONS_CensusDraw_TileGen/geodraw_tileset'
+export const server = 'https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v2/boundaries'
+//'https://onsvisual.github.io/ONS_CensusDraw_TileGen/geodraw_tileset'
 
 //http://localhost:7113
 export const mapstyle = `https://bothness.github.io/ons-basemaps/data/style-outdoor.json`
