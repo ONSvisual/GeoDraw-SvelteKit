@@ -1,6 +1,6 @@
 <script context="module">
 	// Config for places data
-  const baseurl = "https://onsvisual.github.io/cp-places-data";
+  const baseurl = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1";
   const geotypes = [
     {keys: ["E05", "W05"], label: "Ward"},
     {keys: ["E06", "W06"], label: "Unitary authority"},
