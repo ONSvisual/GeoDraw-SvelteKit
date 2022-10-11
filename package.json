@@ -1,11 +1,13 @@
 {
 	"name": "GeoDraw",
-	"version": "0.6.0",
+	"version": "1.1.0",
 	"scripts": {
 		"dev": "vite dev",
+		"debug": "vite dev --debug",
 		"build": "vite build",
 		"start": "vite preview",
-		"deploy": "netlify build && netlify deploy -p "
+		"deploy": "netlify build && netlify deploy -p ",
+		"push": "git add -A; git commit -m 'npm update';git push"
 	},
 	"devDependencies": {
 		"@mapbox/mapbox-gl-draw": "^1.3.0",
@@ -47,6 +49,10 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^1.0.0-next.95",
 		"@sveltejs/adapter-static": "^1.0.0-next.43",
-		"@sveltejs/adapter-vercel": "^1.0.0-next.77"
+		"@sveltejs/adapter-vercel": "^1.0.0-next.77",
+		"d3-selection": "^3.0.0",
+		"d3-shape": "^3.1.0",
+		"math-js": "^1.0.1",
+		"mathjs": "^11.2.1"
 	}
 }

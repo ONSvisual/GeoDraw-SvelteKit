@@ -7,7 +7,11 @@
 	import Icon from "$lib/ui/Icon.svelte";
 
 	import { default as datasets } from "$lib/util/custom_profiles_tables.json";
+<<<<<<< HEAD
   import { simplify_geo, geo_blob } from "$lib/draw/MapDraw.js";
+=======
+  import { simplify_geo, geo_blob } from '../draw/drawing_utils.js'// "$lib/draw/MapDraw.js";
+>>>>>>> origin/upgrade2
   import { download, clip } from "$lib/util/functions";
 	import { onMount } from "svelte";
 	let dataset_keys = Object.keys(datasets);
@@ -285,7 +289,11 @@
 
 <nav>
 	<div class="nav-left">
+<<<<<<< HEAD
 		<button class="text" on:click={() => goto(`${base}/draw/`)}>
+=======
+		<button class="text" on:click={() => goto(`${base}/draw`)}>
+>>>>>>> origin/upgrade2
 			<Icon type="chevron" rotation={180} /><span>Edit area</span>
 		</button>
 	</div>
