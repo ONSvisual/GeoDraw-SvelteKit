@@ -3,8 +3,20 @@
 	import bbox from '@turf/bbox';
 	import wellknown from 'wellknown';
 
-	// API URL for ONS linked geographic data service
-	const apiurl = 'https://pmd3-production-drafter-onsgeo.publishmydata.com/v1/sparql/live?query=';
+	// Config for places data
+  const baseurl = "https://onsvisual.github.io/cp-places-data";
+  const geotypes = [
+    {keys: ["E05", "W05"], label: "Ward"},
+    {keys: ["E06", "W06"], label: "Unitary authority"},
+    {keys: ["E07", "E08"], label: "District"},
+    {keys: ["E09"], label: "London borough"},
+    {keys: ["E10"], label: "County"},
+    {keys: ["E11"], label: "Metropolitan county"},
+    {keys: ["E14", "W07"], label: "Parliamentary constituency"},
+    {keys: ["E30", "K01", "W22"], label: "Travel to work area"},
+    {keys: ["E34", "K05", "W37"], label: "Built-up area"},
+    {keys: [], label: "Built-up area, sub-division"}
+  ];
 
 	async function getData(url) {
     let df = await dfd.readCSV(url, {skipEmptyLines: true});
@@ -12,23 +24,7 @@
 	}
 
 	export async function getPlaces() {
-		const query = `PREFIX entity: <http://statistics.data.gov.uk/id/statistical-entity/>
-	PREFIX entdef: <http://statistics.data.gov.uk/def/statistical-entity#>
-	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX foi: <http://publishmydata.com/def/ontology/foi/>
-	PREFIX statdef: <http://statistics.data.gov.uk/def/statistical-geography#>
-	SELECT DISTINCT ?areacd ?areanm ?group
-	WHERE {
-		VALUES ?types { entity:E06 entity:E07 entity:E08 entity:E09 entity:E10 entity:E14 entity:E30 entity:E34 entity:E35 entity:W06 entity:W07 entity:W22 entity:W37 entity:W38 entity:K01 entity:K05 entity:K06 }
-		?area entdef:code ?types ;
-					statdef:status "live" ;
-					foi:code ?areacd ;
-					statdef:officialname ?areanm ;
-					foi:memberOf ?type .
-		?type rdfs:label ?group .
-	}
-	LIMIT 10000`;
-		let data = await getData(apiurl + encodeURIComponent(query));
+		let data = await getData(`${baseurl}/places_list.csv`);
 		data.forEach(d => { d.group = d.group.substring(4) })
 		data.sort((a, b) => a.areanm.localeCompare(b.areanm));
 		return data;
