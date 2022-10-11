@@ -84,6 +84,7 @@ import {GetCentroids} from './centroid_utils.js'
     $mapsource = {
       area: {
         type: 'vector',
+        maxzoom: 12,
         tiles: [`${server}/{z}/{x}/{y}.pbf`],
       },
     };
