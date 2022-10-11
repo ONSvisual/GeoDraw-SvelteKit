@@ -1,76 +1,58 @@
 <script context="module">
-  // Functions etc to retreive data from ONS Linked Geography API
-	import bbox from '@turf/bbox';
-	import wellknown from 'wellknown';
-
 	// Config for places data
   const baseurl = "https://onsvisual.github.io/cp-places-data";
   const geotypes = [
     {keys: ["E05", "W05"], label: "Ward"},
     {keys: ["E06", "W06"], label: "Unitary authority"},
-    {keys: ["E07", "E08"], label: "District"},
+    {keys: ["E07", "E08"], label: "Local authority district"},
     {keys: ["E09"], label: "London borough"},
     {keys: ["E10"], label: "County"},
     {keys: ["E11"], label: "Metropolitan county"},
     {keys: ["E14", "W07"], label: "Parliamentary constituency"},
     {keys: ["E30", "K01", "W22"], label: "Travel to work area"},
     {keys: ["E34", "K05", "W37"], label: "Built-up area"},
-    {keys: [], label: "Built-up area, sub-division"}
+    {keys: ["E35", "K06", "W38"], label: "Built-up area, sub-division"}
   ];
+  let geotypes_lookup = {};
+  geotypes.forEach(g => g.keys.forEach(k => geotypes_lookup[k] = g.label));
 
 	async function getData(url) {
     let df = await dfd.readCSV(url, {skipEmptyLines: true});
-		return dfd.toJSON(df);
+    return dfd.toJSON(df);
 	}
 
 	export async function getPlaces() {
 		let data = await getData(`${baseurl}/places_list.csv`);
-		data.forEach(d => { d.group = d.group.substring(4) })
+    let lookup = {};
+    data.forEach(d => lookup[d.areacd] = d);
+		data.forEach(d => {
+      let geotype = geotypes_lookup[d.areacd.slice(0,3)];
+      d.group = d.parent ? `${geotype} in ${lookup[d.parent].areanm}` : geotype;
+    });
 		data.sort((a, b) => a.areanm.localeCompare(b.areanm));
 		return data;
 	}
 
 	// Get boundary, bbox and output area lookup
 	export async function getPlace(code) {
-		// Get boundary in WKT format
-		const query_geo = `SELECT ?areanm ?geometry
-WHERE {
-  <http://statistics.data.gov.uk/id/statistical-geography/${code}> <http://www.opengis.net/ont/geosparql#hasGeometry> ?geom ;
-  <http://statistics.data.gov.uk/def/statistical-geography#officialname> ?areanm .
-  ?geom <http://www.opengis.net/ont/geosparql#asWKT> ?geometry .
-}
-LIMIT 1`;
-    let geo = await getData(apiurl + encodeURIComponent(query_geo));
-    
-    if (geo[0]) {
-      // Convert polygon from WKT to geojson format
-      let geojson = wellknown.parse(geo[0].geometry);
-
-      // Get the lon/lat bounding box of the polygon
-      let bounds = bbox(geojson);
-
-      // Get output area lookup for selected geography
-      const query_lookup = `SELECT DISTINCT ?areacd
-WHERE {
-  ?pcode <http://publishmydata.com/def/ontology/foi/within> <http://statistics.data.gov.uk/id/statistical-geography/${code}> ;
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://statistics.data.gov.uk/def/postcode/unit> ;
-  <http://statistics.data.gov.uk/def/spatialrelations/within#outputarea> ?area .
-  ?area <http://publishmydata.com/def/ontology/foi/code> ?areacd ;
-  <http://statistics.data.gov.uk/def/statistical-geography#status> "live" ;
-}`;
-      let lookup = await getData(apiurl + encodeURIComponent(query_lookup));
-
-      return {
-        type: 'place',
-        areanm: geo[0].areanm,
-        areacd: code,
-        geometry: geojson,
-        bbox: bounds,
-        codes: lookup.map(d => d.areacd)
-      };
-    } else {
+    let geo;
+    try {
+      let geo_raw = await fetch(`${baseurl}/${code.slice(0,3)}/${code}.json`);
+      geo = await geo_raw.json();
+    }
+    catch(err) {
+      console.log(err);
       return {type: null};
     }
+
+    return {
+      type: 'place',
+      areanm: geo.properties.areanm,
+      areacd: geo.properties.areacd,
+      geometry: geo.geometry,
+      bbox: geo.properties.bounds,
+      codes: geo.properties.codes
+    };
 	}
 </script>
 <script>
