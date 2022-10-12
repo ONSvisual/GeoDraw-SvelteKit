@@ -398,7 +398,7 @@ function load_geo() {
           name="select"
           value="add"
         />
-        <Icon type="add" />
+        <Icon type="select_add" />
       </label>
       <label
         class:active={state.select == 'subtract'}
@@ -412,7 +412,7 @@ function load_geo() {
           name="select"
           value="subtract"
         />
-        <Icon type="subtract" />
+        <Icon type="select_subtract" />
       </label>
   
 
