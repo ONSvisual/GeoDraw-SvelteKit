@@ -280,6 +280,7 @@
         id={'init_' + mode.key}
         class:active={state.mode == mode.key}
         class:disabled={zoom < zoomstop}
+        style:filter='contrast(1.35)'
         title={mode.label}
         on:click={function () {
           $draw_type = mode.key == 'move' ? null : mode.key;
@@ -303,18 +304,6 @@
     
     {#if advanced}
 
-    <button
-      title={state.showSave ? 'Close save options' : 'Save selected area'}
-      use:tooltip
-      on:click={() => (state.showSave = !state.showSave)}
-      class:active={state.showSave}
-      disabled={!$selected[$selected.length - 1].oa.size > 0}
-    >
-      <Icon
-        type={state.showSave ? 'add' : 'download'}
-        rotation={state.showSave ? 45 : 0}
-      />
-    </button>
 
     <button
       title="Undo last action"
@@ -334,10 +323,12 @@
     {:else}
     <button
       class="text secondary"
-      style:opacity=0.8
+      style:color='lightgray'
+      style:filter='invert(.2)contrast(2)'
       on:click={()=>{advanced=true}}
     > Further Tools
     </button>
+    
     {/if}
 
 
@@ -356,6 +347,18 @@
 
 
 
+    <button
+      title={state.showSave ? 'Close save options' : 'Save selected area'}
+      use:tooltip
+      on:click={() => (state.showSave = !state.showSave)}
+      class:active={state.showSave}
+      disabled={!$selected[$selected.length - 1].oa.size > 0}
+    >
+      <Icon
+        type={state.showSave ? 'add' : 'download'}
+        rotation={state.showSave ? 45 : 0}
+      />
+    </button>
 
 
     <button
