@@ -13,18 +13,11 @@
 
   let speak = false;
   import {
-    // select,
     mapsource,
     maplayer,
     mapfunctions,
     mapobject,
-    mapstyle,
-    minzoom,
-    maxzoom,
-    location,
-    maxbounds,
     draw_type,
-    draw_enabled,
     add_mode,
     radiusInKm,
     selected,
@@ -34,7 +27,6 @@
 
   import { geo_blob, update, simplify_geo} from './drawing_utils.js';
     import bbox from '@turf/bbox';
-    import { stringify } from 'postcss';
   
 import {GetCentroids} from './centroid_utils.js'
 

@@ -3,17 +3,24 @@ class Centroids {
     this.file = `/oa${year}-data.csv.gz`
     this.oa = `oa${year}cd`;
     var df =  await (await dfd.readCSV(this.file))
-    df = df.setIndex({ index: df[this.oa].$data})
+    
     
     this.oalist = new Set(df.$index)
-    
-    // df.sortIndex({ ascending: true });
-
     this.lsoa = this.count(df[`lsoa${year}cd`]);
     this.msoa = this.count(df[`msoa${year}cd`]);
 
+    var a = df['population']
+    this.population = Object.fromEntries(a.$index.map((_, i) => [_, a.$data[i]]));
+
+    var a = df[this.oa]
+    this.index = Object.fromEntries(a.$index.map((_, i) => [a.$data[i],_]));
+
     // df = df.drop({ columns: [`msoa${year}cd`], inplace: false });
+
+    /* rewrite as new DataFrame objext to overcome index issue
+      do not use setIndex as that causes problems with dfd.query */
     this.df = df
+    //new dfd.DataFrame(df.$data, {index:df[this.oa].$data,columns:df.columns})
     this.df.print();
   }
 
@@ -26,8 +33,9 @@ class Centroids {
   parent(oa) {
     // return this.df.query(this.df[this.oa].eq(oa))["ls" + this.oa].$data[0];
     return this.df.loc({ rows: this.indf([...oa]), columns: ["ls" + this.oa] }).$data[0];
-
   }
+
+
 
 
   bounds(oa) {
@@ -40,7 +48,8 @@ class Centroids {
 
 
   indf(oa){
-    return oa.filter(d=>this.oalist.has(d))
+    // checks in dataframe and converts to index
+    return oa.filter(d=>this.oalist.has(d)).map(d=>this.index[d])
 
   }
 
@@ -69,21 +78,19 @@ class Centroids {
       console.debug(a,b,c,d,bbox,bbox[0]);
 
       var matches = await this.df.query(
-            await this.df["lat"].lt(b)
-          .and(await this.df["lng"].lt(a))
-          .and(await this.df["lat"].gt(d))
-          .and(await this.df["lng"].gt(c))
+            await this.df["lat"].lt(90)
+          // .and(await this.df["lng"].lt(a))
+          // .and(await this.df["lat"].gt(d))
+          // .and(await this.df["lng"].gt(c))
       )
     } catch (err) {
       
       var matches = this.df;
       console.error("BBOX FILTER ERROR:", err);
+      this.df.print()
     }
 
     console.warn("maa", bbox, this.df.$index.length, matches.$index.length);
-
-    // matches.print();
-    console.error("maaa");
 
     return { bbox: bbox, ...this.inPolygon(coordinates, matches.$data) };
   }
@@ -95,7 +102,7 @@ class Centroids {
     // options = {simplify_geo: false},
   ) {
     // simplify the codes
-    const oa_all = [...selected.oa]//.map(d=>d.toUpperCase());
+    const oa_all = this.indf([...selected.oa])//.map(d=>d.toUpperCase());
 
     var lsoa = await new Set(
       Object.entries(

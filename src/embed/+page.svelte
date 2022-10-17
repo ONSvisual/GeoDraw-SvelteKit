@@ -1,0 +1,93 @@
+<script>
+  import { onMount } from "svelte";
+  import pym from "pym.js";
+	import html2canvas from "html2canvas";
+
+  import Cards from "$lib/layout/Cards.svelte";
+  import Card from "$lib/layout/partial/Card.svelte";
+	import BarChart from "$lib/tables/BarChart.svelte";
+  import MapAreas from "$lib/tables/MapAreas.svelte";
+  
+  let pym_child;
+  let name;
+  let geojson;
+  let tables;
+
+  function update() {
+    let hash = window.location.hash;
+
+    if (hash && hash.includes("name=")) {
+      let props = {};
+      let searchParams = new URLSearchParams(hash.slice(3));
+
+      for (let pair of searchParams.entries()) {
+        if (pair[0] == 'name') {
+          props[pair[0]] = atob(pair[1]);
+        } else if (['tabs','poly'].includes(pair[0])) {
+          props[pair[0]] = JSON.parse(atob(pair[1]));
+        }
+      }
+
+      name = props.name;
+      geojson = props.poly;
+      tables = props.tabs;
+    }
+  }
+
+  async function makePNG(e) {
+    console.log('pngbtn', e);
+
+    let canvas = await html2canvas(document.body);
+    const base64 = canvas.toDataURL();
+    console.log(canvas);
+
+    let a = document.createElement("a");
+    a.href = base64;
+    a.download = name.replace(/\s+/g, "_") + ".png";
+    a.click();
+  }
+
+  onMount(() => {
+    pym_child = new pym.Child({ id: 'embed', polling: 1000 });
+    pym_child.onMessage('makePNG', makePNG);
+    update();
+    window.onhashchange = update;
+  });
+</script>
+
+<svelte:head>
+  <title>Custom area profile{name ? ` for ${name}` : ''}</title>
+</svelte:head>
+
+{#if tables}
+<h1>{name ? name : ''}</h1>
+<Cards>
+  {#if geojson}
+  <Card title="Area map">
+    <div style:height="230px" style:width="100%">
+      <MapAreas {geojson}/>
+    </div>
+  </Card>
+  {/if}
+  {#each tables as tab}
+  <Card title={tab.name}>
+    <BarChart
+      xKey="pc"
+      yKey="column"
+      zKey="z"
+      data={tab.data}
+    />
+  </Card>
+  {/each}
+</Cards>
+
+<span class="footnote">Source: Census 2011 data. Office for National Statistics | <a href="/" target="_blank">Build a custom area profile</a></span>
+{/if}
+
+<style>
+  h1 {
+    font-size: 1.8rem;
+    margin: 0 0 -12px  0;
+    font-weight: bold;
+  }
+</style>
