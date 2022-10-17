@@ -5,7 +5,7 @@ import {
 
 // global variables shared between units. 
 export const draw_type = writable(undefined); // drawing tool type
-export const selected = writable([{oa:new Set(),lat:[],lng:[]}]); // which layers contain data e.g. ['centroids']
+export const selected = writable([{oa:new Set(),lat:[],lng:[],parents:[]}]); // which layers contain data e.g. ['centroids']
 // export const select = writable([]); // selected areacodes
 
 export const mapsource = writable({}); // source dictionary
@@ -20,8 +20,8 @@ export const centroids = writable();
 
 // map constants
 
-export let minzoom = 4;
-export let maxzoom = 14;
+export let minzoom = 6;
+export let maxzoom = 12;
 export let drawtools = true
 
 export let location = {
@@ -41,23 +41,5 @@ export const server = 'https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v2
 
 //http://localhost:7113
 export const mapstyle = `https://bothness.github.io/ons-basemaps/data/style-outdoor.json`
-// `https://bothness.github.io/ons-basemaps/data/style-omt.json`
-// `/css/style-omt.json`
-//'https://api.mapbox.com/styles/v1/carbondesignsystem/ck7c8ce1y05h61ipb2fixfe76?access_token=pk.eyJ1IjoibWJvc3RvY2siLCJhIjoiY2s5ZWRqb2w1MDBnYjNmbzcxb2xxaGZjeSJ9.ZOeAUq-8dsbN7zqgG7vkdQ'
-//"https://bothness.github.io/ons-basemaps/data/style-omt.json";
-
-export function c2bbox(lat, lng) {
-
-    var min_coords = [
-        Math.min.apply(null, lng),
-        Math.min.apply(null, lat)
-    ]
-    var max_coords = [
-        Math.max.apply(null, lng),
-        Math.max.apply(null, lat)
-    ]
-
-    return [min_coords, max_coords]
-}
 
 

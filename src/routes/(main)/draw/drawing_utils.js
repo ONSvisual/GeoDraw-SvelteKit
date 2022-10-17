@@ -89,7 +89,7 @@ export async function init_draw () {
   get (mapobject).on ('zoomend', function () {
     const de = get (mapobject).getZoom () < mzm
     draw_enabled.set(de);
-    cursor()
+    // cursor()
   });
 
   get(mapobject).doubleClickZoom.enable ()
@@ -210,6 +210,7 @@ export async function update (coordinates) {
 
   var current = get (selected);
   var last = current[current.length - 1];
+  console.debug('update,last',last,current)
 
   // features.bbox.map (d => {
   //   last.lat.push (d[1]);
@@ -338,10 +339,10 @@ export function geo_blob (q) {
 function cursor(){
   // A function to change the df.loc({rows:df.$index.slice(0,4)})ap cursor
   const de = get(draw_enabled)
-  const dt = get(draw_type);
+  const dt = get(draw_type); 
 
-  if (de | dt===undefined ){document.querySelector('#mapcontainer div canvas').style.cursor = 'no-drop';}
-  else if (dt === 'move') {document.querySelector('#mapcontainer div canvas').style.cursor='move'}
+  // if (de | dt === undefined ){document.querySelector('#mapcontainer div canvas').style.cursor = 'no-drop';}
+  if (dt === 'move') {document.querySelector('#mapcontainer div canvas').style.cursor='move'}
   else if (dt === 'select'){
     document.querySelector('#mapcontainer div canvas').style.cursor='auto'
   } 

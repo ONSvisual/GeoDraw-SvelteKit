@@ -5,7 +5,7 @@ class Centroids {
     var df =  await (await dfd.readCSV(this.file))
     
     
-    this.oalist = new Set(df.$index)
+    this.oalist = new Set(df[this.oa].$data)
     this.lsoa = this.count(df[`lsoa${year}cd`]);
     this.msoa = this.count(df[`msoa${year}cd`]);
 
@@ -32,7 +32,10 @@ class Centroids {
 
   parent(oa) {
     // return this.df.query(this.df[this.oa].eq(oa))["ls" + this.oa].$data[0];
-    return this.df.loc({ rows: this.indf([...oa]), columns: ["ls" + this.oa] }).$data[0];
+    var ret = this.df.loc({ rows: this.indf([...oa]), columns: ["ls" + this.oa] }).$data;
+    if (oa.length == 1) return ret[0]
+    return ret
+
   }
 
 
@@ -40,8 +43,10 @@ class Centroids {
 
   bounds(oa) {
     // get the bounaries of all selected oas
+    console.debug('c.bounds',this.df.loc({ rows: this.indf(oa), columns: ["lng", "lat"] }).$data, this.indf(oa), oa)
     return this.getbbox(
       this.df.loc({ rows: this.indf(oa), columns: ["lng", "lat"] }).$data
+      
     );
 
   }
@@ -162,6 +167,7 @@ class Centroids {
   // generic function defs
   ////////////////////////
   getbbox(coords) {
+    
     var lat = coords.map((p) => +p[1]);
     var lng = coords.map((p) => +p[0]);
 
