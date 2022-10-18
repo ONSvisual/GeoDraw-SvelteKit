@@ -72,7 +72,8 @@
 
   async function init() {
     // calculate the centroids and simplifications.
-    centroids.set(await GetCentroids({year: 21, dfd: dfd}));
+    var centroid_dummy = await GetCentroids({year: 21, dfd: dfd})
+    centroids.set( centroid_dummy);
     console.log('cent', $centroids);
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
