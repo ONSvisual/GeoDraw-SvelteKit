@@ -18,6 +18,7 @@
     </h3>
   </header>
   {/if}
+  <br>
   <slot/>
   {#if links && links[0]}
   <div class="margin-top--2">

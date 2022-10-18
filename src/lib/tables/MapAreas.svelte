@@ -6,8 +6,8 @@
 	const style = "https://bothness.github.io/ons-basemaps/data/style-outdoor.json";
 
 	export let geojson = null;
-	export let color = "#206095";
-	export let lineWidth = 2.5;
+	export let color = '#1f8ab0' //"#206095";
+	export let lineWidth = .5;
 	export let fillOpacity = 0.2;
 	
 	let map;
@@ -68,14 +68,25 @@
 		href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css"
 	/>
 </svelte:head>
-
-<div id="map" bind:this={container} bind:clientWidth={w}/>
+<br>
+<div id="map" style:margin='auto!important' style:min-height='400px' class='center' bind:this={container} bind:clientWidth={w}/>
 
 <style>
 	#map {
-		width: 100%;
-		height: 300px;
+		/* width: 100%; */
+		/* height: 300px; */
 		margin: 0;
 		padding: 0;
+	/* color: #1f8ab0 */
+
 	}
+
+	.center {
+		margin:auto!important;
+		position:relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(163, 163, 163, 0.18);
+}
 </style>

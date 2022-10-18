@@ -97,7 +97,7 @@
   <Cards>
     {#if geojson}
       <Card title="Area map">
-        <div style:height="230px" style:width="100%">
+        <div style:min-height='260px' style:width="100%" >
           <MapAreas {geojson} />
         </div>
       </Card>

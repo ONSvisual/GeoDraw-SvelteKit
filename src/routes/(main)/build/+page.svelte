@@ -24,7 +24,7 @@
 
   // import * as dfd from 'danfojs'
   import {Minhash} from 'minhash';
-  import { log } from 'mathjs';
+  import {log} from 'mathjs';
 
   let pym_parent; // Variabl for pym
   //   let geojson; // Simplified geojson boundary for map
@@ -124,8 +124,16 @@
     // 	polygon: polygon,
     // };
 
-    population = await get_pop(state.compressed,state.name);
-    update_profile(state.start, state.name, state.topics, includemap, population);
+    population = await get_pop(state.compressed, state.name);
+    setTimeout(() => {
+      update_profile(
+        state.start,
+        state.name,
+        state.topics,
+        includemap,
+        population
+      );
+    }, 2000);
     console.warn(population);
   }
 
@@ -266,14 +274,15 @@
     return await Promise.all(rtn);
   }
 
-  async function update_profile(start, name, data, includemap,population) {
+  async function update_profile(start, name, data, includemap, population) {
     if (start) {
       tables = await get_data(data);
 
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${population ? `&population=${btoa(JSON.stringify(population))}` : ''}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
-
+      )}${population ? `&population=${btoa(JSON.stringify(population))}` : ''}${
+        includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
+      }`;
 
       // alert(population)
 
@@ -288,7 +297,13 @@
       }
     }
   }
-  $: update_profile(state.start, state.name, state.topics, includemap, population);
+  $: update_profile(
+    state.start,
+    state.name,
+    state.topics,
+    includemap,
+    population
+  );
 
   function makeEmbed(embed_hash) {
     let url = `/embed/${embed_hash}`;
@@ -385,22 +400,6 @@
     <div class="embed">
       <h3>{state.name}</h3>
 
-      <!-- {#if state.start}
-        <Cards>
-          {#if includemap}
-            <Card title={'Area map'}>
-              <MapAreas geojson={store.geometry} />
-            </Card>
-          {/if}
-          {#each tables as tab}
-            <Card title={tab.name}>
-              <BarChart xKey="pc" yKey="column" zKey="z" data={tab.data} />
-            </Card>
-          {/each}
-
-          <br />
-        </Cards>
-      {/if} -->
     </div>
     <div class="embed-actions">
       <button
@@ -422,18 +421,17 @@
       <button on:click={() => pym_parent.sendMessage('makePNG', null)}>
         Download PNG
       </button>
-      <button disabled={!state.topics}
-      on:click={async function(){
-        var tables = await get_data(state.topics);
-        var pretty = JSON.stringify(tables,null,4)
-        var file = new Blob([pretty], {type: 'text/json'});
-        download(file, state.name.replace(' ','_')+'.json');
+      <button
+        disabled={!state.topics}
+        on:click={async function () {
+          var tables = await get_data(state.topics);
+          var pretty = JSON.stringify(tables, null, 4);
+          var file = new Blob([pretty], {type: 'text/json'});
+          download(file, state.name.replace(' ', '_') + '.json');
 
-        console.log(pretty)
-
-      }}
-      
-      >Download Data</button>
+          console.log(pretty);
+        }}>Download Data</button
+      >
       {#if embed_hash && state.showEmbed}
         <p style:margin-bottom={0}>Embed code</p>
         <textarea>{makeEmbed(embed_hash)}</textarea>
