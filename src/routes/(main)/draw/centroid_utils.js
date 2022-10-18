@@ -3,9 +3,10 @@ class Centroids {
     console.debug(year,dfd,'cinit')
     this.file = `/oa${year}-data.csv.gz`;
     this.oa = `oa${year}cd`;
-    var df = await await dfd.readCSV (this.file);
+    var df = await dfd.readCSV (this.file);
     
     df.print()
+    console.debug('df',df)
 
     this.oalist = new Set (df[this.oa].$data);
     this.lsoa = this.count (df[`lsoa${year}cd`]);
