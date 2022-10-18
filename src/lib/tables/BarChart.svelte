@@ -42,7 +42,7 @@
 {#if zDomain[1]}
 <ul class="legend-block">
 	{#each zDomain as group, i}
-	<li>
+	<li class:ew={i != 0}>
 		<div class="legend-vis {i == 0 ? 'bar' : 'marker'}" style:height="1rem" style:width="{i == 0 ? '1rem' : markerWidth + 'px'}"></div>
 		<span class="{i == 0 ? 'bold' : 'brackets'}">{group}</span>
 	</li>
@@ -77,16 +77,29 @@
 	}
 	.bold {
 		font-weight: bold;
+		color:#023d52
 	}
 	.sml {
 		margin-left: 3px;
 		font-size: .85rem;
 	}
+	.ew{
+		/* color:red; */
+		float:right!important;
+	}
+	.brakets{
+		color:#272727;
+	}
 	.brackets::before {
 		content: "(";
+		font-weight: 600;
+		font-size: 120%;
+		
 	}
 	.brackets::after {
 		content: ")";
+		font-weight:600;
+		font-size: 120%;
 	}
 	.bar-group {
 		display: block;

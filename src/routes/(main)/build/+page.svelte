@@ -10,6 +10,7 @@
 
   import {default as datasets} from '$lib/util/custom_profiles_tables.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
+  import {get_pop} from './getpop.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
 
@@ -23,6 +24,7 @@
 
   // import * as dfd from 'danfojs'
   import {Minhash} from 'minhash';
+  import { log } from 'mathjs';
 
   let pym_parent; // Variabl for pym
   //   let geojson; // Simplified geojson boundary for map
@@ -31,7 +33,7 @@
   let includemap = true;
 
   const topics = [
-    {key: 'population', label: 'Population'},
+    // {key: 'population', label: 'Population'},
     {key: 'density', label: 'Population density'},
     {key: 'agemed', label: 'Average (median) age'},
     {key: 'age', label: 'Age profile'},
@@ -87,38 +89,13 @@
   $: regex =
     state.topicsFilter.length > 1 ? new RegExp(state.topicsFilter, 'i') : null;
 
-  // function statechange(states) {
-  // 	console.log(states);
-
-  // 	// var tlist = states.map((key) => datasets[key]); //get obj
-  // 	// var alist = Object.values(compressed).flat().join(";"); // flatten dict
-  // }
-
-  //   async function get_geo(cd) {
-  //     try {
-  //       return await fetch(
-  //         `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${cd.slice(
-  //           0,
-  //           3
-  //         )}/${cd}.json`
-  //       ).then((d) => d.json());
-  //     } catch (error) {
-  //       console.error('FAILED to fetch ', cd);
-  // 	  console.warn(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${cd.slice(
-  //           0,
-  //           3
-  //         )}/${cd}.json`)
-  //       return undefined;
-  //     }
-  //   }
-
   let store;
   let geojson;
+  let population;
   async function init() {
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
     // var areas = [...store.properties.oa_lsoa]; //,...store.properties.lsoa,...store.properties.msoa]
-
     // const features = await Promise.all(areas.map(get_geo));
 
     console.warn('build-', store);
@@ -135,7 +112,6 @@
     state.compressed = Object.values({
       ...props.msoa,
       ...props.lsoa,
-      ...props.msoa,
       ...props.oa,
     })
       .flat()
@@ -147,6 +123,10 @@
     // 	compressed,
     // 	polygon: polygon,
     // };
+
+    population = await get_pop(state.compressed,state.name);
+    update_profile(state.start, state.name, state.topics, includemap, population);
+    console.warn(population);
   }
 
   onMount(init);
@@ -246,9 +226,8 @@
 
             df.print();
 
-            // console.log(df, df_old);
-
-            var pc = df.div(df.sum(), {axis: 0});
+            // var pc = df.div(df.sum(), {axis: 0});
+            var pc = df.div(df.max(), {axis: 0});
 
             var lists = [];
             let keepcol = table['Cell name'].filter((d) =>
@@ -287,13 +266,17 @@
     return await Promise.all(rtn);
   }
 
-  async function update_profile(start, name, data, includemap) {
+  async function update_profile(start, name, data, includemap,population) {
     if (start) {
       tables = await get_data(data);
 
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
+      )}${population ? `&population=${btoa(JSON.stringify(population))}` : ''}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
+
+
+      // alert(population)
+
       if (!pym_parent) {
         pym_parent = new pym.Parent('embed', '/embed/' + embed_hash, {
           name: 'embed',
@@ -305,7 +288,7 @@
       }
     }
   }
-  $: update_profile(state.start, state.name, state.topics, includemap);
+  $: update_profile(state.start, state.name, state.topics, includemap, population);
 
   function makeEmbed(embed_hash) {
     let url = `/embed/${embed_hash}`;
@@ -439,7 +422,18 @@
       <button on:click={() => pym_parent.sendMessage('makePNG', null)}>
         Download PNG
       </button>
-      <button disabled="true">Download Data</button>
+      <button disabled={!state.topics}
+      on:click={async function(){
+        var tables = await get_data(state.topics);
+        var pretty = JSON.stringify(tables,null,4)
+        var file = new Blob([pretty], {type: 'text/json'});
+        download(file, state.name.replace(' ','_')+'.json');
+
+        console.log(pretty)
+
+      }}
+      
+      >Download Data</button>
       {#if embed_hash && state.showEmbed}
         <p style:margin-bottom={0}>Embed code</p>
         <textarea>{makeEmbed(embed_hash)}</textarea>
