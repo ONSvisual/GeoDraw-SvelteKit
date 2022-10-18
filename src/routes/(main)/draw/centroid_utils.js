@@ -1,7 +1,7 @@
 class Centroids {
   async initialize({year, dfd}) {
     console.debug(year,dfd,'cinit')
-    this.file = `/oa${year}-data.csv.gz`;
+    this.file = `./oa${year}-data.csv.gz`;
     this.oa = `oa${year}cd`;
     var df = await dfd.readCSV(this.file);
     console.debug('df',df)
