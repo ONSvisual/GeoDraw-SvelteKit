@@ -1,6 +1,6 @@
 {
-	"name": "GeoDraw",
-	"version": "1.1.0",
+	"name": "Custom Area Profile",
+	"version": "2.0.0",
 	"scripts": {
 		"dev": "vite dev",
 		"debug": "vite dev --debug",
