@@ -1,0 +1,172 @@
+
+<!--  DO NOT INCLUDE THIS SCRIPT INSIDE SVELTE - it uptimises the loop to five 5 times the speedup!  -->
+<!-- AUTHOR: Dan Ellis -->
+
+<meta http-equiv="cache-control" content="no-cache" />
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+
+
+
+<style>
+body{
+    font-family: 'Space Mono', monospace;
+    background-color: '#202124';
+    /* color:'whitesmoke'; */
+    font-size: small;
+
+}
+
+span{color:rgb(7, 2, 2);
+font-weight: 800!important;}
+
+
+</style>
+
+
+<body>
+<h1> User profile estimate* </h1>
+This page measures your browsers performance to aid the user testing stage. 
+
+<h2> CPU </h2> 
+<h3>Time: <span id="time"></span> seconds </h3>
+<h3>Speed: <span id="speed"></span> GHZ </h3>
+
+<br>
+
+<h2> Machine </h2> 
+<h3>Browser: <span id="browser"></span>  </h3>
+<h3>Platform: <span id="platform"></span>  </h3>
+<h3>Vendor: <span id="vendor"></span>  </h3>
+<h3>ProductSub: <span id="productsub"></span>  </h3>
+<h3>userAgent: <span id="useragent"></span>  </h3>
+
+<br>
+
+<h2> Internet </h2> 
+<h3>Latency: <span id="dspeed"> --- checking --- </span> </h3>
+<h3><span id="fast">Based on a 10MB image download.</span>  </h3>
+
+
+</body>
+
+
+
+
+
+
+
+<script>
+    // speedtest 
+    
+    
+    
+    var _speedconstant = 8.9997e-9; //if speed=(c*a)/t, then constant=(s*t)/a and time=(a*c)/s
+    var d = new Date();
+    var amount = 150000000;
+    var estprocessor = 1.7; //average processor speed, in GHZ
+    console.log("JSBenchmark running loop "+amount+" times.     Estimated time (for "+estprocessor+"ghz processor) is "+(Math.round(((_speedconstant*amount)/estprocessor)*100)/100)+"s");
+    for (var i = amount; i>0; i--) {} 
+    var newd = new Date();
+    var accnewd = Number(String(newd.getSeconds())+"."+String(newd.getMilliseconds()));
+    var accd = Number(String(d.getSeconds())+"."+String(d.getMilliseconds())); 
+    var di = accnewd-accd;
+    if (d.getMinutes() != newd.getMinutes()) {
+    di = (60*(newd.getMinutes()-d.getMinutes()))+di}
+    var spd = ((_speedconstant*amount)/di);
+    console.log("Time: "+Math.round(di*1000)/1000+"s, estimated speed: "+Math.round(spd*1000)/1000+"GHZ");
+    
+    
+    
+    
+    document.getElementById('time').innerText = '' + Math.round(di*1000)/1000
+    document.getElementById('speed').innerText = '' + Math.round(spd*1000)/1000
+
+
+    
+
+
+    // browser 
+    navigator.sayswho= (function(){
+    var ua= navigator.userAgent;
+    var tem; 
+    var M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+    if(/trident/i.test(M[1])){
+        tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+        return 'IE '+(tem[1] || '');
+    }
+    if(M[1]=== 'Chrome'){
+        tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+        if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+    }
+    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+    return M.join(' ');
+})();
+
+document.getElementById('browser').innerText= navigator.sayswho
+
+
+
+document.getElementById('platform').innerText=navigator.platform
+document.getElementById('vendor').innerText=navigator.vendor
+document.getElementById('productsub').innerText=navigator.productSub
+document.getElementById('useragent').innerText = navigator.userAgent
+
+
+//  speedtest 
+
+// https://upload.wikimedia.org/wikipedia/commons/f/ff/Pizigani_1367_Chart_10MB.jpg
+
+var testConnectionSpeed = {
+  imageAddr : "Pizigani_1367_Chart_10MB.jpg", // this is just an example, you rather want an image hosted on your server
+  downloadSize : 101747, // Must match the file above (from your server ideally)
+  run:function(mbps_max,cb_gt,cb_lt){
+    testConnectionSpeed.mbps_max = parseFloat(mbps_max) ? parseFloat(mbps_max) : 0;
+    testConnectionSpeed.cb_gt = cb_gt;
+    testConnectionSpeed.cb_lt = cb_lt;
+    testConnectionSpeed.InitiateSpeedDetection();
+  },
+  InitiateSpeedDetection: function() {
+    window.setTimeout(testConnectionSpeed.MeasureConnectionSpeed, 1);
+  },
+  result:function(){
+    var duration = (endTime - startTime) / 1000;
+    var bitsLoaded = testConnectionSpeed.downloadSize * 8;
+    var speedBps = (bitsLoaded / duration).toFixed(2);
+    var speedKbps = (speedBps / 1024).toFixed(2);
+    var speedMbps = (speedKbps / 1024).toFixed(2);
+    if(speedMbps >= (testConnectionSpeed.max_mbps ? testConnectionSpeed.max_mbps : 1) ){
+      testConnectionSpeed.cb_gt ? testConnectionSpeed.cb_gt(speedMbps) : false;
+    }else {
+      testConnectionSpeed.cb_lt ? testConnectionSpeed.cb_lt(speedMbps) : false;
+    }
+  },
+  MeasureConnectionSpeed:function() {
+    var download = new Image();
+    download.onload = function () {
+        endTime = (new Date()).getTime();
+        testConnectionSpeed.result();
+    }
+    startTime = (new Date()).getTime();
+    var cacheBuster = "?nnn=" + startTime;
+    download.src = testConnectionSpeed.imageAddr + cacheBuster;
+  }
+
+}
+
+// start test immediatly, you could also call this on any event or whenever you want
+testConnectionSpeed.run(1.5, 
+
+function(mbps){
+    document.getElementById('dspeed').innerText = ">= 1.5Mbps ("+mbps+"Mbps)" 
+},
+function(mbps){c
+    document.getElementById('dspeed').innerText ="< 1.5Mbps("+mbps+"Mbps)"
+} )
+    
+</script>
+    

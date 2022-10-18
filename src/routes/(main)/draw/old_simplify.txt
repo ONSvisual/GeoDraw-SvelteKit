@@ -1,0 +1,83 @@
+
+  const [x, y, z] = bboxToTile (bbox);
+  console.debug ('bbox', bbox, 'last', last, 'xyz', x, y, z);
+
+  if (z === 28) return null;
+
+  var tile = `${z}/${x}/${y}`;
+
+  if (x < 7) {
+    alert (
+      `Total area selected exceeds allowed limit (zoom level ${z}). Please click undo to continue. Parent Data Tile ${tile}`
+    );
+    return {
+      error_title: 'Total area selected exceeds allowed limit. Please use the undo button to reduce area size.',
+      error: `Parent Data Tile ${tile}`,
+    };
+  }
+
+  // get the data from the tile
+  if (simplify[tile]) {
+    var simple = simplify[tile];
+  } else {
+
+    
+    var simple = await fetch (`${server}/encoding/${tile}.json`).then (d =>
+      d.json ()
+    );
+    simple.lsoa = simple.lsoa.map (d => {
+      d[1] = new Set (d[1]);
+      return d;
+    });
+    simple.msoa = simple.msoa.map (d => {
+      d[1] = new Set (d[1]);
+      return d;
+    });
+    simplify[tile] = simple;
+  }
+
+  // simplify the query
+  var rm = [];
+  var oa = last.oa;
+  var lsoa = simple.lsoa.filter (
+    d => ![...d[1]].filter (x => !oa.has (x)).length
+  );
+  lsoa = new Set (
+    lsoa.map (e => {
+      rm.push ([...e[1]]);
+      return e[0];
+    })
+  );
+  var msoa = simple.msoa.filter (
+    d => ![...d[1]].filter (x => !lsoa.has (x)).length
+  );
+  rm = new Set (rm.flat ());
+  var rmlsoa = new Set (msoa.map (d => d[1]).flat ());
+  oa = [...oa].filter (e => !rm.has (e));
+  lsoa = [...lsoa].filter (e => !rmlsoa.has (e));
+  msoa = msoa.map (d => d[0]);
+
+  console.debug ('lsoa', tile, msoa, oa, lsoa, last.oa);
+
+
+const oalist = [...last.oa];
+
+  await new Promise (res => setTimeout (res, 500));
+
+  const features = get (mapobject)
+    .queryRenderedFeatures ({
+      layers: ['bounds'],
+    })
+    .filter (d => oalist.includes (d.properties.oa)); //.map(d=>d.properties.oa)
+
+
+  if (!features.length) {
+    return false;
+  }
+
+  let merge = makeBoundary (
+    {type: 'FeatureCollection', features},
+    options.simplify_geo
+  );
+
+
