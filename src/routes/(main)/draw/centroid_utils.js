@@ -1,8 +1,11 @@
 class Centroids {
   async initialize({year, dfd}) {
+    console.debug(year,dfd,'cinit')
     this.file = `/oa${year}-data.csv.gz`;
     this.oa = `oa${year}cd`;
     var df = await await dfd.readCSV (this.file);
+    
+    df.print()
 
     this.oalist = new Set (df[this.oa].$data);
     this.lsoa = this.count (df[`lsoa${year}cd`]);

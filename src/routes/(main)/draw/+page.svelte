@@ -27,11 +27,9 @@
     maxzoom,
   } from './mapstore.js';
 
-  import {geo_blob, update, simplify_geo} from './drawing_utils.js';
-  // import bbox from '@turf/bbox';
+  import { update, simplify_geo} from './drawing_utils.js';
 
   import {GetCentroids} from './centroid_utils.js';
-  import Warning from '$lib/ui/Warning.svelte';
 
   const modelist = [
     {key: 'move', label: 'Pan and zoom'},
@@ -72,7 +70,10 @@
 
   async function init() {
     // calculate the centroids and simplifications.
+
+    console.debug('start')
     var centroid_dummy = await GetCentroids({year: 21, dfd: dfd})
+    console.debug('cd',centroid_dummy)
     centroids.set( centroid_dummy);
     console.log('cent', $centroids);
 
