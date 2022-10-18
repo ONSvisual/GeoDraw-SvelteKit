@@ -43,12 +43,7 @@ class Centroids {
 
   bounds (oa) {
     // get the bounaries of all selected oas
-    console.debug (
-      'c.bounds',
-      this.df.loc ({rows: this.indf (oa), columns: ['lng', 'lat']}).$data,
-      this.indf (oa),
-      oa
-    );
+    
     return this.getbbox (
       this.df.loc ({rows: this.indf (oa), columns: ['lng', 'lat']}).$data
     );
@@ -72,13 +67,13 @@ class Centroids {
       var a, b, c, d;
       [a, b] = bbox[1].map (parseFloat);
       [c, d] = bbox[0].map (parseFloat);
-      console.debug (a, b, c, d, bbox, bbox[0]);
+      // console.debug (a, b, c, d, bbox, bbox[0]);
 
       var matches = await this.df.query (
-        await this.df['lat'].lt (90)
-        // .and(await this.df["lng"].lt(a))
-        // .and(await this.df["lat"].gt(d))
-        // .and(await this.df["lng"].gt(c))
+        await this.df['lat'].lt (b)
+        .and(await this.df["lng"].lt(a))
+        .and(await this.df["lat"].gt(d))
+        .and(await this.df["lng"].gt(c))
       );
     } catch (err) {
       var matches = this.df;
@@ -86,7 +81,7 @@ class Centroids {
       this.df.print ();
     }
 
-    console.warn ('maa', bbox, this.df.$index.length, matches.$index.length);
+    // console.warn ('maa', bbox, this.df.$index.length, matches.$index.length);
 
     return {bbox: bbox, ...this.inPolygon (coordinates, matches.$data)};
   }
@@ -139,7 +134,7 @@ class Centroids {
 
     const bbox = this.bounds (oa_all);
 
-    console.debug ('simplify', msoa, lsoa, bbox, oa_all);
+    // console.debug ('simplify', msoa, lsoa, bbox, oa_all);
 
     var merge = {};
     merge.properties = {

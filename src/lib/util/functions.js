@@ -14,3 +14,7 @@ export function download(blob, filename) {
 export function clip(str, msg) {
   navigator.clipboard.writeText(str).then(() => alert(msg));
 }
+
+
+// export json2blob = functio
+// var file = new Blob([text], {type: type});

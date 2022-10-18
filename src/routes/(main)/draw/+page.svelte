@@ -31,6 +31,7 @@
   // import bbox from '@turf/bbox';
 
   import {GetCentroids} from './centroid_utils.js';
+  import Warning from '$lib/ui/Warning.svelte';
 
   const modelist = [
     {key: 'move', label: 'Pan and zoom'},
@@ -266,6 +267,45 @@
     init();
     console.log(window.location.hash);
   });
+
+
+
+
+/* 
+The save data and continue function
+*/
+async function savedata ()  {
+        document.querySelector('#mapcontainer div canvas').style.cursor =
+          'wait';
+        
+        
+        return $centroids
+          .simplify(state.name, $selected[$selected.length - 1],$mapobject)
+
+          .then((q) => {
+            if (q) {
+              console.debug('---req  ', q);
+
+              const items = $selected[$selected.length - 1];
+
+              if (items.oa.size > 0) {
+                if (q.error) return false;
+
+                console.log('buildpage', q);
+                localStorage.setItem('onsbuild', JSON.stringify(q));
+                document.querySelector('#mapcontainer div canvas').style.cursor =
+                'auto';
+                return true;
+              }
+            } 
+
+              alert('No features selected.');
+              document.querySelector('#mapcontainer div canvas').style.cursor =
+                'auto';
+              return false;
+            
+          })
+        }
 </script>
 
 <svelte:head>
@@ -363,39 +403,15 @@
     <button
       class="text confirm"
       disabled={!$selected[$selected.length - 1].oa.size > 0}
-      on:click={() => {
-        document.querySelector('#mapcontainer div canvas').style.cursor =
-          'wait';
-        $centroids
-          .simplify(state.name, $selected[$selected.length - 1],$mapobject)
-
-          .then((q) => {
-            if (q) {
-              console.debug('---req  ', q);
-
-              const items = $selected[$selected.length - 1];
-
-              if (items.oa.size > 0) {
-                if (q.error) return false;
-
-                console.log('buildpage', q);
-                localStorage.setItem('onsbuild', JSON.stringify(q));
-
-                return true;
-              }
-            } else {
-              alert('No features selected.');
-              document.querySelector('#mapcontainer div canvas').style.cursor =
-                'auto';
-              return false;
-            }
-          })
-          .then((rdir) => {
+      on:click={()=>
+          savedata().then( (rdir) => {
+            console.warn(rdir)
             if (rdir) {
               goto(`${base}/build/`);
             }
-          });
-      }}
+            else{console.error('not redirecting', rdir)}
+          })
+      }
     >
       <span>Build profile</span><Icon type="chevron" />
     </button>
@@ -408,15 +424,14 @@
       <input type="text" bind:value={state.name} placeholder="Type a name" />
       <button
         class="text"
-        on:click={async () => {
-          let geo = $centroids.simplify(
-            state.name,
-            $selected[$selected.length - 1]
-          );
-          alert('check here');
-          let blob = geo_blob(geo);
-          download(blob, `${state.name}.json`);
-        }}
+        on:click={()=>
+          savedata().then(() => {
+            var data = JSON.parse(localStorage.getItem('onsbuild'))
+            var file = new Blob([JSON.stringify(data.geojson)], {type: 'text/plain'});
+            download(file, state.name.replace(' ','_')+'.geojson');
+
+          })
+      }
       >
         <Icon type="download" /><span>Save geography</span>
       </button>
