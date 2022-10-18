@@ -147,6 +147,8 @@ export function simplify_geo (geometry, max_length = 3000) {
       highQuality: true,
       tolerance: Math.pow (10, -precision),
     });
+
+    console.warn('turf' , simple)
     simple.coordinates = roundAll (simple.coordinates, Math.ceil (precision));
     length = JSON.stringify (simple).length;
     precision -= 0.5;

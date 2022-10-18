@@ -181,7 +181,6 @@
 
         console.debug('q', q);
         var bbox = get(centroids).bounds([...q.oa]);
-        console.error(167, bbox, q);
 
         $mapobject.fitBounds(bbox, {
           padding: 20,
@@ -368,7 +367,7 @@
         document.querySelector('#mapcontainer div canvas').style.cursor =
           'wait';
         $centroids
-          .simplify(state.name, $selected[$selected.length - 1])
+          .simplify(state.name, $selected[$selected.length - 1],$mapobject)
 
           .then((q) => {
             if (q) {
