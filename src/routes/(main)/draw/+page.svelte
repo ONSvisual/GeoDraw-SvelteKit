@@ -38,7 +38,11 @@
     {key: 'radius', label: 'Draw a radius'},
   ];
 
-  let advanced = false;
+
+  // variable custom testing
+  let advanced = new Date()%2;
+
+
   $: modes = advanced? modelist:modelist.slice(0,2)
 
   let state = {

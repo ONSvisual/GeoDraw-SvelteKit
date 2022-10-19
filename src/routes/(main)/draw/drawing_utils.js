@@ -120,7 +120,8 @@ export async function init_draw () {
   // update circle tool each radius change
   radiusInKm.subscribe (() => circle_fast ());
 
-  get (mapobject).on ('click', 'bounds', function boundclick (e) {
+
+  function boundclick (e) {
     switch (get (draw_type)) {
       case 'radius':
         draw_radius (e.lngLat);
@@ -129,7 +130,10 @@ export async function init_draw () {
         draw_point (e);
         break;
     }
-  });
+  };
+
+  get (mapobject).on ('click', 'bounds', boundclick)//mouse
+  get (mapobject).on ('touchstart', 'bounds', boundclick)//touch
 
 
 }
