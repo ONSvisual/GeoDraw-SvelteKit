@@ -243,6 +243,8 @@ export async function update (coordinates) {
 
 updatelocal(current)
   cursor()
+
+  
 }
 
 function draw_point (e) {

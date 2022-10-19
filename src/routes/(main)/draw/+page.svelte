@@ -58,7 +58,7 @@
   const zoomstop = 8
   let zoom; // prop bound to map zoom level
   let uploader; // DOM element for geojson file upload
-
+  let pselect = '0';
 
   $: showTray = ['polygon', 'radius'].includes(state.mode);
 
@@ -136,6 +136,9 @@
 
     async function recolour() {
       const items = $selected[$selected.length - 1];
+
+      pselect = [...items.oa].map(d=>get(centroids).population[d]||0).reduce((a,b)=>a+b)
+
       // if (!items.oa.size) return;
       console.debug('---recolour', items);
       $mapobject.setPaintProperty('bounds', 'fill-color', [
@@ -611,6 +614,8 @@ async function savedata ()  {
       Explore the map to find a location of interest, then select a drawing tool
       from the menu.
     {/if}
+    <br>
+    <p><span style='font-weight:bold'> Population selected:</span> {pselect} </p>
   </div>
 </aside>
 

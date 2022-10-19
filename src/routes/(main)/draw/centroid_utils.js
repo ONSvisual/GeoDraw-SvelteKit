@@ -22,10 +22,14 @@ class Centroids {
     this.lsoa = this.count (df[`lsoa${year}cd`]);
     this.msoa = this.count (df[`msoa${year}cd`]);
 
+    
+
+    
     var a = df['population'];
     this.population = Object.fromEntries (
-      a.$index.map ((_, i) => [_, a.$data[i]])
+      df[this.oa].$data.map ((_, i) => [_, a.$data[i]])
     );
+
 
     var a = df[this.oa];
     this.index = Object.fromEntries (a.$index.map ((_, i) => [a.$data[i], _]));
@@ -62,6 +66,8 @@ class Centroids {
       this.df.loc ({rows: this.indf (oa), columns: ['lng', 'lat']}).$data
     );
   }
+
+
 
   indf (oa) {
     // checks in dataframe and converts to index
