@@ -17,8 +17,8 @@ class Centroids {
     this.oa = `oa${year}cd`;
 
 
-try{var df = await dfd.readCSV(this.file)}
-catch(err){
+// try{var df = await dfd.readCSV(this.file)}
+// catch(err){
 
     var filestr = await fetch(
       this.file,
@@ -29,7 +29,7 @@ catch(err){
       console.warn('filesrrr',filestr)
 
     var df = await dfd.readCSV(filestr)
-}
+// }
       //this.file);
     console.debug('df',df)
     df.print()
