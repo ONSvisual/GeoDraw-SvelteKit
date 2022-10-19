@@ -11,10 +11,10 @@
 
 </script>
 
-
+ 
 
 <svelte:head>
-  <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"> </script>
+  <script src="/danfo.bundle.js"> </script>
 
   <!-- {#if path === '/draw/'}
   <script sync src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
