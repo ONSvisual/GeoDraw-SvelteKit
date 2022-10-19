@@ -45,15 +45,6 @@
   // variable custom testing
   let advanced = new Date()%2;
 
-    /* 
-  A section to clear the local storage if past the last update date
-  When updating this, use the american format of mm/dd/yy
-  */
-  // if (new Date(localStorage.getItem('lastdate')) < new Date('18/18/2022')){
-  //     localStorage.clear();
-  //  }
-  //  localStorage.setItem('lastdate', +(new Date()))
-
 
    
 
@@ -88,6 +79,18 @@
   let newselect;
 
   async function init() {
+
+            /* 
+  A section to clear the local storage if past the last update date
+  When updating this, use the american format of mm/dd/yy
+  */
+  if (new Date(localStorage.getItem('lastdate')) < new Date('18/18/2022')){
+      localStorage.clear();
+   }
+   localStorage.setItem('lastdate', +(new Date()))
+
+
+   
     // calculate the centroids and simplifications.
 
     console.debug('start')

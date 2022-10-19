@@ -31,6 +31,11 @@
   {/if} -->
 
   <title>Build a custom area profile</title>
+
+  <script defer>
+
+  </script>
+
 </svelte:head>
 
 <main>
