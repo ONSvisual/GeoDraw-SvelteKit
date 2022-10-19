@@ -1,5 +1,5 @@
 // import pako from 'pako'
-
+import {dissolve} from '$lib/mapshaper'
 
 class Centroids {
   async initialize({year, dfd}) {
@@ -20,7 +20,11 @@ class Centroids {
 
     this.oalist = new Set (df[this.oa].$data);
     this.lsoa = this.count (df[`lsoa${year}cd`]);
+
+
+    //groupby lsoa, then count
     this.msoa = this.count (df[`msoa${year}cd`]);
+
 
     console.error('LOSA LOSA LOSA lsoa reference different')
 
@@ -37,12 +41,9 @@ class Centroids {
     var a = df[this.oa];
     this.index = Object.fromEntries (a.$index.map ((_, i) => [a.$data[i], _]));
 
-    // df = df.drop({ columns: [`msoa${year}cd`], inplace: false });
-
-    /* rewrite as new DataFrame objext to overcome index issue
-      do not use setIndex as that causes problems with dfd.query */
+      
     this.df = df;
-    //new dfd.DataFrame(df.$data, {index:df[this.oa].$data,columns:df.columns})
+    
     this.df.print ();
   }
 
@@ -177,7 +178,9 @@ class Centroids {
     var geometry = mapobject
       .queryRenderedFeatures ({layers: ['bounds']})
       .filter (e => selected.oa.has (e.properties.areacd));
-    merge.geojson = {
+
+
+    merge.geojson = dissolve({
       type: 'FeatureCollection',
       features: geometry.map (f => {
         return {
@@ -185,7 +188,10 @@ class Centroids {
           geometry: f.geometry,
         };
       }),
-    };
+    })
+
+
+
 
     console.debug ('---merge---', merge);
 

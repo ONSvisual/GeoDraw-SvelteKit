@@ -8,7 +8,8 @@
   import BarChart from '$lib/tables/BarChart.svelte';
   import MapAreas from '$lib/tables/MapAreas.svelte';
   import Vchart from '$lib/tables/Vchart.svelte'
-  import {detach_after_dev} from 'svelte/internal';
+  // import {detach_after_dev} from 'svelte/internal';
+
 
   let pym_child;
   let name;

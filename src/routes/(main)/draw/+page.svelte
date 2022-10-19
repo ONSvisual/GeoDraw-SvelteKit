@@ -11,7 +11,7 @@
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount, onDestroy} from 'svelte';
 
-
+  
 
 
   let speak = false;
@@ -90,7 +90,7 @@
    localStorage.setItem('lastdate', +(new Date()))
 
 
-   
+
     // calculate the centroids and simplifications.
 
     console.debug('start')
