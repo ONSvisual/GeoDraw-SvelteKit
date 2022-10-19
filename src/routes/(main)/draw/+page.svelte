@@ -136,8 +136,9 @@
 
     async function recolour() {
       const items = $selected[$selected.length - 1];
-
-      pselect = [...items.oa].map(d=>get(centroids).population[d]||0).reduce((a,b)=>a+b)
+      
+      pselect = items.oa.size? [...items.oa].map(d=>get(centroids).population[d]||0).reduce((a,b)=>a+b) : 0
+      
 
       // if (!items.oa.size) return;
       console.debug('---recolour', items);
