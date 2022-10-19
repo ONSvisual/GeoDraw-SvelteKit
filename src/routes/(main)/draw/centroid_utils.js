@@ -20,19 +20,25 @@ class Centroids {
 // try{var df = await dfd.readCSV(this.file)}
 // catch(err){
 
-    var filestr = await fetch(
-      this.file,
-    ).then(res=> res.arrayBuffer()).then(data=>pako.ungzip(data)).then(buffer=>
-      new TextDecoder().decode(buffer))
+    // var filestr = await fetch(
+    //   this.file,
+    // ).then(res=> res.arrayBuffer()).then(data=>pako.ungzip(data)).then(buffer=>
+    //   new TextDecoder().decode(buffer))
 
    
-      console.warn('filesrrr',filestr)
+    //   console.warn('filesrrr',filestr)
 
-    var df = await dfd.readCSV(filestr)
+    // var df = await dfd.readCSV(filestr)
+
+
+    var df = await dfd.readCSV(`/oa${year}-data.csv`)
 // }
       //this.file);
     console.debug('df',df)
     df.print()
+
+
+
 
     this.oalist = new Set (df[this.oa].$data);
     this.lsoa = this.count (df[`lsoa${year}cd`]);
