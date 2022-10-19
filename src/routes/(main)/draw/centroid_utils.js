@@ -1,10 +1,38 @@
+import pako from 'pako'
+
+
 class Centroids {
   async initialize({year, dfd}) {
     console.debug(year,dfd,'cinit')
-    this.file = `./oa${year}-data.csv.gz`;
+
+    
+    this.file = `/oa${year}-data.csv.gz`;
+    
+
+
+
+
+
+
     this.oa = `oa${year}cd`;
-    var df = await dfd.readCSV(this.file);
+
+
+try{var df = await dfd.readCSV(this.file)}
+catch(err){
+
+    var filestr = await fetch(
+      this.file,
+    ).then(res=> res.arrayBuffer()).then(data=>pako.ungzip(data)).then(buffer=>
+      new TextDecoder().decode(buffer))
+
+   
+      console.warn('filesrrr',filestr)
+
+    var df = await dfd.readCSV(filestr)
+}
+      //this.file);
     console.debug('df',df)
+    df.print()
 
     this.oalist = new Set (df[this.oa].$data);
     this.lsoa = this.count (df[`lsoa${year}cd`]);
