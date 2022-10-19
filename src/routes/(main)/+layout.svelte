@@ -1,4 +1,4 @@
-<script  src="/danfo.bundle.js">
+<script>
   import "../../app.css";
   import ONSHeader from "$lib/layout/ONSHeader.svelte";
   import Title from "$lib/layout/Title.svelte";
@@ -14,7 +14,7 @@
  
 
 <svelte:head>
-  <!-- <script src="/danfo.bundle.js"> </script> -->
+  <script src="/danfo.bundle.js"> </script>
 
   <!-- {#if path === '/draw/'}
   <script sync src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
