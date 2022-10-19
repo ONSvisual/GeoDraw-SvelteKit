@@ -11,6 +11,18 @@
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount, onDestroy} from 'svelte';
 
+
+  /* 
+  A section to clear the local storage if past the last update date
+  When updating this, use the american format of mm/dd/yy
+  */
+   if (new Date(localStorage.getItem('lastdate')) < new Date('18/18/2022')){
+      localStorage.clear();
+   }
+   localStorage.setItem('lastdate', +(new Date()))
+
+
+
   let speak = false;
   import {
     mapsource,
@@ -214,7 +226,7 @@
     let file = uploader.files[0] ? uploader.files[0] : null;
 
     if (file) {
-      selected.set([{oa: new Set(), lat: [], lng: [], parents: []}]);
+      selected.set([{oa: new Set(), parents: []}]);
 
       const reader = new FileReader();
 

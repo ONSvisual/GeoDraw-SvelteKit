@@ -22,6 +22,9 @@ class Centroids {
     this.lsoa = this.count (df[`lsoa${year}cd`]);
     this.msoa = this.count (df[`msoa${year}cd`]);
 
+    alert('lsoa reference different')
+    
+
     
 
     

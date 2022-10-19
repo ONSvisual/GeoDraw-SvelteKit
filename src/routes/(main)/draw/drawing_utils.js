@@ -223,6 +223,7 @@ export async function update (coordinates) {
   //   last.lng.push (d[0]);
   // });
 
+  console
   if (get (add_mode)) {
     current.push ({
       oa: new Set ([...last.oa, ...features.oa]),
