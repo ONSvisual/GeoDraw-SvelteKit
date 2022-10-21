@@ -26,3 +26,39 @@ export function get_pop (compressed,area) {
     })
 
   }
+
+
+  async function unpack(d){
+    var ret = await d.json()
+    return ret.obs[0].obs_value.value
+ 
+  }
+
+
+
+  export async function get_stats(compressed,area){
+
+   return  Object.assign({}, ... await Promise.all([['Population','NM_144_1',0],
+     ['Median Age', 'NM_145_1',18],
+     ['Population Density', 'NM_145_1',7],
+
+  ].map( async function(id){
+
+
+    var url = `https://www.nomisweb.co.uk/api/v01/dataset/${id[1]}.data.json?date=latest&geography=MAKE|${area}|${compressed}&rural_urban=0&cell=${id[2]}&measures=20100&select=geography_code,obs_value`;
+
+    var url2 = `https://www.nomisweb.co.uk/api/v01/dataset/${id[1]}.data.json?date=latest&geography=MAKE|England and Wales|${'K04000001'}&rural_urban=0&cell=${id[2]}&measures=20100&select=geography_code,obs_value`;
+
+
+    var key = id[0]
+    var value = await Promise.all([fetch(url).then(unpack),fetch(url2).then(unpack)])
+    var d = {}
+    d[key]= value
+
+    return await d
+  }
+  ))
+)
+// return Object.assign({}, ...data);
+
+  }

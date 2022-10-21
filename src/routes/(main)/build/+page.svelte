@@ -10,7 +10,7 @@
 
   import {default as datasets} from '$lib/util/custom_profiles_tables.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
-  import {get_pop} from './getpop.js';
+  import {get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
 
@@ -22,6 +22,10 @@
     new Map(dataset_keys.map((d) => [datasets[d]['Table name'], d]))
   );
 
+  /////
+  // get build code
+  // #area1 #area2
+
   // import * as dfd from 'danfojs'
   import {Minhash} from 'minhash';
   import {log} from 'mathjs';
@@ -31,9 +35,14 @@
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
+  let includepop = true;
+  let includeage = true;
+  let includedensity = false;
+  let includemedian = false;
+
 
   const topics = [
-    // {key: 'population', label: 'Population'},
+    {key: 'population', label: 'Population'},
     {key: 'density', label: 'Population density'},
     {key: 'agemed', label: 'Average (median) age'},
     {key: 'age', label: 'Age profile'},
@@ -91,19 +100,12 @@
 
   let store;
   let geojson;
-  let population;
+  let population, stats;
   async function init() {
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
-    // var areas = [...store.properties.oa_lsoa]; //,...store.properties.lsoa,...store.properties.msoa]
-    // const features = await Promise.all(areas.map(get_geo));
-
     console.warn('build-', store);
-
-    geojson = store.geojson; //
-
-    // geojson = simplify_geo(store.geojson);
-    console.error('CANT SIMPLIFY A FEATURE COLLECTION');
+    geojson = simplify_geo(store.geojson.geometry);
 
     state.name = store.properties.name;
     state.start = true;
@@ -125,13 +127,16 @@
     // };
 
     population = await get_pop(state.compressed, state.name);
+    stats = await get_stats(state.compressed, state.name);
+
     setTimeout(() => {
       update_profile(
         state.start,
         state.name,
         state.topics,
         includemap,
-        population
+        population,
+        stats,includepop,includeage,includedensity,includemedian
       );
     }, 2000);
     console.warn(population);
@@ -152,6 +157,7 @@
 
       if (table['Nomis table'] in cache) {
         return cache[table['Nomis table']];
+        // } else if
       } else {
         return await dfd
           .readCSV(
@@ -274,13 +280,24 @@
     return await Promise.all(rtn);
   }
 
-  async function update_profile(start, name, data, includemap, population) {
+  async function update_profile(start, name, data, includemap, population,stats,includepop,includeage,includedensity,includemedian) {
     if (start) {
       tables = await get_data(data);
 
+      let dummystats
+      var newstats = []
+      if (stats){
+      if (includepop) newstats.push('Population') 
+      if (includemedian) newstats.push('Median Age') 
+      if (includedensity) newstats.push('Population Density') 
+      dummystats = newstats.map(d=>[d,stats[d]])
+      }
+      console.error(stats,dummystats)
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${population ? `&population=${btoa(JSON.stringify(population))}` : ''}${
+      )}${includeage? `&population=${btoa(JSON.stringify(population))}` : ''}${
+        newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
+      }${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
       }`;
 
@@ -302,7 +319,8 @@
     state.name,
     state.topics,
     includemap,
-    population
+    population,
+    stats,includepop,includeage,includedensity,includemedian
   );
 
   function makeEmbed(embed_hash) {
@@ -365,10 +383,33 @@
     <h2>Name your area</h2>
     <input type="text" bind:value={state.name} placeholder="Type a name" />
 
+    <p style='font-weight:bold'> Area Profiles</p>
+
     <label>
-      <input type="checkbox" name="includemap" bind:checked={includemap} />
+      <input type="checkbox"  bind:checked={includemap} />
       Include Map
     </label>
+
+    <label>
+      <input type="checkbox"  bind:checked={includeage} />
+       Include Age Profile
+    </label>
+    
+    <p style='font-weight:bold'> Individual Statistics</p>
+    
+    <label>
+      <input type="checkbox"  bind:checked={includepop} />
+      Total Population
+    </label>
+    <label>
+      <input type="checkbox"  bind:checked={includedensity} />
+      Area Density
+    </label>
+    <label>
+      <input type="checkbox"  bind:checked={includemedian} />
+      Median Age
+    </label>
+
 
     <h2>Select topics</h2>
     <input
@@ -397,9 +438,8 @@
     <h2>Profile preview</h2>
 
     <div id="embed" />
-    <div class="embed">
-      <h3>{state.name}</h3>
-
+    <div class="embed" style="height:.08em!important;padding:0">
+      <!-- <h3>{state.name}</h3> -->
     </div>
     <div class="embed-actions">
       <button
