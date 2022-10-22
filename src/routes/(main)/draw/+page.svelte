@@ -43,7 +43,7 @@
 
 
   // variable custom testing
-  let advanced = new Date()%2;
+  let advanced = true//new Date()%2;
 
 
    
@@ -80,6 +80,7 @@
 
   async function init() {
 
+document.body.style.opacity = 0.1
             /* 
   A section to clear the local storage if past the last update date
   When updating this, use the american format of mm/dd/yy
@@ -289,11 +290,14 @@
       };
       reader.readAsText(file);
     }
+
+    
   }
 
-  onMount(() => {
-    init();
+  onMount(async () => {
+    await init();
     console.log(window.location.hash);
+    document.body.style.opacity = 1
   });
 
 

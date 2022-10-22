@@ -14,6 +14,9 @@
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
 
+
+
+
   let dataset_keys = Object.keys(datasets);
   dataset_keys = dataset_keys.filter(
     (key) => !/UK\]| - | by |\[[^K]|WA\]/.test(datasets[key].name)
@@ -35,18 +38,15 @@
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
-  let includepop = true;
-  let includeage = true;
-  let includedensity = false;
-  let includemedian = false;
 
 
-  const topics = [
-    {key: 'population', label: 'Population'},
-    {key: 'density', label: 'Population density'},
-    {key: 'agemed', label: 'Average (median) age'},
-    {key: 'age', label: 'Age profile'},
-    {key: 'sex', label: 'Sex'},
+
+  let topics = [
+    {key: 'population', label: 'Population',special:true},
+    {key: 'density', label: 'Population density',special:true},
+    {key: 'agemed', label: 'Average (median) age',special:true},
+    {key: 'age', label: 'Age profile',special:true},
+    // {key: 'sex', label: 'Sex'},
     {key: 'ethnicity', label: 'Ethnicity'},
     {key: 'religion', label: 'Religion'},
     {key: 'marital', label: 'Marital status'},
@@ -63,7 +63,12 @@
     .map(function (topic) {
       return Object.assign({}, topic, datasets[name2key[topic.label]]);
     })
-    .filter((d) => d['Nomis table']);
+    .filter((d) => d['Nomis table'] || d.special)
+    
+    topics.sort((a,b)=>a.key > b.key?1:-1)
+
+  console.warn(topics)
+
 
   let state = {
     mode: 'move',
@@ -102,6 +107,9 @@
   let geojson;
   let population, stats;
   async function init() {
+
+    document.body.style.opacity = 0.1
+
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
     console.warn('build-', store);
@@ -136,10 +144,16 @@
         state.topics,
         includemap,
         population,
-        stats,includepop,includeage,includedensity,includemedian
+        stats
       );
+
+      document.body.style.opacity = 1
+
+
     }, 2000);
     console.warn(population);
+
+    
   }
 
   onMount(init);
@@ -150,10 +164,19 @@
   ////////////////////////////////////////////////////////////////
   let cache = {};
   async function get_data(data) {
-    console.debug('getdata', state);
+
+
+
+    console.debug('getdata', state,data);
     if (!state.start) return [];
-    let rtn = data.map(async function (table) {
-      // console.log('---', table);
+
+
+
+
+
+    let rtn = data.filter(d=>!d.special)
+    .map(async function (table) {
+
 
       if (table['Nomis table'] in cache) {
         return cache[table['Nomis table']];
@@ -280,22 +303,33 @@
     return await Promise.all(rtn);
   }
 
-  async function update_profile(start, name, data, includemap, population,stats,includepop,includeage,includedensity,includemedian) {
+  async function update_profile(start, name, data, includemap, population,stats) {
     if (start) {
+
+
+
       tables = await get_data(data);
 
       let dummystats
       var newstats = []
       if (stats){
-      if (includepop) newstats.push('Population') 
-      if (includemedian) newstats.push('Median Age') 
-      if (includedensity) newstats.push('Population Density') 
+
+
+      var usestats = data.filter(d=>d.special).map(d=>d.key)
+      console.warn('aaaaa',usestats)
+
+
+      if (usestats.includes('population')) newstats.push('Population') 
+      if (usestats.includes('agemed')) newstats.push('Median Age') 
+      if (usestats.includes('density')) newstats.push('Population Density') 
+
+
       dummystats = newstats.map(d=>[d,stats[d]])
       }
       console.error(stats,dummystats)
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${includeage? `&population=${btoa(JSON.stringify(population))}` : ''}${
+      )}${usestats.includes('age')? `&population=${btoa(JSON.stringify(population))}` : ''}${
         newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
       }${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
@@ -314,13 +348,14 @@
       }
     }
   }
+
   $: update_profile(
     state.start,
     state.name,
     state.topics,
     includemap,
     population,
-    stats,includepop,includeage,includedensity,includemedian
+    stats
   );
 
   function makeEmbed(embed_hash) {
@@ -390,25 +425,6 @@
       Include Map
     </label>
 
-    <label>
-      <input type="checkbox"  bind:checked={includeage} />
-       Include Age Profile
-    </label>
-    
-    <p style='font-weight:bold'> Individual Statistics</p>
-    
-    <label>
-      <input type="checkbox"  bind:checked={includepop} />
-      Total Population
-    </label>
-    <label>
-      <input type="checkbox"  bind:checked={includedensity} />
-      Area Density
-    </label>
-    <label>
-      <input type="checkbox"  bind:checked={includemedian} />
-      Median Age
-    </label>
 
 
     <h2>Select topics</h2>

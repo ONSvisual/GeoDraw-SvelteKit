@@ -114,10 +114,10 @@
 
     {#if population || stats}
       
-      <Cards>
+      <!-- <Cards> -->
         {#each stats as stat}
         <Card title="{stat[0]}">
-          <BigNumber value={stat[1][0]}  unit="" description={`<mark>${stat[1][1]}</mark>  in England and Wales`}/>
+          <BigNumber value={stat[1][0].toLocaleString()}  unit="" description={`<mark>${stat[1][1].toLocaleString()}</mark>  in England and Wales`}/>
         </Card>
         {/each}
 
@@ -128,7 +128,7 @@
         {/if}
 
 
-      </Cards>
+      <!-- </Cards> -->
         
   
     {/if}
