@@ -11,9 +11,6 @@
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount, onDestroy} from 'svelte';
 
-  
-
-
   let speak = false;
   import {
     mapsource,
@@ -30,7 +27,7 @@
     maxzoom,
   } from './mapstore.js';
 
-  import { update, simplify_geo} from './drawing_utils.js';
+  import {update, simplify_geo} from './drawing_utils.js';
 
   import {GetCentroids} from './centroid_utils.js';
 
@@ -41,15 +38,10 @@
     {key: 'radius', label: 'Draw a radius'},
   ];
 
-
   // variable custom testing
-  let advanced = true//new Date()%2;
+  let advanced = true; //new Date()%2;
 
-
-   
-
-
-  $: modes = advanced? modelist:modelist.slice(0,2)
+  $: modes = advanced ? modelist : modelist.slice(0, 2);
 
   let state = {
     mode: 'move',
@@ -61,7 +53,7 @@
     topicsExpand: false,
     topicsFilter: '',
   };
-  const zoomstop = 8
+  const zoomstop = 8;
   let zoom; // prop bound to map zoom level
   let uploader; // DOM element for geojson file upload
   let pselect = '0';
@@ -79,25 +71,22 @@
   let newselect;
 
   async function init() {
-
-document.body.style.opacity = 0.1
-            /* 
+    document.body.style.opacity = 0.1;
+    /* 
   A section to clear the local storage if past the last update date
   When updating this, use the american format of mm/dd/yy
   */
-  if (new Date(localStorage.getItem('lastdate')) < new Date('18/18/2022')){
+    if (new Date(localStorage.getItem('lastdate')) < new Date('18/18/2022')) {
       localStorage.clear();
-   }
-   localStorage.setItem('lastdate', +(new Date()))
-
-
+    }
+    localStorage.setItem('lastdate', +new Date());
 
     // calculate the centroids and simplifications.
 
-    console.debug('start')
-    var centroid_dummy = await GetCentroids({year: 21, dfd: dfd})
-    console.debug('cd',centroid_dummy)
-    centroids.set( centroid_dummy);
+    console.debug('start');
+    var centroid_dummy = await GetCentroids({year: 21, dfd: dfd});
+    console.debug('cd', centroid_dummy);
+    centroids.set(centroid_dummy);
     console.log('cent', $centroids);
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
@@ -155,9 +144,12 @@ document.body.style.opacity = 0.1
 
     async function recolour() {
       const items = $selected[$selected.length - 1];
-      
-      pselect = items.oa.size? [...items.oa].map(d=>get(centroids).population[d]||0).reduce((a,b)=>a+b) : 0
-      
+
+      pselect = items.oa.size
+        ? [...items.oa]
+            .map((d) => get(centroids).population[d] || 0)
+            .reduce((a, b) => a + b)
+        : 0;
 
       // if (!items.oa.size) return;
       console.debug('---recolour', items);
@@ -181,24 +173,67 @@ document.body.style.opacity = 0.1
 
       let hash = window.location.hash;
       if (hash.length == 10) {
-        let oa = [hash.slice(1)];
+        let code = [hash.slice(1)];
         newselect();
 
-        if (+(await get(centroids).indf(oa)) > -1) {
-          bbox = get(centroids).bounds(oa);
+        // alert(+(await get(centroids).indf(code)) )
 
-          $selected = [
-            $selected,
-            {
-              oa: new Set(oa),
-              parents: get(centroids).parent(oa),
-            },
-          ];
+        if (+(await get(centroids).indf(code)) > -1) {
+          try {
+            bbox = get(centroids).bounds(code);
 
-          $mapobject.fitBounds(bbox, {padding: 20});
-          state.name = oa;
+            $selected = [
+              $selected,
+              {
+                oa: new Set(code),
+                parents: get(centroids).parent(code),
+              },
+            ];
+
+            $mapobject.fitBounds(bbox, {padding: 20});
+            state.name = code;
+          } catch (err) {
+            code = code[0];
+            // E08000006
+            let data = await fetch(
+              `https://api.github.com/repos/ONSvisual/cp-places-data/contents/${code.slice(
+                0,
+                3
+              )}/${code}.json`
+            )
+              .then((d) => d.json())
+              .then((d) =>
+                fetch(
+                  `https://api.github.com/repos/ONSvisual/cp-places-data/git/blobs/${d.sha}`
+                )
+              )
+              .then((d) => d.json())
+              .then((d) => JSON.parse(atob(d.content)));
+            // console.warn('DATA HASH',data)
+
+            selected.set([{oa: new Set(), parents: []}]);
+            localStorage.clear();
+
+            if (data.type == 'Feature') {
+              $selected = [
+                $selected,
+                {
+                  oa: new Set(data.properties.codes),
+                  parents: get(centroids).parent(data.properties.codes),
+                },
+              ];
+
+              $mapobject.fitBounds(data.properties.bounds, {padding: 20});
+
+              console.warn(data, data.properities);
+
+              state.name = data.properties.areanm;
+            }
+          }
+
           setDrawData();
         }
+
         history.replaceState(null, null, ' ');
       }
       if (localStorage.getItem('draw_data') || false) {
@@ -219,14 +254,12 @@ document.body.style.opacity = 0.1
 
         q.oa = new Set(q.oa);
         selected.set([q]);
-
       }
 
       // Keep track of map zoom level
       zoom = $mapobject.getZoom();
       $mapobject.on('moveend', () => (zoom = $mapobject.getZoom()));
     });
-
   } //endinit
 
   function load_geo() {
@@ -290,54 +323,46 @@ document.body.style.opacity = 0.1
       };
       reader.readAsText(file);
     }
-
-    
   }
 
   onMount(async () => {
     await init();
     console.log(window.location.hash);
-    document.body.style.opacity = 1
+    document.body.style.opacity = 1;
   });
 
-
-
-
-/* 
+  /* 
 The save data and continue function
 */
-async function savedata ()  {
-        document.querySelector('#mapcontainer div canvas').style.cursor =
-          'wait';
-        
-        
-        return $centroids
-          .simplify(state.name, $selected[$selected.length - 1],$mapobject)
+  async function savedata() {
+    document.querySelector('#mapcontainer div canvas').style.cursor = 'wait';
 
-          .then((q) => {
-            if (q) {
-              console.debug('---req  ', q);
+    return $centroids
+      .simplify(state.name, $selected[$selected.length - 1], $mapobject)
 
-              const items = $selected[$selected.length - 1];
+      .then((q) => {
+        if (q) {
+          console.debug('---req  ', q);
 
-              if (items.oa.size > 0) {
-                if (q.error) return false;
+          const items = $selected[$selected.length - 1];
 
-                console.log('buildpage', q);
-                localStorage.setItem('onsbuild', JSON.stringify(q));
-                document.querySelector('#mapcontainer div canvas').style.cursor =
-                'auto';
-                return true;
-              }
-            } 
+          if (items.oa.size > 0) {
+            if (q.error) return false;
 
-              alert('No features selected.');
-              document.querySelector('#mapcontainer div canvas').style.cursor =
-                'auto';
-              return false;
-            
-          })
+            console.log('buildpage', q);
+            localStorage.setItem('onsbuild', JSON.stringify(q));
+            document.querySelector('#mapcontainer div canvas').style.cursor =
+              'auto';
+            return true;
+          }
         }
+
+        alert('No features selected.');
+        document.querySelector('#mapcontainer div canvas').style.cursor =
+          'auto';
+        return false;
+      });
+  }
 </script>
 
 <svelte:head>
@@ -351,7 +376,7 @@ async function savedata ()  {
         id={'init_' + mode.key}
         class:active={state.mode == mode.key}
         class:disabled={zoom < zoomstop}
-        style:filter='contrast(1.35)'
+        style:filter="contrast(1.35)"
         title={mode.label}
         on:click={function () {
           $draw_type = mode.key == 'move' ? null : mode.key;
@@ -369,39 +394,32 @@ async function savedata ()  {
       </label>
     {/each}
   </div>
-  
- 
-  <div class="nav-right"> 
-    
+
+  <div class="nav-right">
     {#if advanced}
-
-
-    <button
-      title="Undo last action"
-      use:tooltip
-
-      disabled={$selected.length < 2}
-      on:click={() => {
-        $selected = $selected.slice(0, -1);
-        setDrawData();
-      }}
-    >
-
-    
-      <Icon type="undo" />
-    </button>
-
+      <button
+        title="Undo last action"
+        use:tooltip
+        disabled={$selected.length < 2}
+        on:click={() => {
+          $selected = $selected.slice(0, -1);
+          setDrawData();
+        }}
+      >
+        <Icon type="undo" />
+      </button>
     {:else}
-    <button
-      class="text secondary"
-      style:color='lightgray'
-      style:filter='invert(.2)contrast(2)'
-      on:click={()=>{advanced=true}}
-    > Further Tools
-    </button>
-    
+      <button
+        class="text secondary"
+        style:color="lightgray"
+        style:filter="invert(.2)contrast(2)"
+        on:click={() => {
+          advanced = true;
+        }}
+      >
+        Further Tools
+      </button>
     {/if}
-
 
     <button
       class="alert"
@@ -414,9 +432,6 @@ async function savedata ()  {
     >
       <Icon type="clear" />
     </button>
-  
-
-
 
     <button
       title={state.showSave ? 'Close save options' : 'Save selected area'}
@@ -431,19 +446,18 @@ async function savedata ()  {
       />
     </button>
 
-
     <button
       class="text confirm"
       disabled={!$selected[$selected.length - 1].oa.size > 0}
-      on:click={()=>
-          savedata().then( (rdir) => {
-            console.warn(rdir)
-            if (rdir) {
-              goto(`${base}/build/`);
-            }
-            else{console.error('not redirecting', rdir)}
-          })
-      }
+      on:click={() =>
+        savedata().then((rdir) => {
+          console.warn(rdir);
+          if (rdir) {
+            goto(`${base}/build/`);
+          } else {
+            console.error('not redirecting', rdir);
+          }
+        })}
     >
       <span>Build profile</span><Icon type="chevron" />
     </button>
@@ -456,14 +470,14 @@ async function savedata ()  {
       <input type="text" bind:value={state.name} placeholder="Type a name" />
       <button
         class="text"
-        on:click={()=>
+        on:click={() =>
           savedata().then(() => {
-            var data = JSON.parse(localStorage.getItem('onsbuild'))
-            var file = new Blob([JSON.stringify(data.geojson)], {type: 'text/plain'});
-            download(file, state.name.replace(' ','_')+'.geojson');
-
-          })
-      }
+            var data = JSON.parse(localStorage.getItem('onsbuild'));
+            var file = new Blob([JSON.stringify(data.geojson)], {
+              type: 'text/plain',
+            });
+            download(file, state.name.replace(' ', '_') + '.geojson');
+          })}
       >
         <Icon type="download" /><span>Save geography</span>
       </button>
@@ -637,8 +651,8 @@ async function savedata ()  {
       Explore the map to find a location of interest, then select a drawing tool
       from the menu.
     {/if}
-    <br>
-    <p><span style='font-weight:bold'> Population selected:</span> {pselect} </p>
+    <br />
+    <p><span style="font-weight:bold"> Population selected:</span> {pselect}</p>
   </div>
 </aside>
 
