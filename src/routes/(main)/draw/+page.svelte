@@ -225,8 +225,6 @@
 
               $mapobject.fitBounds(data.properties.bounds, {padding: 20});
 
-              console.warn(data, data.properities);
-
               state.name = data.properties.areanm;
             }
           }
