@@ -47,8 +47,8 @@ for f in files:
 
 
     # precission
-    df.lng = df.lng.astype('float16')
-    df.lat = df.lat.astype('float16')
+    df.lng = df.lng.astype('float32')
+    df.lat = df.lat.astype('float32')
     df.population.astype('int16')
 
 
