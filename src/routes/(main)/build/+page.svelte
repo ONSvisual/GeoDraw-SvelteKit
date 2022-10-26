@@ -12,6 +12,7 @@
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
   import {get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
+  import {getgit} from '$lib/util/git.js'
   import {onMount} from 'svelte';
 
 
@@ -67,7 +68,6 @@
     
     topics.sort((a,b)=>a.key > b.key?1:-1)
 
-  console.warn(topics)
 
 
   let state = {
@@ -110,16 +110,51 @@
 
     document.body.style.opacity = 0.1
 
+// incase we call for a pre loaded area as a hash string
+    let hash = window.location.hash;
+      if (hash.length == 10) {
+        let code = hash.slice(1);
+
+        let data = await getgit(
+              'ONSvisual',
+              'cp-places-data',
+              `${code.slice(0, 3)}/${code}.json`
+            );
+
+            // localStorage.clear();
+
+
+
+            if (data.type === 'Feature') {
+
+              const info = {
+                compressed:code,
+                geojson:data,
+                name : data.properties.areanm,
+                properties:{oa_all:data.properties.codes}
+
+              }
+
+              localStorage.setItem('onsbuild', JSON.stringify(info));
+            
+            }
+
+      }
+
+
+
+
+       // resume as normal
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
-    console.warn('build-', store);
+    console.debug('build-', store);
     geojson = simplify_geo(store.geojson.geometry);
 
-    state.name = store.properties.name;
+    state.name = store.name;
     state.start = true;
 
-    let props = store.properties;
-    state.compressed = Object.values({
+    let props =  store.properties;
+    state.compressed = store.compressed || Object.values({
       ...props.msoa,
       ...props.lsoa,
       ...props.oa,
@@ -151,7 +186,6 @@
 
 
     }, 2000);
-    console.warn(population);
 
     
   }
@@ -165,14 +199,7 @@
   let cache = {};
   async function get_data(data) {
 
-
-
-    console.debug('getdata', state,data);
     if (!state.start) return [];
-
-
-
-
 
     let rtn = data.filter(d=>!d.special)
     .map(async function (table) {
@@ -190,7 +217,6 @@
               state.compressed
             },K04000001&rural_urban=0&measures=20100&select=geography_name,cell_name,obs_value`
           )
-          // .then(d=>{console.log('ed',d.print(),d);return d})
           .then((d) => d.setIndex({column: 'geography'}))
           .then((de) => {
             var mappings = {};
@@ -299,7 +325,6 @@
           });
       }
     });
-    console.log('rtn', rtn);
     return await Promise.all(rtn);
   }
 
@@ -316,7 +341,6 @@
 
 
       var usestats = data.filter(d=>d.special).map(d=>d.key)
-      console.warn('aaaaa',usestats)
 
 
       if (usestats.includes('population')) newstats.push('Population') 
@@ -326,7 +350,6 @@
 
       dummystats = newstats.map(d=>[d,stats[d]])
       }
-      console.error(stats,dummystats)
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
       )}${usestats.includes('age')? `&population=${btoa(JSON.stringify(population))}` : ''}${

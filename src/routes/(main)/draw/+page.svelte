@@ -11,6 +11,8 @@
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount, onDestroy} from 'svelte';
 
+  import {getgit} from '$lib/util/git.js'
+
   let speak = false;
   import {
     mapsource,
@@ -82,12 +84,8 @@
     localStorage.setItem('lastdate', +new Date());
 
     // calculate the centroids and simplifications.
-
-    console.debug('start');
     var centroid_dummy = await GetCentroids({year: 21, dfd: dfd});
-    console.debug('cd', centroid_dummy);
     centroids.set(centroid_dummy);
-    console.log('cent', $centroids);
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
     // console.clear();
@@ -168,7 +166,7 @@
       newselect = function () {
         localStorage.clear();
         selected.set([{oa: new Set(), parents: []}]);
-        console.log(get(selected));
+        
       };
 
       let hash = window.location.hash;
@@ -195,26 +193,20 @@
           } catch (err) {
             code = code[0];
             // E08000006
-            let data = await fetch(
-              `https://api.github.com/repos/ONSvisual/cp-places-data/contents/${code.slice(
-                0,
-                3
-              )}/${code}.json`
-            )
-              .then((d) => d.json())
-              .then((d) =>
-                fetch(
-                  `https://api.github.com/repos/ONSvisual/cp-places-data/git/blobs/${d.sha}`
-                )
-              )
-              .then((d) => d.json())
-              .then((d) => JSON.parse(atob(d.content)));
+
+            let data = await getgit(
+              'ONSvisual',
+              'cp-places-data',
+              `${code.slice(0, 3)}/${code}.json`
+            );
+
             // console.warn('DATA HASH',data)
 
             selected.set([{oa: new Set(), parents: []}]);
             localStorage.clear();
 
             if (data.type == 'Feature') {
+              
               $selected = [
                 $selected,
                 {
@@ -325,7 +317,6 @@
 
   onMount(async () => {
     await init();
-    console.log(window.location.hash);
     document.body.style.opacity = 1;
   });
 
@@ -340,14 +331,13 @@ The save data and continue function
 
       .then((q) => {
         if (q) {
-          console.debug('---req  ', q);
 
           const items = $selected[$selected.length - 1];
 
           if (items.oa.size > 0) {
             if (q.error) return false;
 
-            console.log('buildpage', q);
+            console.debug('buildpage', q);
             localStorage.setItem('onsbuild', JSON.stringify(q));
             document.querySelector('#mapcontainer div canvas').style.cursor =
               'auto';

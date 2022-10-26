@@ -44,7 +44,7 @@ class Centroids {
       
     this.df = df;
     
-    this.df.print ();
+    // this.df.print ();
   }
 
   count (column) {
@@ -111,7 +111,7 @@ class Centroids {
   }
 
   async simplify (
-    name = 'Area Name',
+    name = 'Enter Area Name',
     selected,
     mapobject
     // options = {simplify_geo: false},
