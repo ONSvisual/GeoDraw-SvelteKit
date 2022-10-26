@@ -1,28 +1,50 @@
+// import pako from 'pako'
+import {dissolve} from '$lib/mapshaper'
+
 class Centroids {
   async initialize({year, dfd}) {
-    this.file = `/oa${year}-data.csv.gz`;
+    console.debug(year,dfd,'cinit')
+
+    
+    this.file = `/oa${year}-data.csv`;
     this.oa = `oa${year}cd`;
-    var df = await await dfd.readCSV (this.file);
+
+    // var filestr = await fetch(
+    //   this.file+'.gz,
+    // ).then(res=> res.arrayBuffer()).then(data=>pako.ungzip(data)).then(buffer=>
+    //   new TextDecoder().decode(buffer))
+    // var df = await dfd.readCSV(filestr)
+
+
+    var df = await dfd.readCSV(`/oa${year}-data.csv`)
 
     this.oalist = new Set (df[this.oa].$data);
     this.lsoa = this.count (df[`lsoa${year}cd`]);
+
+
+    //groupby lsoa, then count
     this.msoa = this.count (df[`msoa${year}cd`]);
 
+
+    console.error('LOSA LOSA LOSA lsoa reference different')
+
+
+    
+
+    
     var a = df['population'];
     this.population = Object.fromEntries (
-      a.$index.map ((_, i) => [_, a.$data[i]])
+      df[this.oa].$data.map ((_, i) => [_, a.$data[i]])
     );
+
 
     var a = df[this.oa];
     this.index = Object.fromEntries (a.$index.map ((_, i) => [a.$data[i], _]));
 
-    // df = df.drop({ columns: [`msoa${year}cd`], inplace: false });
-
-    /* rewrite as new DataFrame objext to overcome index issue
-      do not use setIndex as that causes problems with dfd.query */
+      
     this.df = df;
-    //new dfd.DataFrame(df.$data, {index:df[this.oa].$data,columns:df.columns})
-    this.df.print ();
+    
+    // this.df.print ();
   }
 
   count (column) {
@@ -48,6 +70,8 @@ class Centroids {
       this.df.loc ({rows: this.indf (oa), columns: ['lng', 'lat']}).$data
     );
   }
+
+
 
   indf (oa) {
     // checks in dataframe and converts to index
@@ -87,7 +111,7 @@ class Centroids {
   }
 
   async simplify (
-    name = 'Area Name',
+    name = 'Enter Area Name',
     selected,
     mapobject
     // options = {simplify_geo: false},
@@ -154,7 +178,9 @@ class Centroids {
     var geometry = mapobject
       .queryRenderedFeatures ({layers: ['bounds']})
       .filter (e => selected.oa.has (e.properties.areacd));
-    merge.geojson = {
+
+
+    merge.geojson = dissolve({
       type: 'FeatureCollection',
       features: geometry.map (f => {
         return {
@@ -162,7 +188,10 @@ class Centroids {
           geometry: f.geometry,
         };
       }),
-    };
+    })
+
+
+
 
     console.debug ('---merge---', merge);
 

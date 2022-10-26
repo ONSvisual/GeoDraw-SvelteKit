@@ -2,19 +2,26 @@
   import {onMount} from 'svelte';
   import pym from 'pym.js';
   import html2canvas from 'html2canvas';
+  // import { format } from "d3-format";
 
   import Cards from '$lib/layout/Cards.svelte';
   import Card from '$lib/layout/partial/Card.svelte';
   import BarChart from '$lib/tables/BarChart.svelte';
   import MapAreas from '$lib/tables/MapAreas.svelte';
   import Vchart from '$lib/tables/Vchart.svelte'
-  import {detach_after_dev} from 'svelte/internal';
+  import BigNumber from '$lib/tables/cards/BigNumber.svelte'
+  // import {detach_after_dev} from 'svelte/internal';
+
 
   let pym_child;
   let name;
   let geojson;
   let tables;
   let population;
+  let stats = [];
+
+
+
 
   function update() {
     let hash = window.location.hash;
@@ -27,7 +34,7 @@
         console.debug(pair);
         if (pair[0] == 'name') {
           props[pair[0]] = atob(pair[1]);
-        } else if (['tabs', 'poly', 'population'].includes(pair[0])) {
+        } else if (['tabs', 'poly', 'population','stats'].includes(pair[0])) {
           props[pair[0]] = JSON.parse(atob(pair[1]));
         }
       }
@@ -36,7 +43,9 @@
       geojson = props.poly;
       population = props.population;
       tables = props.tabs;
+      stats = props.stats
 
+      console.error(stats,props)
   //     if (population) {
   //       // var pdf = new dfd.DataFrame(population[1], {columns: population[0]})
 
@@ -103,11 +112,25 @@
       </Card>
     {/if}
 
-    {#if population}
-      <Card title="Population">
+    {#if population || stats}
+      
+      <!-- <Cards> -->
+        {#each stats as stat}
+        <Card title="{stat[0]}">
+          <BigNumber value={stat[1][0].toLocaleString()}  unit="" description={`<mark>${stat[1][1].toLocaleString()}</mark>  in England and Wales`}/>
+        </Card>
+        {/each}
+
+        {#if population}
+        <Card title="Age Profile">
         <Vchart bind:population name={[name,'England and Wales']}/>
-        <!-- <div id='population' style:height="100%" style:width="100%" /> -->
-      </Card>
+        </Card>
+        {/if}
+
+
+      <!-- </Cards> -->
+        
+  
     {/if}
 
     {#each tables as tab}
@@ -129,6 +152,11 @@
   h1 {
     font-size: 1.8rem;
     margin: 0 0 -12px 0;
+    font-weight: bold;
+  }
+
+  h3 {
+    font-size: 1.3rem;
     font-weight: bold;
   }
 </style>

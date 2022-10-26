@@ -11,25 +11,33 @@
 
 </script>
 
-
+ 
 
 <svelte:head>
+  <!-- <script src="/danfo.bundle.js"> </script> -->
 
-  {#if path === '/draw/'}
-  <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
+   <script sync src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
+
+  <!-- {#if path === '/draw/'}
+  <script sync src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
   
   {:else if path === '/build/'}
   <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"></script>
 
 
   {:else if path === '/population/'}
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.3/math.min.js"></script> -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.3/math.min.js"></script> 
+   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script>
   <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.1/lib/bundle.js"> </script>
 
-  {/if}
+  {/if} -->
 
   <title>Build a custom area profile</title>
+
+  <script defer>
+
+  </script>
+
 </svelte:head>
 
 <main>

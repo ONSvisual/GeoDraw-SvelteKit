@@ -7,7 +7,7 @@
 
 	export let geojson = null;
 	export let color = '#1f8ab0' //"#206095";
-	export let lineWidth = .5;
+	export let lineWidth = 2;
 	export let fillOpacity = 0.2;
 	
 	let map;

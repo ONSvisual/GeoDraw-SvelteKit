@@ -46,7 +46,20 @@ for f in files:
     df['population'] = populate(df.index)
 
 
+    # precission
+    df.lng = df.lng.astype('float32')
+    df.lat = df.lat.astype('float32')
+    df.population.astype('int16')
+
+
+
+
+
     df.to_csv(f.split('/')[-1],compression='gzip')
+
+    df.to_csv(f.split('/')[-1].strip('.gz'))
+
+    df.reset_index().to_feather(f.split('/')[-1].replace('.csv.gz','.feather'),compression="lz4")
 
 
 

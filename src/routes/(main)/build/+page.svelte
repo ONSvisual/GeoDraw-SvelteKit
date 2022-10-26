@@ -10,9 +10,13 @@
 
   import {default as datasets} from '$lib/util/custom_profiles_tables.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
-  import {get_pop} from './getpop.js';
+  import {get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
+  import {getgit} from '$lib/util/git.js'
   import {onMount} from 'svelte';
+
+
+
 
   let dataset_keys = Object.keys(datasets);
   dataset_keys = dataset_keys.filter(
@@ -21,6 +25,10 @@
   let name2key = Object.fromEntries(
     new Map(dataset_keys.map((d) => [datasets[d]['Table name'], d]))
   );
+
+  /////
+  // get build code
+  // #area1 #area2
 
   // import * as dfd from 'danfojs'
   import {Minhash} from 'minhash';
@@ -32,12 +40,14 @@
   let tables = []; // Array to hold table data
   let includemap = true;
 
-  const topics = [
-    // {key: 'population', label: 'Population'},
-    {key: 'density', label: 'Population density'},
-    {key: 'agemed', label: 'Average (median) age'},
-    {key: 'age', label: 'Age profile'},
-    {key: 'sex', label: 'Sex'},
+
+
+  let topics = [
+    {key: 'population', label: 'Population',special:true},
+    {key: 'density', label: 'Population density',special:true},
+    {key: 'agemed', label: 'Average (median) age',special:true},
+    {key: 'age', label: 'Age profile',special:true},
+    // {key: 'sex', label: 'Sex'},
     {key: 'ethnicity', label: 'Ethnicity'},
     {key: 'religion', label: 'Religion'},
     {key: 'marital', label: 'Marital status'},
@@ -54,7 +64,11 @@
     .map(function (topic) {
       return Object.assign({}, topic, datasets[name2key[topic.label]]);
     })
-    .filter((d) => d['Nomis table']);
+    .filter((d) => d['Nomis table'] || d.special)
+    
+    topics.sort((a,b)=>a.key > b.key?1:-1)
+
+
 
   let state = {
     mode: 'move',
@@ -91,25 +105,56 @@
 
   let store;
   let geojson;
-  let population;
+  let population, stats;
   async function init() {
+
+    document.body.style.opacity = 0.1
+
+// incase we call for a pre loaded area as a hash string
+    let hash = window.location.hash;
+      if (hash.length == 10) {
+        let code = hash.slice(1);
+
+        let data = await getgit(
+              'ONSvisual',
+              'cp-places-data',
+              `${code.slice(0, 3)}/${code}.json`
+            );
+
+            // localStorage.clear();
+
+
+
+            if (data.type === 'Feature') {
+
+              const info = {
+                compressed:code,
+                geojson:data,
+                name : data.properties.areanm,
+                properties:{oa_all:data.properties.codes}
+
+              }
+
+              localStorage.setItem('onsbuild', JSON.stringify(info));
+            
+            }
+
+      }
+
+
+
+
+       // resume as normal
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
-    // var areas = [...store.properties.oa_lsoa]; //,...store.properties.lsoa,...store.properties.msoa]
-    // const features = await Promise.all(areas.map(get_geo));
+    console.debug('build-', store);
+    geojson = simplify_geo(store.geojson.geometry);
 
-    console.warn('build-', store);
-
-    geojson = store.geojson; //
-
-    // geojson = simplify_geo(store.geojson);
-    console.error('CANT SIMPLIFY A FEATURE COLLECTION');
-
-    state.name = store.properties.name;
+    state.name = store.name;
     state.start = true;
 
-    let props = store.properties;
-    state.compressed = Object.values({
+    let props =  store.properties;
+    state.compressed = store.compressed || Object.values({
       ...props.msoa,
       ...props.lsoa,
       ...props.oa,
@@ -125,16 +170,24 @@
     // };
 
     population = await get_pop(state.compressed, state.name);
+    stats = await get_stats(state.compressed, state.name);
+
     setTimeout(() => {
       update_profile(
         state.start,
         state.name,
         state.topics,
         includemap,
-        population
+        population,
+        stats
       );
+
+      document.body.style.opacity = 1
+
+
     }, 2000);
-    console.warn(population);
+
+    
   }
 
   onMount(init);
@@ -145,13 +198,16 @@
   ////////////////////////////////////////////////////////////////
   let cache = {};
   async function get_data(data) {
-    console.debug('getdata', state);
+
     if (!state.start) return [];
-    let rtn = data.map(async function (table) {
-      // console.log('---', table);
+
+    let rtn = data.filter(d=>!d.special)
+    .map(async function (table) {
+
 
       if (table['Nomis table'] in cache) {
         return cache[table['Nomis table']];
+        // } else if
       } else {
         return await dfd
           .readCSV(
@@ -161,7 +217,6 @@
               state.compressed
             },K04000001&rural_urban=0&measures=20100&select=geography_name,cell_name,obs_value`
           )
-          // .then(d=>{console.log('ed',d.print(),d);return d})
           .then((d) => d.setIndex({column: 'geography'}))
           .then((de) => {
             var mappings = {};
@@ -270,17 +325,36 @@
           });
       }
     });
-    console.log('rtn', rtn);
     return await Promise.all(rtn);
   }
 
-  async function update_profile(start, name, data, includemap, population) {
+  async function update_profile(start, name, data, includemap, population,stats) {
     if (start) {
+
+
+
       tables = await get_data(data);
 
+      let dummystats
+      var newstats = []
+      if (stats){
+
+
+      var usestats = data.filter(d=>d.special).map(d=>d.key)
+
+
+      if (usestats.includes('population')) newstats.push('Population') 
+      if (usestats.includes('agemed')) newstats.push('Median Age') 
+      if (usestats.includes('density')) newstats.push('Population Density') 
+
+
+      dummystats = newstats.map(d=>[d,stats[d]])
+      }
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${population ? `&population=${btoa(JSON.stringify(population))}` : ''}${
+      )}${usestats.includes('age')? `&population=${btoa(JSON.stringify(population))}` : ''}${
+        newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
+      }${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
       }`;
 
@@ -297,12 +371,14 @@
       }
     }
   }
+
   $: update_profile(
     state.start,
     state.name,
     state.topics,
     includemap,
-    population
+    population,
+    stats
   );
 
   function makeEmbed(embed_hash) {
@@ -365,10 +441,14 @@
     <h2>Name your area</h2>
     <input type="text" bind:value={state.name} placeholder="Type a name" />
 
+    <p style='font-weight:bold'> Area Profiles</p>
+
     <label>
-      <input type="checkbox" name="includemap" bind:checked={includemap} />
+      <input type="checkbox"  bind:checked={includemap} />
       Include Map
     </label>
+
+
 
     <h2>Select topics</h2>
     <input
@@ -397,9 +477,8 @@
     <h2>Profile preview</h2>
 
     <div id="embed" />
-    <div class="embed">
-      <h3>{state.name}</h3>
-
+    <div class="embed" style="height:.08em!important;padding:0">
+      <!-- <h3>{state.name}</h3> -->
     </div>
     <div class="embed-actions">
       <button
