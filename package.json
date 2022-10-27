@@ -1,6 +1,6 @@
 {
-	"name": "Custom Area Profile",
-	"version": "2.0.1",
+	"name": "Build a Custom Area Profile",
+	"version": "2.0.2",
 	"scripts": {
 		"dev": "vite dev",
 		"debug": "vite dev --debug",
