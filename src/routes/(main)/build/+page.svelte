@@ -32,20 +32,18 @@
 
   // import * as dfd from 'danfojs'
   import {Minhash} from 'minhash';
-  import {log} from 'mathjs';
 
   let pym_parent; // Variabl for pym
-  //   let geojson; // Simplified geojson boundary for map
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
 
-
+// alert('00 oa 01 lsoa 02 msoa e.g.E00')
 
   let topics = [
-    {key: 'population', label: 'Population',special:true},
+    {key: 'population', label: 'Total Population',special:true},
     {key: 'density', label: 'Population density',special:true},
-    {key: 'agemed', label: 'Average (median) age',special:true},
+    {key: 'agemed', label: 'Median age',special:true},
     {key: 'age', label: 'Age profile',special:true},
     // {key: 'sex', label: 'Sex'},
     {key: 'ethnicity', label: 'Ethnicity'},
@@ -77,7 +75,7 @@
     name: 'Area Name',
     showSave: false,
     showEmbed: false,
-    topics: [topics[1], topics[2]],
+    topics: topics.filter(d=>['population','hours'].includes(d.key)),
     topicsExpand: false,
     topicsFilter: '',
   };
@@ -161,6 +159,8 @@
     })
       .flat()
       .join(';');
+
+      // console.error('comp',state.compressed)
 
     // var senddata = {
     // 	tables: tlist,
@@ -391,7 +391,7 @@
 
 <nav>
   <div class="nav-left">
-    <button class="text" on:click={() => goto(`${base}/draw`)}>
+    <button class="text" on:click={() => goto(`${base}/draw/${'#'+store.compressed || 'kljl'}`)}>
       <Icon type="chevron" rotation={180} /><span>Edit area</span>
     </button>
   </div>

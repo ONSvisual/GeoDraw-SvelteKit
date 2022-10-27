@@ -317,7 +317,10 @@
 
   onMount(async () => {
     await init();
-    document.body.style.opacity = 1;
+    setTimeout(() => {
+      document.body.style.opacity = 1;
+    }, 2000);
+    
   });
 
   /* 
@@ -640,7 +643,7 @@ The save data and continue function
       from the menu.
     {/if}
     <br />
-    <p><span style="font-weight:bold"> Population selected:</span> {pselect}</p>
+    <p><span style="font-weight:bold"> Population selected:</span> {pselect.toLocaleString()}</p>
   </div>
 </aside>
 
