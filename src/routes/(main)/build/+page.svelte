@@ -289,8 +289,10 @@
 
             df.print();
 
-            // var pc = df.div(df.sum(), {axis: 0});
-            var pc = df.div(df.max(), {axis: 0});
+            var pc = df.div(df.sum(), {axis: 0});
+            var bpc = df.div(df.max(), {axis: 0});
+
+            pc.print()
 
             var lists = [];
             let keepcol = table['Cell name'].filter((d) =>
@@ -342,7 +344,6 @@
 
       var usestats = data.filter(d=>d.special).map(d=>d.key)
 
-
       if (usestats.includes('population')) newstats.push('Population') 
       if (usestats.includes('agemed')) newstats.push('Median Age') 
       if (usestats.includes('density')) newstats.push('Population Density') 
@@ -352,7 +353,7 @@
       }
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${usestats.includes('age')? `&population=${btoa(JSON.stringify(population))}` : ''}${
+      )}${usestats||[].includes('age')? `&population=${btoa(JSON.stringify(population))}` : ''}${
         newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
       }${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''

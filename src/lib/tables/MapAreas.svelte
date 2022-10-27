@@ -73,11 +73,8 @@
 
 <style>
 	#map {
-		/* width: 100%; */
-		/* height: 300px; */
 		margin: 0;
 		padding: 0;
-	/* color: #1f8ab0 */
 
 	}
 
