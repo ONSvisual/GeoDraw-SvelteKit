@@ -1,4 +1,5 @@
-# GeoDraw Demo
+# BaCAP (formerly geodraw)
+## Build a Custom Area Profile
 
 To run locally - 
 `npm i`
