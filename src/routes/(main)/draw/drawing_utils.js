@@ -151,8 +151,6 @@ export function simplify_geo (geometry, max_length = 3000) {
       highQuality: true,
       tolerance: Math.pow (10, -precision),
     });
-
-    console.warn('turf' , simple)
     simple.coordinates = roundAll (simple.coordinates, Math.ceil (precision));
     length = JSON.stringify (simple).length;
     precision -= 0.5;
@@ -211,8 +209,6 @@ export async function update (coordinates) {
 
   const features = await get(centroids).contains(coordinates)
 
- console.debug('update centroids',features)
-
 
   var current = get (selected);
   var last = current[current.length - 1];
@@ -223,7 +219,6 @@ export async function update (coordinates) {
   //   last.lng.push (d[0]);
   // });
 
-  console
   if (get (add_mode)) {
     current.push ({
       oa: new Set ([...last.oa, ...features.oa]),

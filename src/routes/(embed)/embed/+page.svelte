@@ -31,7 +31,7 @@
       let searchParams = new URLSearchParams(hash.slice(3));
 
       for (let pair of searchParams.entries()) {
-        console.debug(pair);
+        // console.debug(pair);
         if (pair[0] == 'name') {
           props[pair[0]] = atob(pair[1]);
         } else if (['tabs', 'poly', 'population','stats'].includes(pair[0])) {

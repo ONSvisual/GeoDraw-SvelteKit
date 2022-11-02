@@ -170,7 +170,10 @@
       };
 
       let hash = window.location.hash;
-      if (hash.length == 10) {
+      if (hash === '#undefined'){
+        hash = window.location.hash=''
+      }
+      else if (hash.length == 10) {
         let code = [hash.slice(1)];
         newselect();
 
@@ -200,7 +203,6 @@
               `${code.slice(0, 3)}/${code}.json`
             );
 
-            // console.warn('DATA HASH',data)
 
             selected.set([{oa: new Set(), parents: []}]);
             localStorage.clear();
@@ -226,15 +228,42 @@
 
         history.replaceState(null, null, ' ');
       }
-      if (localStorage.getItem('draw_data') || false) {
-        var q;
-        q = await JSON.parse(localStorage.getItem('draw_data'));
+      else if (localStorage.getItem('onsbuild')){
+        var q = JSON.parse(localStorage.getItem('onsbuild')).properties;
+        state.name = q.name
+
+        if (!q.oa_all.length) {
+          newselect();
+          return 0;
+        }
+
+
+var bbox = get(centroids).bounds([...q.oa_all]);
+
+        $mapobject.fitBounds(bbox, {
+          padding: 20,
+          linear: true,
+        });
+
+        $selected = [
+            {
+              oa: q.oa_all,
+              parents: get(centroids).parent(q.oa_all),
+            },
+          ];
+
+
+        
+      }
+
+      else if (localStorage.getItem('draw_data') || false) {
+        var q = JSON.parse(localStorage.getItem('draw_data'));
+       
         if (!q.oa.length) {
           newselect();
           return 0;
         }
 
-        console.debug('q', q);
         var bbox = get(centroids).bounds([...q.oa]);
 
         $mapobject.fitBounds(bbox, {
@@ -271,7 +300,7 @@
         }
 
         if (b.properties && b.properties.codes) {
-          console.log('reading uploaded codes');
+          console.debug('reading uploaded codes');
           let bb = b.properties.bbox
             ? b.properties.bbox
             : $centroids.getbbox(boundary);
@@ -285,7 +314,7 @@
           ];
           $mapobject.fitBounds(bb, {padding: 20});
         } else if (b.geometry) {
-          console.log('reading uploaded geometry');
+          console.debug('reading uploaded geometry');
           if (JSON.stringify(b.geometry).length > 10000)
             b.geometry = simplify_geo(b.geometry, 10000);
           let bb = bbox(b);
