@@ -14,7 +14,7 @@ const config = {
 		}),
 		prerender: {
 			enabled: production,
-			onError: 'continue'
+			handleHttpError: 'warn'
 		},
 		paths: {
 			base: production ? '' : ''

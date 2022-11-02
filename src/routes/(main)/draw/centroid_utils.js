@@ -1,12 +1,10 @@
 // import pako from 'pako'
-import {dissolve} from '$lib/mapshaper'
+import {dissolve} from '$lib/mapshaper';
 
 class Centroids {
   async initialize({year, dfd}) {
-    console.debug(year,dfd,'cinit')
 
-    
-    this.file = `/oa${year}-data.csv`;
+    this.file = `/oa${year}-data-v2.csv`;
     this.oa = `oa${year}cd`;
 
     // var filestr = await fetch(
@@ -15,35 +13,28 @@ class Centroids {
     //   new TextDecoder().decode(buffer))
     // var df = await dfd.readCSV(filestr)
 
-
-    var df = await dfd.readCSV(`/oa${year}-data.csv`)
+    var df = await dfd.readCSV (`/oa${year}-data.csv`);
 
     this.oalist = new Set (df[this.oa].$data);
-    this.lsoa = this.count (df[`lsoa${year}cd`]);
-
+    this.lsoa = this.count (df['ls' + this.oa]);
 
     //groupby lsoa, then count
-    this.msoa = this.count (df[`msoa${year}cd`]);
+    var msoa = df
+      .loc ({columns: ['ms' + this.oa, 'ls' + this.oa]})
+      .groupby (['ms' + this.oa])
+      .count ();
+    this.msoa = Object.fromEntries (msoa.$data);
 
-
-    console.error('LOSA LOSA LOSA lsoa reference different')
-
-
-    
-
-    
     var a = df['population'];
     this.population = Object.fromEntries (
       df[this.oa].$data.map ((_, i) => [_, a.$data[i]])
     );
 
-
     var a = df[this.oa];
     this.index = Object.fromEntries (a.$index.map ((_, i) => [a.$data[i], _]));
 
-      
     this.df = df;
-    
+
     // this.df.print ();
   }
 
@@ -65,13 +56,11 @@ class Centroids {
 
   bounds (oa) {
     // get the bounaries of all selected oas
-    
+
     return this.getbbox (
       this.df.loc ({rows: this.indf (oa), columns: ['lng', 'lat']}).$data
     );
   }
-
-
 
   indf (oa) {
     // checks in dataframe and converts to index
@@ -91,21 +80,18 @@ class Centroids {
       var a, b, c, d;
       [a, b] = bbox[1].map (parseFloat);
       [c, d] = bbox[0].map (parseFloat);
-      // console.debug (a, b, c, d, bbox, bbox[0]);
 
       var matches = await this.df.query (
-        await this.df['lat'].lt (b)
-        .and(await this.df["lng"].lt(a))
-        .and(await this.df["lat"].gt(d))
-        .and(await this.df["lng"].gt(c))
+        await this.df['lat']
+          .lt (b)
+          .and (await this.df['lng'].lt (a))
+          .and (await this.df['lat'].gt (d))
+          .and (await this.df['lng'].gt (c))
       );
     } catch (err) {
       var matches = this.df;
-      console.error ('BBOX FILTER ERROR:', err);
-      this.df.print ();
     }
 
-    // console.warn ('maa', bbox, this.df.$index.length, matches.$index.length);
 
     return {bbox: bbox, ...this.inPolygon (coordinates, matches.$data)};
   }
@@ -158,8 +144,6 @@ class Centroids {
 
     const bbox = this.bounds (oa_all);
 
-    // console.debug ('simplify', msoa, lsoa, bbox, oa_all);
-
     var merge = {};
     merge.properties = {
       name,
@@ -179,8 +163,7 @@ class Centroids {
       .queryRenderedFeatures ({layers: ['bounds']})
       .filter (e => selected.oa.has (e.properties.areacd));
 
-
-    merge.geojson = dissolve({
+    merge.geojson = dissolve ({
       type: 'FeatureCollection',
       features: geometry.map (f => {
         return {
@@ -188,10 +171,7 @@ class Centroids {
           geometry: f.geometry,
         };
       }),
-    })
-
-
-
+    });
 
     console.debug ('---merge---', merge);
 

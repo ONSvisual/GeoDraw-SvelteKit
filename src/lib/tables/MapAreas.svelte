@@ -68,16 +68,13 @@
 		href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css"
 	/>
 </svelte:head>
-<br>
-<div id="map" style:margin='auto!important' style:min-height='400px' class='center' bind:this={container} bind:clientWidth={w}/>
+
+<div id="map" style:margin='auto!important' style:aspect-ratio='1' class='center' bind:this={container} bind:clientWidth={w}/>
 
 <style>
 	#map {
-		/* width: 100%; */
-		/* height: 300px; */
 		margin: 0;
 		padding: 0;
-	/* color: #1f8ab0 */
 
 	}
 

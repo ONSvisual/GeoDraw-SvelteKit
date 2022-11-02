@@ -1,6 +1,6 @@
 {
-	"name": "Build a Custom Area Profile",
-	"version": "2.0.2",
+	"name": "Build a Custom Area Profile (BaCAP)",
+	"version": "2.0.4",
 	"scripts": {
 		"dev": "vite dev",
 		"debug": "vite dev --debug",
@@ -15,7 +15,7 @@
 		"@mapbox/vector-tile": "^1.3.1",
 		"@netlify/functions": "^1.0.0",
 		"@sveltejs/adapter-netlify": "^1.0.0-next.64",
-		"@sveltejs/kit": "^1.0.0-next.350",
+		"@sveltejs/kit": "^1.0.0-next.531",
 		"@turf/bbox": "^6.5.0",
 		"@turf/boolean-point-in-polygon": "^6.5.0",
 		"@turf/circle": "^6.5.0",
@@ -36,7 +36,7 @@
 		"postcss": "^8.2.8",
 		"pym.js": "^1.3.2",
 		"svelte": "^3.29.0",
-		"svelte-kit": "^1.0.0-next.503",
+		"svelte-kit": "^1.0.0",
 		"svelte-select": "^4.4.7",
 		"tailwindcss": "^2.0.4",
 		"vite": "^3",

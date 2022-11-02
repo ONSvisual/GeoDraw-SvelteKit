@@ -2,42 +2,28 @@
   // imports
   import maplibregl from 'maplibre-gl';
   import {createEventDispatcher, onMount} from 'svelte';
-  // import {writable, get} from 'svelte/store';
   import {init_draw} from './drawing_utils.js';
-  const dispatch = createEventDispatcher();
   import {
-    // select,
     mapsource,
     maplayer,
     mapfunctions,
     mapobject,
-    draw_type,
-    // datalayers,
     mapstyle,
     minzoom,
     maxzoom,
-    // location,
     maxbounds,
-    selected,
-    draw_enabled,
 
-    // level,
-    // zoomed,
-    //init_draw,
   } from './mapstore.js';
 
   const mapboxgl = maplibregl;
-  //styling
-  // import 'mapbox-gl/dist/mapbox-gl-draw.css'
-  // import './css/mapbox-gl.css';
+  
 
   let webgl_canvas;
 
   export let drawing_tools = false;
 
   /// MAP creation
-  async function init() {
-    console.warn(webgl_canvas);
+  async function init() {;
 
     $mapobject = new mapboxgl.Map({
       container: 'mapcontainer',
@@ -85,7 +71,6 @@
   /// Set all Mapbox Parameters ///
   export async function SetLayers() {
     // set mapbox layers
-    console.log('set layers');
 
     mapsource.subscribe(async () => {
       // set the sources
@@ -99,7 +84,6 @@
     maplayer.subscribe(async () => {
       // set the layers
       for (const value of $maplayer) {
-        console.log('layer', value);
         if ($mapobject.getLayer(value.id)) $mapobject.removeLayer(value.id);
         $mapobject.addLayer(value);
       }
@@ -110,29 +94,10 @@
       // set the functions
       for (const e of $mapfunctions) {
         // $mapobject.off(e.event, e.layer, e.callback);
-        if (!e.off) console.log('adding', e.event, e.layer);
         $mapobject.on(e.event, e.layer, e.callback);
       }
     });
-
-
-
     if (drawing_tools) await init_draw();
-
-    // draw_type.subscribe(() => {
-    //   console.warn('------dt-------', $draw_type);
-    //   if (draw) {
-    //     clean();
-
-    //     if (e.target.checked) {
-    //       map[handler].enable();
-    //     } else {
-    //       map[handler].disable();
-    //     }
-    //   }
-    // });
-
-    console.warn('---loaded---');
   }
 
   /// main

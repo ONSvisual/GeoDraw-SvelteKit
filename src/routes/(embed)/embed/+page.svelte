@@ -31,7 +31,7 @@
       let searchParams = new URLSearchParams(hash.slice(3));
 
       for (let pair of searchParams.entries()) {
-        console.debug(pair);
+        // console.debug(pair);
         if (pair[0] == 'name') {
           props[pair[0]] = atob(pair[1]);
         } else if (['tabs', 'poly', 'population','stats'].includes(pair[0])) {
@@ -45,7 +45,7 @@
       tables = props.tabs;
       stats = props.stats
 
-      console.error(stats,props)
+      // console.error(stats,props)
   //     if (population) {
   //       // var pdf = new dfd.DataFrame(population[1], {columns: population[0]})
 
@@ -81,7 +81,7 @@
 
     let canvas = await html2canvas(document.body);
     const base64 = canvas.toDataURL();
-    console.log(canvas);
+    // console.log(canvas);
 
     let a = document.createElement('a');
     a.href = base64;
@@ -115,7 +115,7 @@
     {#if population || stats}
       
       <!-- <Cards> -->
-        {#each stats as stat}
+        {#each stats||[] as stat}
         <Card title="{stat[0]}">
           <BigNumber value={stat[1][0].toLocaleString()}  unit="" description={`<mark>${stat[1][1].toLocaleString()}</mark>  in England and Wales`}/>
         </Card>
@@ -133,7 +133,7 @@
   
     {/if}
 
-    {#each tables as tab}
+    {#each tables||[] as tab}
       <Card title={tab.name}>
         <BarChart xKey="pc" yKey="column" zKey="z" data={tab.data} />
       </Card>

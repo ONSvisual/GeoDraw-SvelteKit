@@ -2,21 +2,15 @@
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import pym from 'pym.js';
-
   import tooltip from '$lib/ui/tooltip';
   import Icon from '$lib/ui/Icon.svelte';
-  //   import Cards from '$lib/layout/Cards.svelte';
-  //   import Card from '$lib/layout/partial/Card.svelte';
-
   import {default as datasets} from '$lib/util/custom_profiles_tables.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
   import {get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
-  import {getgit} from '$lib/util/git.js'
+  import {getgit} from '$lib/util/git.js';
   import {onMount} from 'svelte';
-
-
-
+  import {Minhash} from 'minhash';
 
   let dataset_keys = Object.keys(datasets);
   dataset_keys = dataset_keys.filter(
@@ -27,26 +21,18 @@
   );
 
   /////
-  // get build code
-  // #area1 #area2
-
-  // import * as dfd from 'danfojs'
-  import {Minhash} from 'minhash';
-  import {log} from 'mathjs';
-
   let pym_parent; // Variabl for pym
-  //   let geojson; // Simplified geojson boundary for map
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
 
-
+  // alert('00 oa 01 lsoa 02 msoa e.g.E00')
 
   let topics = [
-    {key: 'population', label: 'Population',special:true},
-    {key: 'density', label: 'Population density',special:true},
-    {key: 'agemed', label: 'Average (median) age',special:true},
-    {key: 'age', label: 'Age profile',special:true},
+    {key: 'population', label: 'Total Population', special: true},
+    {key: 'density', label: 'Population density', special: true},
+    {key: 'agemed', label: 'Median age', special: true},
+    {key: 'age', label: 'Age profile', special: true},
     // {key: 'sex', label: 'Sex'},
     {key: 'ethnicity', label: 'Ethnicity'},
     {key: 'religion', label: 'Religion'},
@@ -64,11 +50,9 @@
     .map(function (topic) {
       return Object.assign({}, topic, datasets[name2key[topic.label]]);
     })
-    .filter((d) => d['Nomis table'] || d.special)
-    
-    topics.sort((a,b)=>a.key > b.key?1:-1)
+    .filter((d) => d['Nomis table'] || d.special);
 
-
+  topics.sort((a, b) => (a.key > b.key ? 1 : -1));
 
   let state = {
     mode: 'move',
@@ -77,12 +61,13 @@
     name: 'Area Name',
     showSave: false,
     showEmbed: false,
-    topics: [topics[1], topics[2]],
+    topics: topics.filter((d) => ['population', 'hours'].includes(d.key)),
     topicsExpand: false,
     topicsFilter: '',
   };
 
   function filterTopics(topics, selected, regex, expand) {
+    /// display only those which exist
     let topics_start = [];
     let topics_end = [];
     topics.forEach((topic) => {
@@ -106,61 +91,64 @@
   let store;
   let geojson;
   let population, stats;
+
   async function init() {
+    document.body.style.opacity = 0.1;
 
-    document.body.style.opacity = 0.1
-
-// incase we call for a pre loaded area as a hash string
+    // incase we call for a pre loaded area as a hash string
     let hash = window.location.hash;
-      if (hash.length == 10) {
-        let code = hash.slice(1);
+    if (hash = '#undefined'){ 
+      hash = ''
+      window.location.hash= ''
+    }
+    else if (hash.length == 10) {
+      let code = hash.slice(1);
 
-        let data = await getgit(
-              'ONSvisual',
-              'cp-places-data',
-              `${code.slice(0, 3)}/${code}.json`
-            );
+      let data = await getgit(
+        'ONSvisual',
+        'cp-places-data',
+        `${code.slice(0, 3)}/${code}.json`
+      );
 
-            // localStorage.clear();
+      if (data.type === 'Feature') {
+        const info = {
+          compressed: code,
+          geojson: data,
+          name: data.properties.areanm,
+          properties: {oa_all: data.properties.codes},
+        };
 
-
-
-            if (data.type === 'Feature') {
-
-              const info = {
-                compressed:code,
-                geojson:data,
-                name : data.properties.areanm,
-                properties:{oa_all:data.properties.codes}
-
-              }
-
-              localStorage.setItem('onsbuild', JSON.stringify(info));
-            
-            }
-
+        localStorage.setItem('onsbuild', JSON.stringify(info));
       }
+    }
 
-
-
-
-       // resume as normal
+    // resume as normal
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
     console.debug('build-', store);
+    if (!store){
+      alert('Warning, no area selected! Redirecting to the drawing page.')
+      goto(`${base}/draw/`);
+    }
+    
     geojson = simplify_geo(store.geojson.geometry);
+    
 
-    state.name = store.name;
+    state.name = store.properties.name;
     state.start = true;
 
-    let props =  store.properties;
-    state.compressed = store.compressed || Object.values({
-      ...props.msoa,
-      ...props.lsoa,
-      ...props.oa,
-    })
-      .flat()
-      .join(';');
+    let props = store.properties;
+    state.compressed =
+      store.compressed ||
+      Object.values({
+        ...props.msoa,
+        ...props.lsoa,
+        ...props.oa,
+      })
+        .flat()
+        .join(';');
+
+    // console.error('comp',state.compressed)
 
     // var senddata = {
     // 	tables: tlist,
@@ -182,12 +170,8 @@
         stats
       );
 
-      document.body.style.opacity = 1
-
-
+      document.body.style.opacity = 1;
     }, 2000);
-
-    
   }
 
   onMount(init);
@@ -198,165 +182,170 @@
   ////////////////////////////////////////////////////////////////
   let cache = {};
   async function get_data(data) {
-
     if (!state.start) return [];
 
-    let rtn = data.filter(d=>!d.special)
-    .map(async function (table) {
-
-
-      if (table['Nomis table'] in cache) {
-        return cache[table['Nomis table']];
-        // } else if
-      } else {
-        return await dfd
-          .readCSV(
-            `https://www.nomisweb.co.uk/api/v01/dataset/${table[
-              'Nomis table'
-            ].toLowerCase()}.bulk.csv?date=latest&geography=MAKE|MyCustomArea|${
-              state.compressed
-            },K04000001&rural_urban=0&measures=20100&select=geography_name,cell_name,obs_value`
-          )
-          .then((d) => d.setIndex({column: 'geography'}))
-          .then((de) => {
-            var mappings = {};
-            var cols = de.columns.filter((d) => d.includes(':'));
-            cols.forEach((d, i) => {
-              mappings[d] = d.replaceAll(/[\:\;]/g, ' ');
-              ///:\s*(.+);/.exec(d)[1];
-            });
-
-            return de
-              .loc({
-                rows: de.index.filter((d) => d),
-                columns: cols,
-              })
-              .rename(mappings, {inplace: false});
-          })
-
-          .then((df_old) => {
-            // mandatory cleanup
-            var cols = df_old.$columns.filter(
-              (d) =>
-                !(
-                  (
-                    d.includes('count') ||
-                    d.includes('All') ||
-                    (d.match(/\;/g) || []).length === 1 ||
-                    d.includes('sum') ||
-                    d.includes('Total')
-                  )
-                  // d.includes('Mean')
-                )
-            );
-
-            df_old = df_old.loc({columns: cols});
-
-            // add headers to hash search algorithm
-            const matches = table['Cell name'].map((d) => {
-              var match = new Minhash();
-              d.match(/\w+/g).forEach((e) => match.update(e));
-              return [d, match];
-            });
-
-            // name cleanup
-            let colmap = new Map();
-            df_old.$columns.forEach((m) => {
-              const m0 = new Minhash();
-              m.match(/\w+/g).forEach((e) => m0.update(e));
-              var last = 0;
-              var keep = m;
-
-              for (const mx of matches) {
-                var j = m0.jaccard(mx[1]);
-                if (j > last) {
-                  last = j;
-                  keep = mx[0];
-                }
-              }
-              // create a hierarchical map
-              colmap.set([keep, [m, ...(colmap.get(keep) || [])]]);
-            });
-
-            // rebuild with grouped data
-            let df = {};
-            colmap.forEach((_, item) => {
-              var [key, value] = item;
-              df[key] = df_old.loc({columns: value}).sum({axis: 1}).$data;
-            });
-
-            df = new dfd.DataFrame(df);
-
-            df.print();
-
-            // var pc = df.div(df.sum(), {axis: 0});
-            var pc = df.div(df.max(), {axis: 0});
-
-            var lists = [];
-            let keepcol = table['Cell name'].filter((d) =>
-              df.$columns.includes(d)
-            );
-            // columns to plot (must appear in both nomis and datasheet. )
-            dfd
-              .toJSON(pc.loc({columns: keepcol}), {
-                format: 'columns',
-              })
-              .forEach((dict, i) => {
-                for (var key in dict) {
-                  lists.push({
-                    z: ['CustomArea', 'England and Wales'][i],
-                    pc: dict[key],
-                    column: key,
-                  });
-                }
+    let rtn = data
+      .filter((d) => !d.special)
+      .map(async function (table) {
+        if (table['Nomis table'] in cache) {
+          return cache[table['Nomis table']];
+        } else {
+          return await dfd
+            .readCSV(
+              `https://www.nomisweb.co.uk/api/v01/dataset/${table[
+                'Nomis table'
+              ].toLowerCase()}.bulk.csv?date=latest&geography=MAKE|MyCustomArea|${
+                state.compressed
+              },K04000001&rural_urban=0&measures=20100&select=geography_name,cell_name,obs_value`
+            )
+            .then((d) => d.setIndex({column: 'geography'}))
+            .then((de) => {
+              var mappings = {};
+              var cols = de.columns.filter((d) => d.includes(':'));
+              cols.forEach((d, i) => {
+                mappings[d] = d.replaceAll(/[\:\;]/g, ' ');
+                ///:\s*(.+);/.exec(d)[1];
               });
 
-            cache[table['Nomis table']] = {
-              name: table['Table name'],
-              data: lists,
-              embed: {
-                nid: table['Nomis table'],
-                did: keepcol.map((d) => table['Cell name'].indexOf(d)),
-                data: [...new Uint16Array(lists.map((d) => d.pc * 10000))],
-              },
-            };
-            console.debug('table', cache[table['Nomis table']]);
-            return cache[table['Nomis table']];
-          });
-      }
-    });
+              return de
+                .loc({
+                  rows: de.index.filter((d) => d),
+                  columns: cols,
+                })
+                .rename(mappings, {inplace: false});
+            })
+
+            .then((df_old) => {
+              // mandatory cleanup
+              var cols = df_old.$columns.filter(
+                (d) =>
+                  !(
+                    (
+                      d.includes('count') ||
+                      d.includes('All') ||
+                      (d.match(/\;/g) || []).length === 1 ||
+                      d.includes('sum') ||
+                      d.includes('Total')
+                    )
+                    // d.includes('Mean')
+                  )
+              );
+
+              df_old = df_old.loc({columns: cols});
+
+              // add headers to hash search algorithm
+              const matches = table['Cell name'].map((d) => {
+                var match = new Minhash();
+                d.match(/\w+/g).forEach((e) => match.update(e));
+                return [d, match];
+              });
+
+              // name cleanup
+              let colmap = new Map();
+              df_old.$columns.forEach((m) => {
+                const m0 = new Minhash();
+                m.match(/\w+/g).forEach((e) => m0.update(e));
+                var last = 0;
+                var keep = m;
+
+                for (const mx of matches) {
+                  var j = m0.jaccard(mx[1]);
+                  if (j > last) {
+                    last = j;
+                    keep = mx[0];
+                  }
+                }
+                // create a hierarchical map
+                colmap.set([keep, [m, ...(colmap.get(keep) || [])]]);
+              });
+
+              // rebuild with grouped data
+              let df = {};
+              colmap.forEach((_, item) => {
+                var [key, value] = item;
+                df[key] = df_old.loc({columns: value}).sum({axis: 1}).$data;
+              });
+
+              df = new dfd.DataFrame(df);
+
+              // df.print();
+
+              var pc = df.div(df.sum(), {axis: 0});
+              // var bpc = df.div(df.max(), {axis: 0});
+
+              // pc.print()
+
+              var lists = [];
+              let keepcol = table['Cell name'].filter((d) =>
+                df.$columns.includes(d)
+              );
+              // columns to plot (must appear in both nomis and datasheet. )
+              dfd
+                .toJSON(pc.loc({columns: keepcol}), {
+                  format: 'columns',
+                })
+                .forEach((dict, i) => {
+                  for (var key in dict) {
+                    lists.push({
+                      z: ['CustomArea', 'England and Wales'][i],
+                      pc: dict[key],
+                      column: key,
+                    });
+                  }
+                });
+
+              cache[table['Nomis table']] = {
+                name: table['Table name'],
+                data: lists,
+                embed: {
+                  nid: table['Nomis table'],
+                  did: keepcol.map((d) => table['Cell name'].indexOf(d)),
+                  data: [...new Uint16Array(lists.map((d) => d.pc * 10000))],
+                },
+              };
+              // console.debug('table', cache[table['Nomis table']]);
+              return cache[table['Nomis table']];
+            });
+        }
+      });
     return await Promise.all(rtn);
   }
 
-  async function update_profile(start, name, data, includemap, population,stats) {
+  async function update_profile(
+    start,
+    name,
+    data,
+    includemap,
+    population,
+    stats
+  ) {
     if (start) {
-
-
+      var ls = JSON.parse(localStorage.getItem('onsbuild'));
+      ls.properties.name = name;
+      localStorage.setItem('onsbuild', JSON.stringify(ls));
 
       tables = await get_data(data);
 
-      let dummystats
-      var newstats = []
-      if (stats){
+      let dummystats;
+      var newstats = [];
+      if (stats) {
+        var usestats = data.filter((d) => d.special).map((d) => d.key);
 
+        if (usestats.includes('population')) newstats.push('Population');
+        if (usestats.includes('agemed')) newstats.push('Median Age');
+        if (usestats.includes('density')) newstats.push('Population Density');
 
-      var usestats = data.filter(d=>d.special).map(d=>d.key)
-
-
-      if (usestats.includes('population')) newstats.push('Population') 
-      if (usestats.includes('agemed')) newstats.push('Median Age') 
-      if (usestats.includes('density')) newstats.push('Population Density') 
-
-
-      dummystats = newstats.map(d=>[d,stats[d]])
+        dummystats = newstats.map((d) => [d, stats[d]]);
       }
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${usestats.includes('age')? `&population=${btoa(JSON.stringify(population))}` : ''}${
-        newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
+      )}${
+        usestats || [].includes('age')
+          ? `&population=${btoa(JSON.stringify(population))}`
+          : ''
       }${
-        includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
-      }`;
+        newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
+      }${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
 
       // alert(population)
 
@@ -391,7 +380,10 @@
 
 <nav>
   <div class="nav-left">
-    <button class="text" on:click={() => goto(`${base}/draw`)}>
+    <button
+      class="text"
+      on:click={() => goto(`${base}/draw/${'#' + (store.compressed || '')}`)}
+    >
       <Icon type="chevron" rotation={180} /><span>Edit area</span>
     </button>
   </div>
@@ -441,14 +433,12 @@
     <h2>Name your area</h2>
     <input type="text" bind:value={state.name} placeholder="Type a name" />
 
-    <p style='font-weight:bold'> Area Profiles</p>
+    <p style="font-weight:bold">Area Profiles</p>
 
     <label>
-      <input type="checkbox"  bind:checked={includemap} />
+      <input type="checkbox" bind:checked={includemap} />
       Include Map
     </label>
-
-
 
     <h2>Select topics</h2>
     <input

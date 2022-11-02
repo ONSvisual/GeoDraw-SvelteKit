@@ -9,6 +9,7 @@
 	export let suffix = "%";
 	export let barHeight = 25;
 	export let markerWidth = 3;
+	var bmax;
 	
 	function groupData(data, key) {
 		let data_indexed = {};
@@ -35,8 +36,11 @@
 	$: zDomain = data.map(d => d[zKey]).filter((v, i, a) => a.indexOf(v) === i);
 	
 	$: xScale = (value) => value * 100;
-	
 	$: data_grouped = groupData(data, yKey);
+
+	$: bmax = Math.max(...data.map(d=>+d[xKey]))
+
+
 </script>
 
 {#if zDomain[1]}
@@ -60,9 +64,9 @@
 	<div class="bar-group" style:height="{barHeight}px">
 	{#each group.values as d, i}
 		{#if i == 0}
-		<div class="bar" style:left="0" style:width="{xScale(d[xKey])}%"/>
+		<div class="bar" style:left="0" style:width="{xScale(d[xKey]/bmax)}%"/>
 		{:else}
-		<div class="marker" style:left="calc({xScale(d[xKey])}% - {markerWidth / 2}px)" style:border-left-width="{markerWidth}px"/>
+		<div class="marker" style:left="calc({xScale(d[xKey]/bmax)}% - {markerWidth / 2}px)" style:border-left-width="{markerWidth}px"/>
 		{/if}
 	{/each}
 	</div>
