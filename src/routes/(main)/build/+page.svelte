@@ -1,4 +1,6 @@
 <script>
+    import ONSloader from '../ONSloader.svelte';
+  let isLoading = false;
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import pym from 'pym.js';
@@ -93,7 +95,7 @@
   let population, stats;
 
   async function init() {
-    document.body.style.opacity = 0.1;
+    isLoading=true
 
     // incase we call for a pre loaded area as a hash string
     let hash = window.location.hash;
@@ -170,8 +172,8 @@
         stats
       );
 
-      document.body.style.opacity = 1;
-    }, 2000);
+      isLoading=false
+    }, 4000);
   }
 
   onMount(init);
@@ -508,7 +510,7 @@
     </div>
   </article>
 </div>
-
+<ONSloader isLoading={isLoading}/>
 <style>
   .profile {
     flex-grow: 1;

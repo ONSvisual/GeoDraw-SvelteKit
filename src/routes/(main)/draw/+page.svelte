@@ -1,4 +1,6 @@
 <script>
+  import ONSloader from '../ONSloader.svelte';
+  let isLoading = false;
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import tooltip from '$lib/ui/tooltip';
@@ -10,7 +12,6 @@
   import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount, onDestroy} from 'svelte';
-
   import {getgit} from '$lib/util/git.js'
 
   let speak = false;
@@ -73,7 +74,7 @@
   let newselect;
 
   async function init() {
-    document.body.style.opacity = 0.1;
+    isLoading=true
     /* 
   A section to clear the local storage if past the last update date
   When updating this, use the american format of mm/dd/yy
@@ -347,8 +348,8 @@ var bbox = get(centroids).bounds([...q.oa_all]);
   onMount(async () => {
     await init();
     setTimeout(() => {
-      document.body.style.opacity = 1;
-    }, 2000);
+      isLoading=false
+    }, 3000);
     
   });
 
@@ -675,6 +676,17 @@ The save data and continue function
     <p><span style="font-weight:bold"> Population selected:</span> {pselect.toLocaleString()}</p>
   </div>
 </aside>
+
+
+<ONSloader isLoading={isLoading}/>
+
+
+
+
+
+
+
+
 
 <style>
   div.maplibregl-control-container {
