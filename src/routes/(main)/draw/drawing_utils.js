@@ -350,7 +350,7 @@ function cursor(){
   else if (dt === 'select'){
     document.querySelector('#mapcontainer div canvas').style.cursor='auto'
   } 
-  else{
-    document.querySelector('#mapcontainer div canvas').style.cursor='url("/cursor/Working.ani"),crosshair'
-  }
+  // else{
+  //   document.querySelector('#mapcontainer div canvas').style.cursor='url("/cursor/Working.ani"),crosshair'
+  // }
 }
