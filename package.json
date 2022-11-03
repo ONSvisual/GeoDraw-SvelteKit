@@ -5,6 +5,7 @@
 		"dev": "vite dev",
 		"debug": "vite dev --debug",
 		"build": "vite build",
+		"buildgit": "vite build && cp -r build docs",
 		"start": "vite preview",
 		"deploy": "netlify build && netlify deploy -p ",
 		"push": "git add -A; git commit -m 'npm update';git push"
