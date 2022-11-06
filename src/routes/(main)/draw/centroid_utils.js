@@ -4,7 +4,7 @@ import {dissolve} from '$lib/mapshaper';
 class Centroids {
   async initialize({year, dfd}) {
 
-    this.file = `/oa${year}-data-v2.csv`;
+    this.file = `/oa${year}-data-v3.csv`;
     this.oa = `oa${year}cd`;
 
     // var filestr = await fetch(
