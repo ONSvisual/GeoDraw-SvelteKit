@@ -75,7 +75,7 @@
     mapsource.subscribe(async () => {
       // set the sources
       for (const [key, value] of Object.entries($mapsource)) {
-        if ($mapobject.getSource(key)) $mapobject.removeSource(key);
+        // if ($mapobject.getSource(key)) $mapobject.removeSource(key);
         // if (value.hasOwnProperty('data')) value.data = await value.data; // for async loads
         if (!$mapobject.getSource(key)) $mapobject.addSource(key, value); // as it may nto be removable
       }

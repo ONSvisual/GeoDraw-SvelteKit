@@ -8,7 +8,6 @@
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
   import {get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
-  import {getgit} from '$lib/util/git.js';
   import {onMount} from 'svelte';
   import {Minhash} from 'minhash';
 
@@ -97,25 +96,23 @@
 
     // incase we call for a pre loaded area as a hash string
     let hash = window.location.hash;
-    if (hash = '#undefined'){ 
+    if (hash === '#undefined'){ 
       hash = ''
       window.location.hash= ''
     }
     else if (hash.length == 10) {
       let code = hash.slice(1);
 
-      let data = await getgit(
-        'ONSvisual',
-        'cp-places-data',
-        `${code.slice(0, 3)}/${code}.json`
-      );
+      let data = await (await fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`)).json();
 
       if (data.type === 'Feature') {
         const info = {
           compressed: code,
           geojson: data,
-          name: data.properties.areanm,
-          properties: {oa_all: data.properties.codes},
+          properties: {
+            oa_all: data.properties.codes,
+            name: data.properties.areanm ? data.properties.areanm : data.properties.areacd
+          },
         };
 
         localStorage.setItem('onsbuild', JSON.stringify(info));
@@ -350,7 +347,7 @@
       // alert(population)
 
       if (!pym_parent) {
-        pym_parent = new pym.Parent('embed', '/embed/' + embed_hash, {
+        pym_parent = new pym.Parent('embed', `${base}/embed/${embed_hash}`, {
           name: 'embed',
           id: 'iframe',
         });
@@ -371,7 +368,7 @@
   );
 
   function makeEmbed(embed_hash) {
-    let url = `/embed/${embed_hash}`;
+    let url = `${base}/embed/${embed_hash}`;
     return `<div id="profile"></div>
 <script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
 <script>var pymParent = new pym.Parent("profile", "${url}", {name: "profile"});<\/script>`;
