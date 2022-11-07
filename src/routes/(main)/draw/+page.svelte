@@ -390,6 +390,10 @@
       points:{
         type:'geojson',
         data: get(centroids).geojson,
+        // a hack since max and min zoom do not work. 
+        cluster: true,
+clusterMaxZoom: 10, // Max zoom to cluster points on
+clusterRadius: 350 // Radius of each cluster when clustering points (defaults to 50)
       }
 
 
