@@ -467,7 +467,7 @@ clusterRadius: 1000 // Radius of each cluster when clustering points (defaults t
     ];
     /// end read out areas
 
-    async function recolour(selected) {
+    function recolour(selected) {
       const items = selected[selected.length - 1];
 
       pselect = items.oa.size
@@ -488,7 +488,7 @@ clusterRadius: 1000 // Radius of each cluster when clustering points (defaults t
     }
 
     $mapobject.on('load', async () => {
-      selected.subscribe(recolour);
+      
 
       newselect = function () {
         localStorage.clear();
@@ -599,6 +599,10 @@ clusterRadius: 1000 // Radius of each cluster when clustering points (defaults t
       zoom = $mapobject.getZoom();
       $mapobject.on('moveend', () => (zoom = $mapobject.getZoom()));
     });
+
+    selected.subscribe(recolour);
+    recolour($selected)
+
   } //endinit
 
   function load_geo() {

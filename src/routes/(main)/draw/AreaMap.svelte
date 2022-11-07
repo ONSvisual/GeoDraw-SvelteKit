@@ -17,6 +17,10 @@
 <script>
   // imports
   import maplibregl from 'maplibre-gl';
+
+  maplibregl.workerCount = 5;
+  maplibregl.maxParallelImageRequests = 20;
+
   import {createEventDispatcher, onMount} from 'svelte';
   import {init_draw} from './drawing_utils.js';
   import {
