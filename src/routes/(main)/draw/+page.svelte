@@ -392,8 +392,8 @@
         data: get(centroids).geojson,
         // a hack since max and min zoom do not work. 
         cluster: true,
-clusterMaxZoom: 10, // Max zoom to cluster points on
-clusterRadius: 350 // Radius of each cluster when clustering points (defaults to 50)
+clusterMaxZoom: 9, // Max zoom to cluster points on
+clusterRadius: 1000 // Radius of each cluster when clustering points (defaults to 50)
       }
 
 
@@ -418,8 +418,8 @@ clusterRadius: 350 // Radius of each cluster when clustering points (defaults to
         'source': 'points',
         'type': 'circle',
         'paint': {
-        'circle-radius': 2,
-        'circle-color': '#007cbf'
+        'circle-radius': 2.5,
+        'circle-color': 'coral'//'#007cbf'
         }
       },
     ];
