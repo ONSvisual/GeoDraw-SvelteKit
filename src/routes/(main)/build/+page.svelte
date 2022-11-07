@@ -233,7 +233,7 @@
     /// display only those which exist
     let topics_start = [];
     let topics_end = [];
-    topics.forEach((topic) => {
+    [...topics].sort((a, b) => a.label.localeCompare(b.label)).forEach((topic) => {
       if (selected.includes(topic)) {
         topics_start.push(topic);
       } else {
