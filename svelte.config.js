@@ -17,7 +17,7 @@ const config = {
 			handleHttpError: 'warn'
 		},
 		paths: {
-			base: production ? '/census2021/custom-profiles/build' : ''
+			base: production ? '' : ''
 		},
 		trailingSlash: 'always'
 	}
