@@ -478,7 +478,7 @@ clusterRadius: 1000 // Radius of each cluster when clustering points (defaults t
 
       // if (!items.oa.size) return;
       console.debug('---recolour', items);
-      $mapobject.setPaintProperty('bounds', 'fill-color', [
+      if ($mapobject.getLayer('bounds')) $mapobject.setPaintProperty('bounds', 'fill-color', [
         'match',
         ['get', 'areacd'],
         ['literal', ...items.oa],
