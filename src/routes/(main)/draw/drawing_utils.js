@@ -6,9 +6,9 @@ import {
   selected,
   add_mode,
   draw_enabled,
-  centroids
+  centroids,
 } from './mapstore.js';
-import {roundAll,extent} from './misc_utils.js'
+import {roundAll, extent} from './misc_utils.js';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
 import circle from '@turf/circle';
@@ -17,20 +17,33 @@ import turf_simplify from '@turf/simplify';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/mapshaper';
 
-
-
-const mzm = 10
+const mzm = 10;
 export var Draw;
 export let coordinates = [];
 // keep track of coordinates of centre of radius drawing tool
 let radius_center = null;
 
-
-
-
-
 ////////////////////
 ///////////////////
+
+function cursor () {
+  // A function to change the df.loc({rows:df.$index.slice(0,4)})ap cursor
+  const de = get (draw_enabled);
+  const dt = get (draw_type);
+
+  // if (de | dt === undefined ){document.querySelector('#mapcontainer div canvas').style.cursor = 'no-drop';}
+
+  switch (dt) {
+    case 'select':
+      document.querySelector ('#mapcontainer div canvas').style.cursor = 'auto';
+      break;
+    case 'move':
+      document.querySelector ('#mapcontainer div canvas').style.cursor = 'grab';
+      break;
+    default:
+      document.querySelector ('#mapcontainer div canvas').style.cursor = 'auto';
+  }
+}
 
 export async function init_draw () {
   get (mapobject).addSource ('drawsrc', {
@@ -87,12 +100,12 @@ export async function init_draw () {
     clearpoly ();
   }
   get (mapobject).on ('zoomend', function () {
-    const de = get (mapobject).getZoom () < mzm
-    draw_enabled.set(de);
+    const de = get (mapobject).getZoom () < mzm;
+    draw_enabled.set (de);
     // cursor()
   });
 
-  get(mapobject).doubleClickZoom.enable ()
+  get (mapobject).doubleClickZoom.enable ();
   // on move events
   get (mapobject).on ('mousemove', 'bounds', function move (e) {
     // console.log (e.lngLat, get (draw_type));
@@ -106,20 +119,19 @@ export async function init_draw () {
     add_mode.set (true);
     circle_fast ((clear = get (draw_type) != 'radius'));
     Draw.deleteAll ();
-    cursor() 
-    if (dt === 'polygon') {Draw.changeMode ('draw_polygon', {})}
-  
+    cursor ();
+    if (dt === 'polygon') {
+      Draw.changeMode ('draw_polygon', {});
+    }
   });
 
   // set default
   radius_center = null;
   circle_fast ((clear = true));
   draw_type.set ('move');
-  
 
   // update circle tool each radius change
   radiusInKm.subscribe (() => circle_fast ());
-
 
   function boundclick (e) {
     switch (get (draw_type)) {
@@ -130,15 +142,11 @@ export async function init_draw () {
         draw_point (e);
         break;
     }
-  };
+  }
 
-  get (mapobject).on ('click', 'bounds', boundclick)//mouse
-  get (mapobject).on ('touchstart', 'bounds', boundclick)//touch
-
-
+  get (mapobject).on ('click', 'bounds', boundclick); //mouse
+  get (mapobject).on ('touchstart', 'bounds', boundclick); //touch
 }
-
-
 
 export function simplify_geo (geometry, max_length = 3000) {
   // Simplifies a geojson geometry
@@ -161,8 +169,6 @@ export function simplify_geo (geometry, max_length = 3000) {
   );
   return simple;
 }
-
-
 
 function makeBoundary (geojson, simplify = false) {
   let dissolved = dissolve (geojson);
@@ -189,7 +195,8 @@ function clear () {
   });
 }
 
-export function clearpoly () {// clear()
+export function clearpoly () {
+  // clear()
   Draw.deleteAll ();
   Draw.changeMode ('draw_polygon', {});
 }
@@ -198,26 +205,20 @@ export function change_data (layer, data) {
   get (mapobject).getSource (layer).setData (data);
 }
 
-
 ////////////////////
 // Matching Utilities
 ////////////////////
 
 export async function update (geo) {
   // update all polygon like draw items
-  document.querySelector('#mapcontainer div canvas').style.cursor='wait'
+  document.querySelector ('#mapcontainer div canvas').style.cursor = 'wait';
 
   const features = await get(centroids).contains(geo)
 
 
   var current = get (selected);
   var last = current[current.length - 1];
-  console.debug('update,last',last,current)
-
-  // features.bbox.map (d => {
-  //   last.lat.push (d[1]);
-  //   last.lng.push (d[0]);
-  // });
+  console.debug ('update,last', last, current);
 
   if (get (add_mode)) {
     current.push ({
@@ -225,61 +226,52 @@ export async function update (geo) {
       parents: [...last.parents, ...features.parents],
     });
   } else {
-
     // drop matches individually
-    features.parents.forEach(d=>{
-      var id = last.parents.indexOf(d)
-      if (id >= 0) last.parents.splice(id,1)
-    })
+    features.parents.forEach (d => {
+      var id = last.parents.indexOf (d);
+      if (id >= 0) last.parents.splice (id, 1);
+    });
     current.push ({
       oa: new Set ([...last.oa].filter (x => !features.oa.has (x))),
       parents: last.parents,
     });
   }
 
-updatelocal(current)
-  cursor()
-
-  
+  updatelocal (current);
+  cursor ();
 }
 
 function draw_point (e) {
-// update using select tool 
+  // update using select tool
 
-console.debug(e.features.map (d => d.properties.areacd))
+  console.debug (e.features.map (d => d.properties.areacd));
   const oalist = new Set (e.features.map (d => d.properties.areacd));
   const current = get (selected);
   var last = Object.assign ({}, current[current.length - 1]);
-
-
 
   last = {
     oa: new Set (last.oa),
     parents: [...last.parents],
   };
 
-  [...oalist].forEach (
-    oa => {
+  [...oalist].forEach (oa => {
+    const parent = get (centroids).parent (oa);
 
-      const parent = get(centroids).parent(oa)
-
-      if (last.oa.has (oa)){
-         last.oa.delete (oa)
-         var id = last.parents.indexOf(parent)
-         if (id>-1) last.parents.splice(id,1)
-      }else{
-        last.oa.add (oa)
-        last.parents.push(parent)
-      }
-      })
+    if (last.oa.has (oa)) {
+      last.oa.delete (oa);
+      var id = last.parents.indexOf (parent);
+      if (id > -1) last.parents.splice (id, 1);
+    } else {
+      last.oa.add (oa);
+      last.parents.push (parent);
+    }
+  });
 
   current.push (last);
-  updatelocal(current)
-  
+  updatelocal (current);
 }
 
-
-function updatelocal(current){
+function updatelocal (current) {
   selected.set (current);
   var items = current[current.length - 1];
   // we cannot stringify sets!
@@ -289,8 +281,6 @@ function updatelocal(current){
   );
   localStorage.setItem ('draw_data', items);
 }
-
-
 
 ////////////////////
 // Circle Tools
@@ -309,7 +299,6 @@ function circle_fast (clear = false, center = radius_center) {
   if (center && !clear) {
     const options = {steps: 24, units: 'kilometers'};
     geo = circle ([center.lng, center.lat], +get (radiusInKm), options);
-
   } else {
     geo = {type: 'Polygon', coordinates: []};
   }
@@ -320,7 +309,6 @@ function circle_fast (clear = false, center = radius_center) {
 ////////////////////
 // Query
 ////////////////////
-
 
 export function geo_blob (q) {
   q.properties = {
@@ -336,20 +324,4 @@ export function geo_blob (q) {
   return new Blob ([JSON.stringify (q)], {
     type: 'application/geo+json;charset=utf-8',
   });
-}
-
-
-function cursor(){
-  // A function to change the df.loc({rows:df.$index.slice(0,4)})ap cursor
-  const de = get(draw_enabled)
-  const dt = get(draw_type); 
-
-  // if (de | dt === undefined ){document.querySelector('#mapcontainer div canvas').style.cursor = 'no-drop';}
-  if (dt === 'move') {document.querySelector('#mapcontainer div canvas').style.cursor='move'}
-  else if (dt === 'select'){
-    document.querySelector('#mapcontainer div canvas').style.cursor='auto'
-  } 
-  else{
-    document.querySelector('#mapcontainer div canvas').style.cursor='url("/cursor/Working.ani"),crosshair'
-  }
 }

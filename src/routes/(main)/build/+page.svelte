@@ -1,4 +1,168 @@
+<ONSloader isLoading={isLoading}/>
+<nav>
+  <div class="nav-left">
+    <button
+      class="text"
+      on:click={() => goto(`${base}/draw/${'#' + (store.compressed || '')}`)}
+    >
+      <Icon type="chevron" rotation={180} /><span>Edit area</span>
+    </button>
+  </div>
+  <div class="nav-right">
+    <button
+      title={state.showSave ? 'Close save options' : 'Save selected area'}
+      use:tooltip
+      on:click={() => (state.showSave = !state.showSave)}
+      class:active={state.showSave}
+    >
+      <Icon
+        type={state.showSave ? 'add' : 'download'}
+        rotation={state.showSave ? 45 : 0}
+      />
+    </button>
+  </div>
+</nav>
+{#if state.showSave}
+  <nav class="tray">
+    <div />
+    <div class="save-buttons">
+      <input type="text" bind:value={state.name} placeholder="Type a name" />
+      <button
+        class="text"
+        on:click={async () => {
+          let blob = geo_blob(store);
+          download(blob, `${state.name}.json`);
+        }}
+      >
+        <Icon type="download" /><span>Save geography</span>
+      </button>
+      <button
+        class="text"
+        on:click={() =>
+          clip(
+            store.properties.oa_all.join(','),
+            'Copied output area codes to clipboard'
+          )}
+      >
+        <Icon type="copy" /><span>Copy area codes</span>
+      </button>
+    </div>
+  </nav>
+{/if}
+<div class="container">
+  <aside class="topics-box">
+    <h2>Name your area</h2>
+    <input type="text" bind:value={state.name} placeholder="Type a name" />
+
+    <p style="font-weight:bold">Area Profiles</p>
+
+    <label>
+      <input type="checkbox" bind:checked={includemap} />
+      Include Map
+    </label>
+
+    <h2>Select topics</h2>
+    <input
+      type="text"
+      placeholder="Type to filter"
+      bind:value={state.topicsFilter}
+    />
+    {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i}
+      <label style:display={i < 6 || state.topicsExpand ? null : 'none'}>
+        <input
+          type="checkbox"
+          bind:group={state.topics}
+          name="topics"
+          value={topic}
+        />
+        {@html highlight(topic.label, regex)}
+      </label>
+    {/each}
+    {#if !regex}
+      <button on:click={() => (state.topicsExpand = !state.topicsExpand)}>
+        {state.topicsExpand ? 'Show fewer' : `Show ${topics.length - 6} more`}
+      </button>
+    {/if}
+  </aside>
+  <article class="profile">
+    <h2>Profile preview</h2>
+
+    <div id="embed" />
+    <div class="embed" style="height:.08em!important;padding:0">
+      <!-- <h3>{state.name}</h3> -->
+    </div>
+    <div class="embed-actions">
+      <button
+        on:click|preventDefault={() => {
+          state.showEmbed = !state.showEmbed;
+
+          setTimeout(() => {
+            const el = document.querySelector('textarea');
+            if (!el) return;
+
+            el.scrollIntoView({
+              behavior: 'smooth',
+            });
+          });
+        }}
+      >
+        {state.showEmbed ? 'Hide embed code' : 'Show embed code'}
+      </button>
+      <button on:click={() => pym_parent.sendMessage('makePNG', null)}>
+        Download PNG
+      </button>
+      <button
+        disabled={!state.topics}
+        on:click={async function () {
+          var tables = await get_data(state.topics);
+          var pretty = JSON.stringify(tables, null, 4);
+          var file = new Blob([pretty], {type: 'text/json'});
+          download(file, state.name.replace(' ', '_') + '.json');
+
+          console.log(pretty);
+        }}>Download Data</button
+      >
+      {#if embed_hash && state.showEmbed}
+        <p style:margin-bottom={0}>Embed code</p>
+        <textarea>{makeEmbed(embed_hash)}</textarea>
+      {/if}
+    </div>
+  </article>
+</div>
+
+<style>
+  .profile {
+    flex-grow: 1;
+  }
+  .embed {
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 30px;
+    margin-bottom: 10px;
+    background-color: rgba(119, 136, 153, 0.105);
+  }
+  .container {
+    margin-right: 16px;
+    max-width: none;
+  }
+
+  :global(#lmap) {
+    filter: invert(0.9);
+    opacity: 0.9;
+  }
+
+  .embed-actions textarea {
+    width: 100%;
+    height: 100px;
+    resize: none;
+  }
+</style>
+
+
 <script>
+    import ONSloader from '../ONSloader.svelte';
+  let isLoading = false;
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import pym from 'pym.js';
@@ -92,7 +256,7 @@
   let population, stats;
 
   async function init() {
-    document.body.style.opacity = 0.1;
+    isLoading=true
 
     // incase we call for a pre loaded area as a hash string
     let hash = window.location.hash;
@@ -167,8 +331,8 @@
         stats
       );
 
-      document.body.style.opacity = 1;
-    }, 2000);
+      isLoading=false
+    }, 4000);
   }
 
   onMount(init);
@@ -337,9 +501,10 @@
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
         JSON.stringify(tables).replaceAll('CustomArea', name)
       )}${
-        usestats || [].includes('age')
+        (usestats)?
+        usestats.includes('age')
           ? `&population=${btoa(JSON.stringify(population))}`
-          : ''
+          : '' : ''
       }${
         newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
       }${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
@@ -374,163 +539,3 @@
 <script>var pymParent = new pym.Parent("profile", "${url}", {name: "profile"});<\/script>`;
   }
 </script>
-
-<nav>
-  <div class="nav-left">
-    <button
-      class="text"
-      on:click={() => goto(`${base}/draw/${'#' + (store.compressed || '')}`)}
-    >
-      <Icon type="chevron" rotation={180} /><span>Edit area</span>
-    </button>
-  </div>
-  <div class="nav-right">
-    <button
-      title={state.showSave ? 'Close save options' : 'Save selected area'}
-      use:tooltip
-      on:click={() => (state.showSave = !state.showSave)}
-      class:active={state.showSave}
-    >
-      <Icon
-        type={state.showSave ? 'add' : 'download'}
-        rotation={state.showSave ? 45 : 0}
-      />
-    </button>
-  </div>
-</nav>
-{#if state.showSave}
-  <nav class="tray">
-    <div />
-    <div class="save-buttons">
-      <input type="text" bind:value={state.name} placeholder="Type a name" />
-      <button
-        class="text"
-        on:click={async () => {
-          let blob = geo_blob(store);
-          download(blob, `${state.name}.json`);
-        }}
-      >
-        <Icon type="download" /><span>Save geography</span>
-      </button>
-      <button
-        class="text"
-        on:click={() =>
-          clip(
-            store.properties.oa_all.join(','),
-            'Copied output area codes to clipboard'
-          )}
-      >
-        <Icon type="copy" /><span>Copy area codes</span>
-      </button>
-    </div>
-  </nav>
-{/if}
-<div class="container">
-  <aside class="topics-box">
-    <h2>Name your area</h2>
-    <input type="text" bind:value={state.name} placeholder="Type a name" />
-
-    <p style="font-weight:bold">Area Profiles</p>
-
-    <label>
-      <input type="checkbox" bind:checked={includemap} />
-      Include Map
-    </label>
-
-    <h2>Select topics</h2>
-    <input
-      type="text"
-      placeholder="Type to filter"
-      bind:value={state.topicsFilter}
-    />
-    {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i}
-      <label style:display={i < 6 || state.topicsExpand ? null : 'none'}>
-        <input
-          type="checkbox"
-          bind:group={state.topics}
-          name="topics"
-          value={topic}
-        />
-        {@html highlight(topic.label, regex)}
-      </label>
-    {/each}
-    {#if !regex}
-      <button on:click={() => (state.topicsExpand = !state.topicsExpand)}>
-        {state.topicsExpand ? 'Show fewer' : `Show ${topics.length - 6} more`}
-      </button>
-    {/if}
-  </aside>
-  <article class="profile">
-    <h2>Profile preview</h2>
-
-    <div id="embed" />
-    <div class="embed" style="height:.08em!important;padding:0">
-      <!-- <h3>{state.name}</h3> -->
-    </div>
-    <div class="embed-actions">
-      <button
-        on:click|preventDefault={() => {
-          state.showEmbed = !state.showEmbed;
-
-          setTimeout(() => {
-            const el = document.querySelector('textarea');
-            if (!el) return;
-
-            el.scrollIntoView({
-              behavior: 'smooth',
-            });
-          });
-        }}
-      >
-        {state.showEmbed ? 'Hide embed code' : 'Show embed code'}
-      </button>
-      <button on:click={() => pym_parent.sendMessage('makePNG', null)}>
-        Download PNG
-      </button>
-      <button
-        disabled={!state.topics}
-        on:click={async function () {
-          var tables = await get_data(state.topics);
-          var pretty = JSON.stringify(tables, null, 4);
-          var file = new Blob([pretty], {type: 'text/json'});
-          download(file, state.name.replace(' ', '_') + '.json');
-
-          console.log(pretty);
-        }}>Download Data</button
-      >
-      {#if embed_hash && state.showEmbed}
-        <p style:margin-bottom={0}>Embed code</p>
-        <textarea>{makeEmbed(embed_hash)}</textarea>
-      {/if}
-    </div>
-  </article>
-</div>
-
-<style>
-  .profile {
-    flex-grow: 1;
-  }
-  .embed {
-    display: block;
-    width: auto;
-    height: auto;
-    padding: 30px;
-    margin-bottom: 10px;
-    background-color: rgba(119, 136, 153, 0.105);
-  }
-  .container {
-    margin-right: 16px;
-    max-width: none;
-  }
-
-  :global(#lmap) {
-    filter: invert(0.9);
-    opacity: 0.9;
-  }
-
-  .embed-actions textarea {
-    width: 100%;
-    height: 100px;
-    resize: none;
-  }
-</style>
