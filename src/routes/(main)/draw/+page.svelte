@@ -386,6 +386,13 @@
         minzoom: minzoom,
         tiles: [`${server}/{z}/{x}/{y}.pbf`],
       },
+
+      points:{
+        type:'geojson',
+        data: get(centroids).geojson,
+      }
+
+
     };
 
     $maplayer = [
@@ -394,6 +401,7 @@
         source: 'area',
         'source-layer': 'oa',
         // tileSize: 256,
+
         type: 'fill',
         paint: {
           'fill-color': 'transparent',
@@ -401,8 +409,35 @@
           'fill-outline-color': 'steelblue',
         },
       },
+      {
+        id: 'cpt',
+        'source': 'points',
+        'type': 'circle',
+        'paint': {
+        'circle-radius': 2,
+        'circle-color': '#007cbf'
+        }
+      },
     ];
 
+
+//     map.addLayer({
+// 'id': 'conferences',
+// 'type': 'symbol',
+// 'source': 'conferences',
+// 'layout': {
+// 'icon-image': 'custom-marker',
+// // get the year from the source's "year" property
+// 'text-field': ['get', 'year'],
+// 'text-font': [
+// 'Open Sans Semibold',
+// 'Arial Unicode MS Bold'
+// ],
+// 'text-offset': [0, 1.25],
+// 'text-anchor': 'top'
+// }
+// });
+// }
     /// Read out area names
 
     // if ('SpeechSynthesisUtterance' in window) {

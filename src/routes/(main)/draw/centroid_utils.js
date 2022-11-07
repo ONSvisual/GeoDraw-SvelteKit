@@ -40,9 +40,9 @@ class Centroids {
 		this.msoa_count = msoa_ct;
   }
 
-  geojson () {
-    return this.geojson;
-  }
+  // geojson () {
+  //   return this.geojson;
+  // }
 
   parent (oa) {
     // Return LSOA parents for OAs
