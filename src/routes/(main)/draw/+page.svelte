@@ -12,7 +12,6 @@
         id={'init_' + mode.key}
         class:active={state.mode == mode.key}
         class:disabled={zoom < zoomstop}
-        style:filter="contrast(1.35)"
         title={mode.label}
         on:click={function () {
           $draw_type = mode.key == 'move' ? null : mode.key;
@@ -231,6 +230,7 @@
       on:change={load_geo}
     />
   </div>
+  {#if state.infoExpand}
   <div class="message">
     {#if (!zoom || zoom < zoomstop) && $selected[$selected.length - 1].oa.size > 0}
       <strong>Zoom in to continue</strong><br />
@@ -264,7 +264,22 @@
       from the menu.
     {/if}
     <br />
-    <p><span style="font-weight:bold"> Population selected:</span> {pselect.toLocaleString()}</p>
+  </div>
+  {/if}
+  <div class="population">
+    <span>
+      {#if pselect}
+      <strong>{pselect.toLocaleString()}</strong> total population
+      {:else}
+      No areas selected
+      {/if}
+    </span>
+    <button
+      on:click={() => state.infoExpand = !state.infoExpand}
+      title="{state.infoExpand ? 'Hide info' : 'Show info'}"
+      use:tooltip>
+      <Icon type="chevron" rotation={state.infoExpand ? 90 : -90}/>
+    </button>
   </div>
 </aside>
 
@@ -342,6 +357,7 @@
     topics: [],
     topicsExpand: false,
     topicsFilter: '',
+    infoExpand: true
   };
   const zoomstop = 8;
   let zoom; // prop bound to map zoom level
@@ -382,7 +398,7 @@
     $mapsource = {
       area: {
         type: 'vector',
-        maxzoom: maxzoom,
+        maxzoom: 12, // This is the maximum zoom the tiles are available for
         minzoom: minzoom,
         tiles: [`${server}/{z}/{x}/{y}.pbf`],
       },
