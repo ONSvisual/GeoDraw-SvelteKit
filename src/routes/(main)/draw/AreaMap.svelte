@@ -79,7 +79,7 @@
         e.error.message != 'Failed to fetch' &&
         !/CORS/.test(e.error.message)
       ) {
-        console.error('--', e.error.status, e.error.message);
+        // console.error('--', e.error.status, e.error.message);
         return e;
       }
     });

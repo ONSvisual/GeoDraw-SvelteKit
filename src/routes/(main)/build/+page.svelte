@@ -332,7 +332,7 @@
       );
 
       isLoading=false
-    }, 4000);
+    }, 1000);
   }
 
   onMount(init);

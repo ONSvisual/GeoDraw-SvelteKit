@@ -418,7 +418,7 @@ clusterRadius: 1000 // Radius of each cluster when clustering points (defaults t
         'source': 'points',
         'type': 'circle',
         'paint': {
-        'circle-radius': 2.5,
+        'circle-radius': 1,
         'circle-color': 'coral'//'#007cbf'
         }
       },

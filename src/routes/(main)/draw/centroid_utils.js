@@ -5,7 +5,10 @@ import bboxPoly from "@turf/bbox-polygon";
 import inPoly from "@turf/points-within-polygon";
 import {dissolve} from '$lib/mapshaper';
 import { e } from "mathjs";
-const url = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv";
+const url = 
+"https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv";
+
+//'/oa21-data-v4.csv'
 
 class Centroids {
   async initialize() {
@@ -34,6 +37,8 @@ class Centroids {
 				msoa_ct[d.msoa21cd] += 1;
 			}
 		});
+
+    this.sizes = arr.map(d=>d.r)
 		this.geojson = gjson;
 		this.lookup = lkp;
 		this.lsoa_count = lsoa_ct;
