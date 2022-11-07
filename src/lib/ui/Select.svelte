@@ -1,7 +1,10 @@
 <script context="module">
+  import { csvParse, autoType } from "d3-dsv";
+
 	// Config for places data
   const baseurl = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1";
   const geotypes = [
+    {keys: ["E04", "W04"], label: "Parish"},
     {keys: ["E05", "W05"], label: "Ward"},
     {keys: ["E06", "W06"], label: "Unitary authority"},
     {keys: ["E07", "E08"], label: "Local authority district"},
@@ -17,12 +20,13 @@
   geotypes.forEach(g => g.keys.forEach(k => geotypes_lookup[k] = g.label));
 
 	async function getData(url) {
-    let df = await dfd.readCSV(url, {skipEmptyLines: true});
-    return dfd.toJSON(df);
+    let res = await fetch(url);
+    return csvParse(await res.text(), autoType);
 	}
 
 	export async function getPlaces() {
-		let data = await getData(`${baseurl}/places_list.csv`);
+		let data = await getData(`${baseurl}/places-list.csv`);
+    data = data.filter(d => d.areanm); // Hack for faulty areas. Filter out rows without a name
     let lookup = {};
     data.forEach(d => lookup[d.areacd] = d);
 		data.forEach(d => {

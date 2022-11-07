@@ -95,8 +95,8 @@ export async function init_draw () {
   Draw.deleteAll ();
   async function drawPoly (e) {
     var data = Draw.getAll ();
-    var coords = await data.features[0].geometry.coordinates[0];
-    update (coords);
+    var geo = await data.features[0];
+    update (geo);
     clearpoly ();
   }
   get (mapobject).on ('zoomend', function () {
@@ -209,11 +209,12 @@ export function change_data (layer, data) {
 // Matching Utilities
 ////////////////////
 
-export async function update (coordinates) {
+export async function update (geo) {
   // update all polygon like draw items
   document.querySelector ('#mapcontainer div canvas').style.cursor = 'wait';
 
-  const features = await get (centroids).contains (coordinates);
+  const features = await get(centroids).contains(geo)
+
 
   var current = get (selected);
   var last = current[current.length - 1];
@@ -288,9 +289,8 @@ function updatelocal (current) {
 function draw_radius (center, points = 24) {
   const options = {steps: points, units: 'kilometers'};
   let geo = circle ([center.lng, center.lat], +get (radiusInKm), options);
-  let coordinates = geo.geometry.coordinates[0];
 
-  update (coordinates);
+  update (geo);
 }
 
 /// Fast Circle on-move Function

@@ -300,7 +300,6 @@
   import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount, onDestroy} from 'svelte';
-  import {getgit} from '$lib/util/git.js'
 
   let speak = false;
   import {
@@ -373,7 +372,7 @@
     localStorage.setItem('lastdate', +new Date());
 
     // calculate the centroids and simplifications.
-    var centroid_dummy = await GetCentroids({year: 21, dfd: dfd});
+    var centroid_dummy = await GetCentroids();
     centroids.set(centroid_dummy);
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
@@ -429,12 +428,12 @@
     ];
     /// end read out areas
 
-    async function recolour() {
-      const items = $selected[$selected.length - 1];
+    async function recolour(selected) {
+      const items = selected[selected.length - 1];
 
       pselect = items.oa.size
         ? [...items.oa]
-            .map((d) => get(centroids).population[d] || 0)
+            .map((d) => get(centroids).population(d) || 0)
             .reduce((a, b) => a + b)
         : 0;
 
@@ -468,7 +467,7 @@
 
         // alert(+(await get(centroids).indf(code)) )
 
-        if (+(await get(centroids).indf(code)) > -1) {
+        if (get(centroids).exists(code)) {
           try {
             bbox = get(centroids).bounds(code);
 
@@ -484,14 +483,8 @@
             state.name = code;
           } catch (err) {
             code = code[0];
-            // E08000006
 
-            let data = await getgit(
-              'ONSvisual',
-              'cp-places-data',
-              `${code.slice(0, 3)}/${code}.json`
-            );
-
+            let data = await (await fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`)).json();
 
             selected.set([{oa: new Set(), parents: []}]);
             localStorage.clear();
@@ -526,8 +519,7 @@
           return 0;
         }
 
-
-var bbox = get(centroids).bounds([...q.oa_all]);
+        var bbox = get(centroids).bounds([...q.oa_all]);
 
         $mapobject.fitBounds(bbox, {
           padding: 20,
@@ -536,7 +528,7 @@ var bbox = get(centroids).bounds([...q.oa_all]);
 
         $selected = [
             {
-              oa: q.oa_all,
+              oa: new Set(q.oa_all),
               parents: get(centroids).parent(q.oa_all),
             },
           ];
@@ -672,4 +664,6 @@ The save data and continue function
         return false;
       });
   }
+
+  $: console.log("selected", $selected);
 </script>
