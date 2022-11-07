@@ -52,13 +52,8 @@
 		if (map) map.fitBounds(bounds, {padding: 20, animate: false});
 	}
 	
-	function setData(data) {
-		if (map) map.getSource('boundary').setData(data);
-	}
-	
 	$: bounds = geojson ? bbox(geojson) : [[-9, 49], [2, 61]];
 	$: data = geojson ? geojson : {'type': 'Polygon', 'coordinates': []};
-	$: setData(data);
 	$: fitBounds(bounds, w);
 </script>
 
