@@ -26,6 +26,7 @@
 
 	export async function getPlaces() {
 		let data = await getData(`${baseurl}/places-list.csv`);
+    data = data.filter(d => d.areanm); // Hack for faulty areas. Filter out rows without a name
     let lookup = {};
     data.forEach(d => lookup[d.areacd] = d);
 		data.forEach(d => {
