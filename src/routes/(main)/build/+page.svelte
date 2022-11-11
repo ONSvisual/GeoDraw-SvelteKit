@@ -35,7 +35,7 @@
   let topics = [
     {key: 'population', label: 'Total population', special: true},
     {key: 'density', label: 'Population density', special: true},
-    {key: 'agemed', label: 'Median age', special: true},
+    // {key: 'agemed', label: 'Median age', special: true},
     {key: 'age', label: 'Age profile', special: true},
     // {key: 'sex', label: 'Sex'},
     // {key: 'ethnicity', label: 'Ethnicity'},
@@ -261,8 +261,6 @@
               // //   ///:\s*(.+);/.exec(d)[1];
               // // });
 
-              de.print();
-              console.log(cols);
               return de.loc({
                 rows: ['MyCustomArea', 'England and Wales'],
                 columns: cols,
