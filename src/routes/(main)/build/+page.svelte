@@ -14,6 +14,8 @@
   import {onMount} from 'svelte';
   import {Minhash} from 'minhash';
   import {list} from 'postcss';
+  import { error } from '@sveltejs/kit';
+  import { map, row, splitUnit } from 'mathjs';
 
   // let dataset_keys = Object.keys(datasets);
   // dataset_keys = dataset_keys.filter(
@@ -213,6 +215,9 @@
     population = await get_pop(state.compressed, state.name);
     stats = await get_stats(state.compressed, state.name);
 
+      console.error(stats,population)
+
+
     setTimeout(() => {
       update_profile(
         state.start,
@@ -253,7 +258,6 @@
             )
             .then((d) => d.setIndex({column: 'geography'}))
             .then((de) => {
-              (window.d = de), (window.t = table);
               // var mappings = {};
               var cols = de.columns.filter((d) => d.includes(':'));
               // // cols.forEach((d, i) => {
@@ -340,7 +344,6 @@
 
               var pc = df.sum();
               var lists = [];
-              window.p = pc;
               Object.entries(table.columns).forEach((g) => {
 
                 if (g[1].length === 1) {
@@ -487,11 +490,15 @@
       </button>
       <button
         class="text"
-        on:click={() =>
+        on:click={() =>{
+          var codes = store.properties.oa_all.join(',');
           clip(
-            store.properties.oa_all.join(','),
+            codes,
             'Copied output area codes to clipboard'
-          )}
+          )
+          console.log(codes)
+          console.log('codes copied to clipboard')
+          }}
       >
         <Icon type="copy" /><span>Copy area codes</span>
       </button>
@@ -563,12 +570,34 @@
       <button
         disabled={!state.topics}
         on:click={async function () {
-          var tables = await get_data(state.topics);
-          var pretty = JSON.stringify(tables, null, 4);
-          var file = new Blob([pretty], {type: 'text/json'});
-          download(file, state.name.replace(' ', '_') + '.json');
 
-          console.log(pretty);
+var tables = await get_data(state.topics);
+      
+          if (!tables.length) return alert('No tables selected. Please add some from the left hand side. ')
+
+          let csv = 'Dataset,Column,Area,Percentage\n'
+
+
+          Object.entries(stats).forEach(s=>{
+            s[1].forEach((d,i)=>
+              csv += `${'General statistics'},${s[0]},${[state.name,'England and Wales'][i]},${d}\n`
+            )
+          })
+
+          tables.forEach(t=>{
+            t.data.forEach(row=>
+              csv += `${t.name.replace(/[\n,]/, '')},${row.column.replace(/[\n,]/, '')},${row.z==='England and Wales'?row.z:state.name},${row.pc.toFixed(4)}\n`
+            )
+
+          })
+
+          console.table(csv.split('\n').map(d=>d.split(',')))
+          
+          // var pretty = JSON.stringify(tables, null, 4);
+          var file = new Blob([csv], {type: 'text/csv'});
+          download(file, state.name.replace(' ', '_') + '.csv');
+
+          // console.log(pretty);
         }}>Download Data</button
       >
       {#if embed_hash && state.showEmbed}
