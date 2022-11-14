@@ -37,7 +37,7 @@ export async function get_stats (compressed, area) {
     ...(await Promise.all (
       [
         ['Population', 'NM_2021_1', 0],
-        // ['Median Age', 'NM_145_1', 18],// not updated
+        // ['Median Age', 'NM_145_1', 0],// not updated
         ['Population Density', 'NM_2026_1', 0],
       ].map (async function (id) {
         var url = `https://www.nomisweb.co.uk/api/v01/dataset/${id[1].toLowerCase ()}.data.json?date=latest&geography=MAKE|${area}|${compressed}&measures=20100&select=geography_code,obs_value`;

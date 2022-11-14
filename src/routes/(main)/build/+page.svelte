@@ -12,10 +12,6 @@
   import {get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
-  import {Minhash} from 'minhash';
-  import {list} from 'postcss';
-  import { error } from '@sveltejs/kit';
-  import { map, row, splitUnit } from 'mathjs';
 
   // let dataset_keys = Object.keys(datasets);
   // dataset_keys = dataset_keys.filter(
@@ -37,7 +33,7 @@
   let topics = [
     {key: 'population', label: 'Total population', special: true},
     {key: 'density', label: 'Population density', special: true},
-    // {key: 'agemed', label: 'Median age', special: true},
+    {key: 'agemed', label: 'Median age (disabled)', special: true},
     {key: 'age', label: 'Age profile (2011)', special: true},
     // {key: 'sex', label: 'Sex'},
     // {key: 'ethnicity', label: 'Ethnicity'},
