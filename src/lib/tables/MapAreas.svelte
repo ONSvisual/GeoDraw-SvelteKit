@@ -20,7 +20,7 @@
 			style,
 			bounds,
 			interactive: false,
-    		preserveDrawingBuffer: true
+    	preserveDrawingBuffer: true
 		});
 		
 		map.on('load', () => {
@@ -48,13 +48,17 @@
 		});
 	});
 	
-	function fitBounds(bounds, w) {
-		if (map) map.fitBounds(bounds, {padding: 20, animate: false});
+	function fitBounds(bounds) {
+    console.log("refitting");
+		if (map) {
+      map.resize();
+      map.fitBounds(bounds, {padding: 20, animate: false});
+    }
 	}
 	
 	$: bounds = geojson ? bbox(geojson) : [[-9, 49], [2, 61]];
 	$: data = geojson ? geojson : {'type': 'Polygon', 'coordinates': []};
-	$: fitBounds(bounds, w);
+	$: w && fitBounds(bounds);
 </script>
 
 <svelte:head>
@@ -64,21 +68,12 @@
 	/>
 </svelte:head>
 
-<div id="map" style:margin='auto!important' style:aspect-ratio='1' class='center' bind:this={container} bind:clientWidth={w}/>
+<div id="map" class="center" bind:this={container} bind:clientWidth={w}/>
 
 <style>
 	#map {
 		margin: 0;
 		padding: 0;
-
+    height: 300px;
 	}
-
-	.center {
-		margin:auto!important;
-		position:relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid rgba(163, 163, 163, 0.18);
-}
 </style>

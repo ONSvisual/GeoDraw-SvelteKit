@@ -5,7 +5,7 @@
 	export let zKey = "group";
 
 	// if less than 1% use decimal formatting
-	export let formatTick = num => num>1? Math.ceil(num):(Math.ceil(num * 100) / 100).toFixed(2);
+	export let formatTick = num => num.toFixed(1);
 	export let suffix = "%";
 	export let barHeight = 25;
 	export let markerWidth = 3;
@@ -81,29 +81,17 @@
 	}
 	.bold {
 		font-weight: bold;
-		color:#023d52
 	}
 	.sml {
 		margin-left: 3px;
 		font-size: .85rem;
 	}
-	.ew{
-		/* color:red; */
-		float:right!important;
-	}
-	.brakets{
-		color:#272727;
-	}
 	.brackets::before {
 		content: "(";
-		font-weight: 600;
-		font-size: 120%;
 		
 	}
 	.brackets::after {
 		content: ")";
-		font-weight:600;
-		font-size: 120%;
 	}
 	.bar-group {
 		display: block;
