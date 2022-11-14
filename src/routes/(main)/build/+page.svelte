@@ -32,8 +32,8 @@
 
   let topics = [
     {key: 'population', label: 'Total population', special: true},
-    {key: 'density', label: 'Population density', special: true},
-    {key: 'agemed', label: 'Median age (disabled)', special: true},
+    // {key: 'density', label: 'Population density', special: true},
+    // {key: 'agemed', label: 'Median age', special: true},
     {key: 'age', label: 'Age profile (2011)', special: true},
     // {key: 'sex', label: 'Sex'},
     // {key: 'ethnicity', label: 'Ethnicity'},

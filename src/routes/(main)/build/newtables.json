@@ -1181,9 +1181,7 @@
         "code": "TS017",
         "nomis": "NM_2037_1",
         "columns": {
-            " 0 people in household": [
-                "Household size: 0 people in household; measures: Value"
-            ],
+       
             " 1 person in household": [
                 "Household size: 1 person in household; measures: Value"
             ],
@@ -1193,7 +1191,7 @@
             " 3 people in household": [
                 "Household size: 3 people in household; measures: Value"
             ],
-            " 4 plus": [
+            " 4 or more people in household": [
                 "Household size: 4 people in household; measures: Value",
                 "Household size: 5 people in household; measures: Value",
                 "Household size: 6 people in household; measures: Value",
