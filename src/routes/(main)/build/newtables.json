@@ -84,7 +84,28 @@
         "code": "TS004",
         "nomis": "NM_2024_1",
         "columns": {
-            " Africa": [
+            "Born in the UK": [
+                "Country of birth: Europe: United Kingdom; measures: Value"
+            ],
+            " Born outside the UK": [
+                "Country of birth: Africa; measures: Value",
+                "Country of birth: Antarctica and Oceania (including Australasia) and Other; measures: Value",
+                "Country of birth: British Overseas ; measures: Value",
+                "Country of birth: Europe; measures: Value",
+                "Country of birth: Europe: EU countries; measures: Value",
+                "Country of birth: Europe: EU countries: European Union EU14; measures: Value",
+                "Country of birth: Europe: EU countries: European Union EU8; measures: Value",
+                "Country of birth: Europe: EU countries: European Union EU2; measures: Value",
+                "Country of birth: Europe: EU countries: All other EU countries; measures: Value",
+                "Country of birth: Europe: Non-EU countries; measures: Value",
+                "Country of birth: Europe: Non-EU countries: All other non-EU countries; measures: Value",
+                "Country of birth: Middle East and Asia; measures: Value",
+                "Country of birth: The Americas and the Caribbean; measures: Value"
+            ]
+           
+        },
+        "original_ignore": {
+        " Africa": [
                 "Country of birth: Africa; measures: Value"
             ],
             " Antarctica and Oceania (including Australasia) and Other": [
@@ -109,8 +130,7 @@
             ],
             " The Americas and the Caribbean": [
                 "Country of birth: The Americas and the Caribbean; measures: Value"
-            ]
-        },
+            ]},
         "name": "Country of birth"
     },
     "TS005": {
@@ -1173,19 +1193,11 @@
             " 3 people in household": [
                 "Household size: 3 people in household; measures: Value"
             ],
-            " 4 people in household": [
-                "Household size: 4 people in household; measures: Value"
-            ],
-            " 5 people in household": [
-                "Household size: 5 people in household; measures: Value"
-            ],
-            " 6 people in household": [
-                "Household size: 6 people in household; measures: Value"
-            ],
-            " 7 people in household": [
-                "Household size: 7 people in household; measures: Value"
-            ],
-            " 8 or more people in household": [
+            " 4 plus": [
+                "Household size: 4 people in household; measures: Value",
+                "Household size: 5 people in household; measures: Value",
+                "Household size: 6 people in household; measures: Value",
+                "Household size: 7 people in household; measures: Value",
                 "Household size: 8 or more people in household; measures: Value"
             ]
         },
