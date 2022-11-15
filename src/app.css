@@ -208,6 +208,10 @@ aside.info-box > .population > span {
 }
 aside.topics-box {
   padding-right: 20px;
+  min-width: 280px;
+}
+aside.topics-box input[type=text] {
+  width: 100%;
 }
 nav.tray {
   z-index: 9;

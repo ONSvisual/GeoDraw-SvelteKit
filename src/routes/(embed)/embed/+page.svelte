@@ -2,14 +2,34 @@
   import {onMount} from 'svelte';
   import pym from 'pym.js';
   import html2canvas from 'html2canvas';
+  import topics from '$lib/topics.json';
   import Cards from '$lib/layout/Cards.svelte';
   import Card from '$lib/layout/partial/Card.svelte';
   import BarChart from '$lib/tables/BarChart.svelte';
   import MapAreas from '$lib/tables/MapAreas.svelte';
-  import Vchart from '$lib/tables/Vchart.svelte';
+  import ProfileChart from '$lib/tables/ProfileChart.svelte';
   import BigNumber from '$lib/tables/cards/BigNumber.svelte';
 
   let pym_child, name,geojson,tables,population,stats = [];
+
+  let topicsLookup = (() => {
+    let lookup = {};
+    topics.forEach(t => lookup[t.code] = t);
+    return lookup;
+  })();
+
+  function expandTable(table, areaName) {
+    let def = topicsLookup[table.code];
+    let data = [];
+    let i = 0;
+    [areaName, "England and Wales"].forEach(name => {
+      def.categories.forEach(cat => {
+        data.push({areanm: name, category: cat.label, value: table.data[i]})
+        i ++;
+      });
+    });
+    return data;
+  };
 
   function update() {
     let hash = window.location.hash;
@@ -67,31 +87,19 @@
         </div>
       </Card>
     {/if}
-
-    {#if population || stats}
-      <!-- <Cards> -->
-      {#each stats || [] as stat}
-        <Card title={stat[0]}>
-          <BigNumber
-            value={stat[1][0].toLocaleString()}
-            unit={stat[1][2]}
-            description={`<mark>${stat[1][1].toLocaleString()}</mark>  in England and Wales`}
-          />
-        </Card>
-      {/each}
-
-      {#if population}
-        <Card title="Age Profile">
-          <Vchart bind:population name={[name, 'England and Wales']} />
-        </Card>
-      {/if}
-
-      <!-- </Cards> -->
-    {/if}
-
     {#each tables || [] as tab}
-      <Card title={tab.name}>
-        <BarChart xKey="pc" yKey="column" zKey="z" data={tab.data} />
+      <Card title={topicsLookup[tab.code].label}>
+        {#if ["population", "households", "population_density", "median_age"].includes(tab.code)}
+        <BigNumber
+          value={tab.data[0].toLocaleString()}
+          unit={topicsLookup[tab.code].unit}
+          description={`<mark>${tab.data[1].toLocaleString()}</mark>  in England and Wales`}
+        />
+        {:else if tab.code === "resident_age"}
+        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name)} />
+        {:else}
+        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name)} />
+        {/if}
       </Card>
     {/each}
   </Cards>
