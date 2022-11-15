@@ -191,16 +191,19 @@
     state.start = true;
 
     let props = store.properties;
+
     state.compressed =
       store.compressed ||
-      Object.values({
+      [
         ...props.msoa,
         ...props.lsoa,
         ...props.oa,
-      })
+    ]
         .flat()
         .join(';');
 
+
+  
    
     // var senddata = {
     // 	tables: tlist,
