@@ -9,9 +9,10 @@
   // import {default as datasets} from '$lib/util/custom_profiles_tables.json';
   import {default as datasets} from './newtables.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
-  import {get_pop, get_stats} from './gettable.js';
+  import {fauxdensity, get_pop, get_stats} from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
+  import {default as area} from '@turf/area'
 
   // let dataset_keys = Object.keys(datasets);
   // dataset_keys = dataset_keys.filter(
@@ -32,7 +33,7 @@
 
   let topics = [
     {key: 'population', label: 'Total population', special: true},
-    // {key: 'density', label: 'Population density', special: true},
+    {key: 'density', label: 'Population density', special: true},
     // {key: 'agemed', label: 'Median age', special: true},
     {key: 'age', label: 'Age profile (2011)', special: true},
     // {key: 'sex', label: 'Sex'},
@@ -209,9 +210,13 @@
     // };
 
     population = await get_pop(state.compressed, state.name);
-    stats = await get_stats(state.compressed, state.name);
+    stats = await get_stats(state.compressed, state.name).then(d=>fauxdensity(d,area(store.geojson.geometry)));
 
-      console.error(stats,population)
+
+    console.debug('desnity adjustment',stats,stats['Population density'])
+
+
+    // console.debug(stats,population)
 
 
     setTimeout(() => {
@@ -273,6 +278,8 @@
             })
 
             .then((df) => {
+
+              df.print();
               //   // mandatory cleanup
               //   var cols = df_old.$columns.filter(
               //     (d) =>
@@ -338,7 +345,10 @@
               // );
               // columns to plot (must appear in both nomis and datasheet. )
 
-              var pc = df.sum();
+
+              console.warn('------')
+              
+              var pc = df[table['total']]
               var lists = [];
               Object.entries(table.columns).forEach((g) => {
 
@@ -347,8 +357,9 @@
                 } else {
                   var data = df.loc({columns: g[1]}).sum({axis: 1});
                 }
+                // 0.001 = 0.1%
+                data = data.div(pc).round(3).$data;
 
-                data = data.div(pc).$data;
 
                 [0, 1].forEach((i) => {
                   lists.push({
@@ -399,7 +410,7 @@
 
         if (usestats.includes('population')) newstats.push('Population');
         if (usestats.includes('agemed')) newstats.push('Median Age');
-        if (usestats.includes('density')) newstats.push('Population Density');
+        if (usestats.includes('density')) newstats.push('Population density');
 
         dummystats = newstats.map((d) => [d, stats[d]]);
       }
@@ -569,20 +580,20 @@
 
 var tables = await get_data(state.topics);
       
-          if (!tables.length) return alert('No tables selected. Please add some from the left hand side. ')
+          // if (!tables.length) return alert('No tables selected. Please add some from the left hand side. ')
 
-          let csv = 'Dataset,Column,Area,Percentage\n'
+          let csv = 'Dataset,Column,Area,Value,Unit\n'
 
 
           Object.entries(stats).forEach(s=>{
-            s[1].forEach((d,i)=>
-              csv += `${'General statistics'},${s[0]},${[state.name,'England and Wales'][i]},${d}\n`
+            s[1].slice(0,2).forEach((d,i)=>
+              csv += `${'General statistics'},${s[0]},${[state.name,'England and Wales'][i]},${+d},${s[1][2]}\n`
             )
           })
 
           tables.forEach(t=>{
             t.data.forEach(row=>
-              csv += `${t.name.replace(/[\n,]/, '')},${row.column.replace(/[\n,]/, '')},${row.z==='England and Wales'?row.z:state.name},${row.pc.toFixed(4)}\n`
+              csv += `${t.name.replace(/[\n,]/, '')},${row.column.replace(/[\n,]/, '')},${row.z==='England and Wales'?row.z:state.name},${(row.pc*100).toFixed(1)},Percentage\n`
             )
 
           })

@@ -1,6 +1,6 @@
 {
 	"name": "Build a Custom Area Profile (BaCAP)",
-	"version": "2.1.0",
+	"version": "2.1.4",
 	"scripts": {
 		"dev": "vite dev",
 		"debug": "vite dev --debug",
@@ -54,10 +54,12 @@
 		"@sveltejs/adapter-node": "^1.0.0-next.95",
 		"@sveltejs/adapter-static": "^1.0.0-next.43",
 		"@sveltejs/adapter-vercel": "^1.0.0-next.77",
+		"@turf/area": "^6.5.0",
 		"d3-format": "^3.1.0",
 		"d3-selection": "^3.0.0",
 		"d3-shape": "^3.1.0",
 		"math-js": "^1.0.1",
-		"mathjs": "^11.2.1"
+		"mathjs": "^11.2.1",
+		"thanos-js": "^0.0.11"
 	}
 }

@@ -2,6 +2,7 @@
     "TS001": {
         "code": "TS001",
         "nomis": "NM_2021_1",
+        "total": "Residence type: Total; measures: Value",
         "columns": {
             " Lives in a communal establishment": [
                 "Residence type: Lives in a communal establishment; measures: Value"
@@ -15,33 +16,22 @@
     "TS002": {
         "code": "TS002",
         "nomis": "NM_2022_1",
+        "total": "Marital and civil partnership status: Total; measures: Value",
         "columns": {
             " Divorced or civil partnership dissolved": [
-                "Marital and civil partnership status: Divorced or civil partnership dissolved; measures: Value",
-                "Marital and civil partnership status: Divorced or civil partnership dissolved: Divorced; measures: Value",
-                "Marital and civil partnership status: Divorced or civil partnership dissolved: Formerly in a civil partnership now legally dissolved; measures: Value"
+                "Marital and civil partnership status: Divorced or civil partnership dissolved; measures: Value"
             ],
             " Married or in a registered civil partnership": [
-                "Marital and civil partnership status: Married or in a registered civil partnership; measures: Value",
-                "Marital and civil partnership status: Married or in a registered civil partnership: Married; measures: Value",
-                "Marital and civil partnership status: Married or in a registered civil partnership: Married: Opposite sex; measures: Value",
-                "Marital and civil partnership status: Married or in a registered civil partnership: Married: Same sex; measures: Value",
-                "Marital and civil partnership status: Married or in a registered civil partnership: In a registered civil partnership; measures: Value",
-                "Marital and civil partnership status: Married or in a registered civil partnership: In a registered civil partnership: Opposite sex; measures: Value",
-                "Marital and civil partnership status: Married or in a registered civil partnership: In a registered civil partnership: Same sex; measures: Value"
+                "Marital and civil partnership status: Married or in a registered civil partnership; measures: Value"
             ],
             " Never married and never registered a civil partnership": [
                 "Marital and civil partnership status: Never married and never registered a civil partnership; measures: Value"
             ],
             " Separated, but still legally married or still legally in a civil partnership": [
-                "Marital and civil partnership status: Separated, but still legally married or still legally in a civil partnership; measures: Value",
-                "Marital and civil partnership status: Separated, but still legally married or still legally in a civil partnership: Separated, but still married; measures: Value",
-                "Marital and civil partnership status: Separated, but still legally married or still legally in a civil partnership: Separated, but still in a registered civil partnership; measures: Value"
+                "Marital and civil partnership status: Separated, but still legally married or still legally in a civil partnership; measures: Value"
             ],
             " Widowed or surviving civil partnership partner": [
-                "Marital and civil partnership status: Widowed or surviving civil partnership partner; measures: Value",
-                "Marital and civil partnership status: Widowed or surviving civil partnership partner: Widowed; measures: Value",
-                "Marital and civil partnership status: Widowed or surviving civil partnership partner: Surviving partner from civil partnership; measures: Value"
+                "Marital and civil partnership status: Widowed or surviving civil partnership partner; measures: Value"
             ]
         },
         "name": "Legal partnership status"
@@ -49,33 +39,16 @@
     "TS003": {
         "code": "TS003",
         "nomis": "NM_2023_1",
+        "total": "Household composition: Total; measures: Value",
         "columns": {
             " One person household": [
-                "Household composition: One person household; measures: Value",
-                "Household composition: One person household: Aged 66 years and over; measures: Value",
-                "Household composition: One person household: Other; measures: Value"
+                "Household composition: One person household; measures: Value"
             ],
             " Other household types": [
-                "Household composition: Other household types; measures: Value",
-                "Household composition: Other household types: With dependent children; measures: Value",
-                "Household composition: Other household types: Other, including all full-time students and all aged 66 years and over; measures: Value"
+                "Household composition: Other household types; measures: Value"
             ],
             " Single family household": [
-                "Household composition: Single family household; measures: Value",
-                "Household composition: Single family household: All aged 66 years and over; measures: Value",
-                "Household composition: Single family household: Married or civil partnership couple; measures: Value",
-                "Household composition: Single family household: Married or civil partnership couple: No children; measures: Value",
-                "Household composition: Single family household: Married or civil partnership couple: Dependent children; measures: Value",
-                "Household composition: Single family household: Married or civil partnership couple: All children non-dependent; measures: Value",
-                "Household composition: Single family household: Cohabiting couple family; measures: Value",
-                "Household composition: Single family household: Cohabiting couple family: No children; measures: Value",
-                "Household composition: Single family household: Cohabiting couple family: With dependent children; measures: Value",
-                "Household composition: Single family household: Cohabiting couple family: All children non-dependent; measures: Value",
-                "Household composition: Single family household: Lone parent family; measures: Value",
-                "Household composition: Single family household: Lone parent family: With dependent children; measures: Value",
-                "Household composition: Single family household: Lone parent family: All children non-dependent; measures: Value",
-                "Household composition: Single family household: Other single family household; measures: Value",
-                "Household composition: Single family household: Other single family household: Other family composition; measures: Value"
+                "Household composition: Single family household; measures: Value"
             ]
         },
         "name": "Household composition"
@@ -83,6 +56,7 @@
     "TS004": {
         "code": "TS004",
         "nomis": "NM_2024_1",
+        "total": "Country of birth: Total; measures: Value",
         "columns": {
             "Born in the UK": [
                 "Country of birth: Europe: United Kingdom; measures: Value"
@@ -91,21 +65,17 @@
                 "Country of birth: Africa; measures: Value",
                 "Country of birth: Antarctica and Oceania (including Australasia) and Other; measures: Value",
                 "Country of birth: British Overseas ; measures: Value",
-                "Country of birth: Europe; measures: Value",
-                "Country of birth: Europe: EU countries; measures: Value",
                 "Country of birth: Europe: EU countries: European Union EU14; measures: Value",
                 "Country of birth: Europe: EU countries: European Union EU8; measures: Value",
                 "Country of birth: Europe: EU countries: European Union EU2; measures: Value",
                 "Country of birth: Europe: EU countries: All other EU countries; measures: Value",
                 "Country of birth: Europe: Non-EU countries; measures: Value",
-                "Country of birth: Europe: Non-EU countries: All other non-EU countries; measures: Value",
                 "Country of birth: Middle East and Asia; measures: Value",
                 "Country of birth: The Americas and the Caribbean; measures: Value"
             ]
-           
         },
         "original_ignore": {
-        " Africa": [
+            " Africa": [
                 "Country of birth: Africa; measures: Value"
             ],
             " Antarctica and Oceania (including Australasia) and Other": [
@@ -130,12 +100,14 @@
             ],
             " The Americas and the Caribbean": [
                 "Country of birth: The Americas and the Caribbean; measures: Value"
-            ]},
+            ]
+        },
         "name": "Country of birth"
     },
     "TS005": {
         "code": "TS005",
         "nomis": "NM_2025_1",
+        "total": "Passports held: Total; measures: Value",
         "columns": {
             " Africa": [
                 "Passports held: Africa; measures: Value",
@@ -200,6 +172,7 @@
     "TS007": {
         "code": "TS007",
         "nomis": "NM_2027_1",
+        "total": "Age: Total; measures: Value",
         "columns": {
             " Aged 1 year": [
                 "Age: Aged 1 year; measures: Value"
@@ -543,6 +516,7 @@
     "TS008": {
         "code": "TS008",
         "nomis": "NM_2028_1",
+        "total": "Sex: All persons; measures: Value",
         "columns": {
             " All persons": [
                 "Sex: All persons; measures: Value"
@@ -559,6 +533,7 @@
     "TS009": {
         "code": "TS009",
         "nomis": "NM_2029_1",
+        "total": "Sex: All persons; Age: Total; measures: Value",
         "columns": {
             " All persons": [
                 "Sex: All persons; Age: Aged 4 years and under; measures: Value",
@@ -878,24 +853,13 @@
     "TS010": {
         "code": "TS010",
         "nomis": "NM_2030_1",
+        "total": "Living arrangements: Total; measures: Value",
         "columns": {
             " Living in a couple": [
-                "Living arrangements: Living in a couple; measures: Value",
-                "Living arrangements: Living in a couple: Married or in a civil partnership; measures: Value",
-                "Living arrangements: Living in a couple: Married or in a civil partnership: Opposite-sex couple; measures: Value",
-                "Living arrangements: Living in a couple: Married or in a civil partnership: Same-sex couple; measures: Value",
-                "Living arrangements: Living in a couple: Separated, but still married or in a civil partnership; measures: Value",
-                "Living arrangements: Living in a couple: Cohabiting; measures: Value",
-                "Living arrangements: Living in a couple: Cohabiting: Opposite-sex couple; measures: Value",
-                "Living arrangements: Living in a couple: Cohabiting: Same-sex couple; measures: Value"
+                "Living arrangements: Living in a couple; measures: Value"
             ],
             " Not living in a couple": [
-                "Living arrangements: Not living in a couple; measures: Value",
-                "Living arrangements: Not living in a couple: Single (never married and never registered a same-sex civil partnership); measures: Value",
-                "Living arrangements: Not living in a couple: Married or in a registered civil partnership; measures: Value",
-                "Living arrangements: Not living in a couple: Separated (including those who are married and those who are in civil partnerships); measures: Value",
-                "Living arrangements: Not living in a couple: Divorced or formerly in a civil partnership which is now legally dissolved; measures: Value",
-                "Living arrangements: Not living in a couple: Widowed or surviving partner from a civil partnership; measures: Value"
+                "Living arrangements: Not living in a couple; measures: Value"
             ]
         },
         "name": "Living arrangements"
@@ -903,6 +867,7 @@
     "TS011": {
         "code": "TS011",
         "nomis": "NM_2031_1",
+        "total": "Household deprivation: Total: All households; measures: Value",
         "columns": {
             " Household is deprived in four dimensions": [
                 "Household deprivation: Household is deprived in four dimensions; measures: Value"
@@ -925,6 +890,7 @@
     "TS012": {
         "code": "TS012",
         "nomis": "NM_2032_1",
+        "total": "Country of birth: Total: All usual residents; measures: Value",
         "columns": {
             " Africa": [
                 "Country of birth: Africa; measures: Value",
@@ -1026,6 +992,7 @@
     "TS013": {
         "code": "TS013",
         "nomis": "NM_2033_1",
+        "total": "Passports held: Total: All usual residents; measures: Value",
         "columns": {
             " Africa": [
                 "Passports held: Africa; measures: Value",
@@ -1115,6 +1082,7 @@
     "TS015": {
         "code": "TS015",
         "nomis": "NM_2035_1",
+        "total": "Year of arrival in the UK: Total: All usual residents; measures: Value",
         "columns": {
             " Arrived 1951 to 1960": [
                 "Year of arrival in the UK: Arrived 1951 to 1960; measures: Value"
@@ -1158,6 +1126,7 @@
     "TS016": {
         "code": "TS016",
         "nomis": "NM_2036_1",
+        "total": "Length of residence in the UK: Total: All usual residents; measures: Value",
         "columns": {
             " 10 years or more": [
                 "Length of residence in the UK: 10 years or more; measures: Value"
@@ -1180,8 +1149,8 @@
     "TS017": {
         "code": "TS017",
         "nomis": "NM_2037_1",
+        "total": "Household size: Total: All household spaces; measures: Value",
         "columns": {
-       
             " 1 person in household": [
                 "Household size: 1 person in household; measures: Value"
             ],
@@ -1204,6 +1173,7 @@
     "TS018": {
         "code": "TS018",
         "nomis": "NM_2038_1",
+        "total": "Age of arrival in the UK: Total: All usual residents; measures: Value",
         "columns": {
             " Arrived in the UK": [
                 "Age of arrival in the UK: Arrived in the UK; measures: Value",
@@ -1233,6 +1203,7 @@
     "TS019": {
         "code": "TS019",
         "nomis": "NM_2039_1",
+        "total": "Migrant indicator: Total: All usual residents; measures: Value",
         "columns": {
             " Address one year ago is student term-time or boarding school address in the UK": [
                 "Migrant indicator: Address one year ago is student term-time or boarding school address in the UK; measures: Value"
@@ -1252,6 +1223,7 @@
     "TS020": {
         "code": "TS020",
         "nomis": "NM_2040_1",
+        "total": "",
         "columns": {
             " All persons": [
                 "Sex: All persons; measures: Value"
@@ -1274,6 +1246,7 @@
     "TS071": {
         "code": "TS071",
         "nomis": "NM_2091_1",
+        "total": "Household reference person previously served in UK armed forces: Total: All households; measures: Value",
         "columns": {
             " Household reference person has not previously served in regular or reserve UK armed forces": [
                 "Household reference person previously served in UK armed forces: Household reference person has not previously served in regular or reserve UK armed forces; measures: Value"
