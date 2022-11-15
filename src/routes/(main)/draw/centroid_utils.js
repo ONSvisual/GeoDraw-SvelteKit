@@ -9,6 +9,12 @@ const url = 'https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv';
 
 //'/oa21-data-v4.csv'
 
+
+function u(x){
+  return [...new Set(x)]
+}
+
+
 class Centroids {
   async initialize () {
     let res = await fetch (url);
@@ -100,7 +106,7 @@ class Centroids {
     let msoa = [];
     for (let i = 0; i < oa_all.length; i++) {
 
-      if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
+      // if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
    
 
         if (
@@ -120,15 +126,25 @@ class Centroids {
       }
 
 
-      }else {
-        oa.push(oa_all[i])
+      // }
       
-      }
+      // else {
+      //   oa.push(oa_all[i])
+      
+      // }
 
      
     }
+
+    oa = u(oa)
+    msoa = u(msoa)
+    lsoa = u(lsoa)
+
+
     console.warn('ssss', {oa,lsoa,msoa,oa_all})
     const bbox = this.bounds (oa_all);
+
+
 
     var merge = {};
     merge.properties = {
