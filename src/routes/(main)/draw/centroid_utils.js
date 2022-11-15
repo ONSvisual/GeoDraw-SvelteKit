@@ -1,48 +1,49 @@
 // import pako from 'pako'
-import { csvParse, autoType } from "d3-dsv";
-import bbox from "@turf/bbox";
-import bboxPoly from "@turf/bbox-polygon";
-import inPoly from "@turf/points-within-polygon";
+import {csvParse, autoType} from 'd3-dsv';
+import bbox from '@turf/bbox';
+import bboxPoly from '@turf/bbox-polygon';
+import inPoly from '@turf/points-within-polygon';
 import {dissolve} from '$lib/mapshaper';
-import { e } from "mathjs";
-const url = 
-"https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv";
+import {e} from 'mathjs';
+const url = 'https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv';
 
 //'/oa21-data-v4.csv'
 
 class Centroids {
-  async initialize() {
-    let res = await fetch(url);
-		let arr = csvParse(await res.text(), autoType);
-		
-		let gjson = {type: "FeatureCollection", features: []};
-		let lkp = {};
-		let lsoa_ct = {};
-		let msoa_ct = {};
-		arr.forEach(d => {
-			lkp[d.oa21cd] = d;
-			gjson.features.push({
-				type: "Feature",
-				properties: {areacd: d.oa21cd},
-				geometry: {type: "Point", coordinates: [d.lng, d.lat]}
-			})
-			if (!lsoa_ct[d.lsoa21cd]) {
-				lsoa_ct[d.lsoa21cd] = 1;
-			} else {
-				lsoa_ct[d.lsoa21cd] += 1;
-			}
-			if (!msoa_ct[d.msoa21cd]) {
-				msoa_ct[d.msoa21cd] = 1;
-			} else {
-				msoa_ct[d.msoa21cd] += 1;
-			}
-		});
+  async initialize () {
+    let res = await fetch (url);
+    let arr = csvParse (await res.text (), autoType);
 
-    this.sizes = arr.map(d=>d.r)
-		this.geojson = gjson;
-		this.lookup = lkp;
-		this.lsoa_count = lsoa_ct;
-		this.msoa_count = msoa_ct;
+    let gjson = {type: 'FeatureCollection', features: []};
+    let lkp = {};
+    let lsoa_ct = {};
+    let msoa_ct = {};
+    arr.forEach (d => {
+      lkp[d.oa21cd] = d;
+      gjson.features.push ({
+        type: 'Feature',
+        properties: {areacd: d.oa21cd},
+        geometry: {type: 'Point', coordinates: [d.lng, d.lat]},
+      });
+
+      if (!lsoa_ct[d.lsoa21cd]) {
+        lsoa_ct[d.lsoa21cd] = 1;
+      } else {
+        lsoa_ct[d.lsoa21cd] += 1;
+      }
+
+      if (!msoa_ct[d.msoa21cd]) {
+        msoa_ct[d.msoa21cd] = 1;
+      } else {
+        msoa_ct[d.msoa21cd] += 1;
+      }
+    });
+
+    this.sizes = arr.map (d => d.r);
+    this.geojson = gjson;
+    this.lookup = lkp;
+    this.lsoa_count = lsoa_ct;
+    this.msoa_count = msoa_ct;
   }
 
   // geojson () {
@@ -51,20 +52,22 @@ class Centroids {
 
   parent (oa) {
     // Return LSOA parents for OAs
-    if (typeof oa === "string") {
+    if (typeof oa === 'string') {
       return this.lookup[oa].lsoa21cd;
     } else {
-      return oa.map(cd => this.lookup[cd].lsoa21cd);
+      return oa.map (cd => this.lookup[cd].lsoa21cd);
     }
   }
 
   bounds (oas) {
     // get a boundary for a list of OA codes
     let points = {
-      type: "FeatureCollection",
-      features: this.geojson.features.filter(f => oas.includes(f.properties.areacd))
+      type: 'FeatureCollection',
+      features: this.geojson.features.filter (f =>
+        oas.includes (f.properties.areacd)
+      ),
     };
-    return bbox(points);
+    return bbox (points);
   }
 
   exists (oa) {
@@ -73,13 +76,13 @@ class Centroids {
 
   contains (geo) {
     // Returns OA codes within the coordinates of a Polygon/MultiPolygon
-    let bounds = bbox(geo);
-    bounds = bboxPoly(bounds);
+    let bounds = bbox (geo);
+    bounds = bboxPoly (bounds);
 
-    let oas = inPoly(this.geojson, bounds);
-    oas = inPoly(oas, geo).features.map(oa => oa.properties.areacd);
+    let oas = inPoly (this.geojson, bounds);
+    oas = inPoly (oas, geo).features.map (oa => oa.properties.areacd);
 
-    return {bbox: bounds, oa: new Set(oas), parents: this.parent(oas)};
+    return {bbox: bounds, oa: new Set (oas), parents: this.parent (oas)};
   }
 
   async simplify (
@@ -89,24 +92,38 @@ class Centroids {
     // options = {simplify_geo: false},
   ) {
     // simplify the codes
-    const oa_all = Array.from(selected.oa);
-    const lsoa_all = oa_all.map(oa => this.lookup[oa].lsoa21cd);
-		const msoa_all = oa_all.map(oa => this.lookup[oa].msoa21cd);
-		let oa = [];
+    const oa_all = Array.from (selected.oa);
+    const lsoa_all = oa_all.map (oa => this.lookup[oa].lsoa21cd);
+    const msoa_all = oa_all.map (oa => this.lookup[oa].msoa21cd);
+    let oa = [];
     let lsoa = [];
     let msoa = [];
-		for (let i = 0; i < oa_all.length; i ++) {
-			if (!msoa.includes(msoa_all[i]) && !lsoa.includes(lsoa_all[i])) {
-				if (msoa_all.filter(msoa => msoa_all[i] == msoa).length == this.msoa_count[msoa_all[i]]) {
-					msoa.push(msoa_all[i]);
-				} else if (lsoa_all.filter(lsoa => lsoa_all[i] == lsoa).length == this.lsoa_count[lsoa_all[i]]) {
-					lsoa.push(lsoa_all[i]);
-				} else {
-					oa.push(oa_all[i]);
-				}
-			}
-		}
+    for (let i = 0; i < oa_all.length; i++) {
 
+      if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
+   
+
+        if (
+          msoa_all.filter (msoa => msoa_all[i] == msoa).length ==
+          this.msoa_count[msoa_all[i]]
+        ) {
+          msoa.push (msoa_all[i]);
+        } else if (
+          lsoa_all.filter (lsoa => lsoa_all[i] == lsoa).length ==
+          this.lsoa_count[lsoa_all[i]]
+        ) {
+          lsoa.push (lsoa_all[i]);
+        }
+
+
+      }else {
+        oa.push(oa_all[i])
+      
+      }
+
+     
+    }
+    console.warn('ssss', {oa,lsoa,msoa,oa_all})
     const bbox = this.bounds (oa_all);
 
     var merge = {};
