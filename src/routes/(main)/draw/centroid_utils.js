@@ -114,7 +114,7 @@ class Centroids {
         ) {
           lsoa.push (lsoa_all[i]);
         }
-      }else {
+      else {
         oa.push(oa_all[i])
       
       }
