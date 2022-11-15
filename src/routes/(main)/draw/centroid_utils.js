@@ -4,7 +4,6 @@ import bbox from '@turf/bbox';
 import bboxPoly from '@turf/bbox-polygon';
 import inPoly from '@turf/points-within-polygon';
 import {dissolve} from '$lib/mapshaper';
-import {e} from 'mathjs';
 const url = 'https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv';
 
 //'/oa21-data-v4.csv'
@@ -106,7 +105,7 @@ class Centroids {
     let msoa = [];
     for (let i = 0; i < oa_all.length; i++) {
 
-      // if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
+      if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
    
 
         if (
@@ -125,20 +124,15 @@ class Centroids {
       
       }
 
-
-      // }
-      
-      // else {
-      //   oa.push(oa_all[i])
-      
-      // }
+    }
 
      
     }
 
-    oa = u(oa)
-    msoa = u(msoa)
-    lsoa = u(lsoa)
+
+    // oa = u(oa)
+    // msoa = u(msoa)
+    // lsoa = u(lsoa)
 
 
     console.warn('ssss', {oa,lsoa,msoa,oa_all})

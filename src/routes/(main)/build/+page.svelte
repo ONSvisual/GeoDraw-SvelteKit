@@ -204,6 +204,7 @@
 
 
   
+    console.warn(state.compressed)
    
     // var senddata = {
     // 	tables: tlist,
