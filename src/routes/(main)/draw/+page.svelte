@@ -160,55 +160,36 @@
       if (hash === '#undefined') {
         hash = window.location.hash = '';
       } else if (hash.length == 10) {
-        let code = [hash.slice(1)];
-        newselect();
+        let code = hash.slice(1);
+        try {
+          let data = await (
+            await fetch(
+              `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
+                0,
+                3
+              )}/${code}.json`
+            )
+          ).json();
 
+          newselect();
+          selected.set([{oa: new Set(), parents: []}]);
+          localStorage.clear();
+          
+          $selected = [
+            ...$selected,
+            {
+              oa: new Set(data.properties.codes),
+              parents: get(centroids).parent(data.properties.codes),
+            },
+          ];
 
-        if (get(centroids).exists(code)) {
-          try {
-            bbox = get(centroids).bounds(code);
+          $mapobject.fitBounds(data.properties.bounds, {padding: 20});
 
-            $selected = [
-              $selected,
-              {
-                oa: new Set(code),
-                parents: get(centroids).parent(code),
-              },
-            ];
-
-            $mapobject.fitBounds(bbox, {padding: 20});
-            state.name = code;
-          } catch (err) {
-            code = code[0];
-
-            let data = await (
-              await fetch(
-                `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
-                  0,
-                  3
-                )}/${code}.json`
-              )
-            ).json();
-
-            selected.set([{oa: new Set(), parents: []}]);
-            localStorage.clear();
-
-            if (data.type == 'Feature') {
-              $selected = [
-                $selected,
-                {
-                  oa: new Set(data.properties.codes),
-                  parents: get(centroids).parent(data.properties.codes),
-                },
-              ];
-
-              $mapobject.fitBounds(data.properties.bounds, {padding: 20});
-
-              state.name = data.properties.areanm;
-            }
-          }
-
+          state.name = data.properties.areanm;
           setDrawData();
+        }
+        catch {
+          alert(`Requested GSS code ${code} is unavailable or invalid.`);
         }
 
         history.replaceState(null, null, ' ');
