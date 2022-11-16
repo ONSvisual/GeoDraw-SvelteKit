@@ -50,6 +50,9 @@ export async function get_stats (compressed, area) {
 
         var key = id[0];
 
+
+  
+
         var d = {};
         d[key] = await Promise.all ([
           fetch (url).then (unpack),
