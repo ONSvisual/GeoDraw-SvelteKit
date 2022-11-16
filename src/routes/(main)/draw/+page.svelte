@@ -11,9 +11,8 @@
   import {get} from 'svelte/store';
   import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
-  import {onMount, onDestroy} from 'svelte';
+  import {onMount, onDestroy, getContext} from 'svelte';
   import {update, simplify_geo} from './drawing_utils.js';
-  import {GetCentroids} from './centroid_utils.js';
   import {
     mapsource,
     maplayer,
@@ -78,10 +77,6 @@
       localStorage.clear();
     }
     localStorage.setItem('lastdate', +new Date());
-
-    // calculate the centroids and simplifications.
-    var centroid_dummy = await GetCentroids();
-    centroids.set(centroid_dummy);
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
     // console.clear();

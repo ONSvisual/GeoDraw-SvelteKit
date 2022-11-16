@@ -13,7 +13,6 @@
   import getTable from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
-  import area from '@turf/area'
 
   // let dataset_keys = Object.keys(datasets);
   // dataset_keys = dataset_keys.filter(
