@@ -177,7 +177,9 @@
 
             $mapobject.fitBounds(data.properties.bounds, {padding: 20});
 
-            state.name = data.properties.areanm;
+            state.name = data.properties.hclnm ? data.properties.hclnm :
+              data.properties.areanm ? data.properties.areanm :
+              data.properties.areacd;
             setDrawData();
           });
         }
