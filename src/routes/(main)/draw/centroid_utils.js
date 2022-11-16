@@ -73,7 +73,7 @@ class Centroids {
       ),
     };
     let bounds = bbox (points);
-    bounds = [bounds[0] - 0.05, bounds[1] - 0.05, bounds[2] + 0.05, bounds[3] + 0.05];
+    bounds = [bounds[0] - 0.02, bounds[1] - 0.02, bounds[2] + 0.02, bounds[3] + 0.02];
     console.log("bounds", bounds);
     return bounds;
   }
@@ -93,24 +93,14 @@ class Centroids {
     return {bbox: bounds, oa: new Set (oas), parents: this.parent (oas)};
   }
 
-  async simplify (
-    name = 'Enter Area Name',
-    selected,
-    mapobject
-    // options = {simplify_geo: false},
-  ) {
-    // simplify the codes
-    const oa_all = Array.from (selected.oa);
+  compress (oa_all) {
     const lsoa_all = oa_all.map (oa => this.lookup[oa].lsoa21cd);
     const msoa_all = oa_all.map (oa => this.lookup[oa].msoa21cd);
     let oa = [];
     let lsoa = [];
     let msoa = [];
     for (let i = 0; i < oa_all.length; i++) {
-
       if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
-   
-
         if (
           msoa_all.filter (msoa => msoa_all[i] == msoa).length ==
           this.msoa_count[msoa_all[i]]
@@ -122,23 +112,32 @@ class Centroids {
         ) {
           lsoa.push (lsoa_all[i]);
         }
-      else {
-        oa.push(oa_all[i])
-      
+        else {
+          oa.push(oa_all[i])
+        }
       }
-
     }
+    console.warn('ssss', {oa,lsoa,msoa,oa_all});
+    return {oa, lsoa, msoa};
+  }
 
-     
-    }
+  async simplify (
+    name = 'Enter Area Name',
+    selected,
+    mapobject
+    // options = {simplify_geo: false},
+  ) {
+    const oa_all = Array.from (selected.oa);
 
+    // compress the codes
+    let {oa, lsoa, msoa} = this.compress(oa_all);
 
     // oa = u(oa)
     // msoa = u(msoa)
     // lsoa = u(lsoa)
 
 
-    console.warn('ssss', {oa,lsoa,msoa,oa_all})
+    
     const bbox = this.bounds (oa_all);
 
 

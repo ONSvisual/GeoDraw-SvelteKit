@@ -13,6 +13,7 @@
   import getTable from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
+  import { centroids } from '../draw/mapstore.js';
 
   // let dataset_keys = Object.keys(datasets);
   // dataset_keys = dataset_keys.filter(
@@ -79,29 +80,32 @@
   async function init() {
     isLoading = true;
 
-    // incase we call for a pre loaded area as a hash string
+    // in case we call for a pre loaded area as a hash string
     let hash = window.location.hash;
     if (hash === '#undefined') {
       hash = '';
       window.location.hash = '';
     } else if (hash.length == 10) {
       let code = hash.slice(1);
-
-      let data = await (
-        await fetch(
-          `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
-            0,
-            3
-          )}/${code}.json`
-        )
-      ).json();
-
-      if (data.type === 'Feature') {
+      try {
+        let data = await (
+          await fetch(
+            `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
+              0,
+              3
+            )}/${code}.json`
+          )
+        ).json();
+        let comp = $centroids.compress(data.properties.codes);
+        console.log(comp);
         const info = {
-          compressed: code,
+          compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(";"),
           geojson: data,
           properties: {
             oa_all: data.properties.codes,
+            oa: comp.oa,
+            lsoa: comp.lsoa,
+            msoa: comp.msoa,
             name: data.properties.areanm
               ? data.properties.areanm
               : data.properties.areacd,
@@ -110,7 +114,12 @@
 
         localStorage.setItem('onsbuild', JSON.stringify(info));
       }
+      catch (err) {
+        console.warn(err);
+        alert(`Requested GSS code ${code} is unavailable or invalid.`);
+      }
     }
+    history.replaceState(null, null, ' ');
 
     // resume as normal
     store = JSON.parse(localStorage.getItem('onsbuild'));
@@ -127,6 +136,7 @@
     state.start = true;
 
     let props = store.properties;
+    console.log("props", props);
 
     state.compressed =
       store.compressed ||
