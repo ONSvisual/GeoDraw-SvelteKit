@@ -1,7 +1,7 @@
 <script>
   import ONSloader from '../ONSloader.svelte';
   let isLoading = false;
-  import {goto} from '$app/navigation';
+  import {goto} from '$app/nasimplifyvigation';
   import {base} from '$app/paths';
   import pym from 'pym.js';
   import tooltip from '$lib/ui/tooltip';
