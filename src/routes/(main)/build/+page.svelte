@@ -272,7 +272,7 @@
         class="text"
         on:click={async () => {
           let blob = geo_blob(store);
-          download(blob, `${state.name}.json`);
+          download(blob, `${state.name.replace(' ', '_')}.json`);
         }}
       >
         <Icon type="download" /><span>Save geography</span>

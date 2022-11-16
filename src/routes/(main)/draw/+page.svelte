@@ -168,7 +168,7 @@
               `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
                 0,
                 3
-              )}/${code}.geojson`
+              )}/${code}.json`
             )
           ).json();
 
@@ -451,7 +451,7 @@ The save data and continue function
         on:click={async () => {
           let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
           let blob = geo_blob(data);
-          download(blob, state.name.replace(' ', '_') + '.geojson');
+          download(blob, state.name.replace(' ', '_') + '.json');
         }}>
         <Icon type="download" /><span>Save geography</span>
       </button>
