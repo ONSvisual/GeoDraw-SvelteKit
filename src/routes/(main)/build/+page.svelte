@@ -1,7 +1,6 @@
 <script>
   import ONSloader from '../ONSloader.svelte';
-  let isLoading = false;
-  import {goto} from '$app/nasimplifyvigation';
+  import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import pym from 'pym.js';
   import tooltip from '$lib/ui/tooltip';
@@ -24,6 +23,7 @@
   // );
 
   /////
+  let isLoading = false;
   let pym_parent; // Variabl for pym
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
@@ -34,7 +34,6 @@
     topics.forEach(t => lookup[t.code] = t);
     return lookup;
   })();
-
 
   // alert('00 oa 01 lsoa 02 msoa e.g.E00')
 
@@ -77,7 +76,7 @@
   let store;
   let geojson;
 
-  async function init() {
+  function init() {
     isLoading = true;
 
     // in case we call for a pre loaded area as a hash string
@@ -88,38 +87,33 @@
     } else if (hash.length == 10) {
       let code = hash.slice(1);
       try {
-        let data = await (
-          await fetch(
-            `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
-              0,
-              3
-            )}/${code}.json`
-          )
-        ).json();
-        let comp = $centroids.compress(data.properties.codes);
-        console.log(comp);
-        const info = {
-          compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(";"),
-          geojson: data,
-          properties: {
-            oa_all: data.properties.codes,
-            oa: comp.oa,
-            lsoa: comp.lsoa,
-            msoa: comp.msoa,
-            name: data.properties.areanm
-              ? data.properties.areanm
-              : data.properties.areacd,
-          },
-        };
-
+        fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`)
+        .then(res => res.json())
+        .then(data => {
+          let comp = $centroids.compress(data.properties.codes);
+          console.log(comp);
+          const info = {
+            compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(";"),
+            geojson: data,
+            properties: {
+              oa_all: data.properties.codes,
+              oa: comp.oa,
+              lsoa: comp.lsoa,
+              msoa: comp.msoa,
+              name: data.properties.areanm
+                ? data.properties.areanm
+                : data.properties.areacd,
+            },
+          };
+        });
         localStorage.setItem('onsbuild', JSON.stringify(info));
       }
       catch (err) {
         console.warn(err);
         alert(`Requested GSS code ${code} is unavailable or invalid.`);
       }
+      history.replaceState(null, null, ' ');
     }
-    history.replaceState(null, null, ' ');
 
     // resume as normal
     store = JSON.parse(localStorage.getItem('onsbuild'));
@@ -160,18 +154,6 @@
     // };
 
     // console.debug(stats,population)
-
-
-    setTimeout(() => {
-      update_profile(
-        state.start,
-        state.name,
-        state.topics,
-        includemap
-      );
-
-      isLoading = false;
-    }, 1000);
   }
 
   onMount(init);
@@ -185,7 +167,13 @@
     if (!state.start) return [];
     let tables = [];
     for (let i = 0; i < data.length; i ++) {
-      let table = await getTable(data[i], state.compressed);
+      let table;
+      if (cache[data[i].code]) {
+        table = cache[data[i].code];
+      } else {
+        table = await getTable(data[i], state.compressed);
+        cache[data[i].code] = table;
+      }
       tables.push({code: data[i].code, data: table});
     }
     console.log(tables);
@@ -217,6 +205,7 @@
           name: 'embed',
           id: 'iframe',
         });
+        isLoading = false;
       } else {
         document.getElementById('iframe').contentWindow.location.hash =
           embed_hash;

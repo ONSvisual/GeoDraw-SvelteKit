@@ -1,6 +1,5 @@
 <script>
   import ONSloader from '../ONSloader.svelte';
-  let isLoading = false;
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import tooltip from '$lib/ui/tooltip';
@@ -38,6 +37,7 @@
   ];
 
   // variable custom testing
+  let isLoading = false;
   let advanced = true; //new Date()%2;
   $: modes = advanced ? modelist : modelist.slice(0, 2);
   let state = {
@@ -67,8 +67,8 @@
   }
 
   let newselect;
-
-  async function init() {
+  
+  function init() {
     isLoading = true;
       /* 
     A section to clear the local storage if past the last update date
@@ -86,18 +86,14 @@
     $mapsource = {
       area: {
         type: 'vector',
-        // maxzoom: 12, // This is the maximum zoom the tiles are available for
+        maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
         minzoom: minzoom,
         tiles: [`${server}/{z}/{x}/{y}.pbf`],
       },
 
       points: {
         type: 'geojson',
-        data: get(centroids).geojson,
-        // a hack since max and min zoom do not work.
-        cluster: true,
-        clusterMaxZoom: 9, // Max zoom to cluster points on
-        clusterRadius: 1000, // Radius of each cluster when clustering points (defaults to 50)
+        data: $centroids.geojson
       },
     };
 
@@ -119,6 +115,7 @@
         id: 'cpt',
         source: 'points',
         type: 'circle',
+        minzoom: 9,
         paint: {
           'circle-radius': 1,
           'circle-color': 'coral'
@@ -135,7 +132,7 @@
 
       pselect = items.oa.size
         ? [...items.oa]
-            .map((d) => get(centroids).population(d) || 0)
+            .map((d) => $centroids.population(d) || 0)
             .reduce((a, b) => a + b)
         : 0;
 
@@ -154,7 +151,7 @@
     $mapobject.on('load', async () => {
       newselect = function () {
         localStorage.clear();
-        selected.set([{oa: new Set(), parents: []}]);
+        selected.set([{oa: new Set()}]);
       };
 
       let hash = window.location.hash;
@@ -163,31 +160,25 @@
       } else if (hash.length == 10) {
         let code = hash.slice(1);
         try {
-          let data = await (
-            await fetch(
-              `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
-                0,
-                3
-              )}/${code}.json`
-            )
-          ).json();
+          fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`)
+          .then(res => res.json())
+          .then(data => {
+            newselect();
+            selected.set([{oa: new Set()}]);
+            localStorage.clear();
+            
+            $selected = [
+              ...$selected,
+              {
+                oa: new Set(data.properties.codes)
+              },
+            ];
 
-          newselect();
-          selected.set([{oa: new Set(), parents: []}]);
-          localStorage.clear();
-          
-          $selected = [
-            ...$selected,
-            {
-              oa: new Set(data.properties.codes),
-              parents: get(centroids).parent(data.properties.codes),
-            },
-          ];
+            $mapobject.fitBounds(data.properties.bounds, {padding: 20});
 
-          $mapobject.fitBounds(data.properties.bounds, {padding: 20});
-
-          state.name = data.properties.areanm;
-          setDrawData();
+            state.name = data.properties.areanm;
+            setDrawData();
+          });
         }
         catch {
           alert(`Requested GSS code ${code} is unavailable or invalid.`);
@@ -203,7 +194,7 @@
           return 0;
         }
 
-        var bbox = get(centroids).bounds([...q.oa_all]);
+        var bbox = $centroids.bounds([...q.oa_all]);
 
         $mapobject.fitBounds(bbox, {
           padding: 20,
@@ -212,8 +203,7 @@
 
         $selected = [
           {
-            oa: new Set(q.oa_all),
-            parents: get(centroids).parent(q.oa_all),
+            oa: new Set(q.oa_all)
           },
         ];
       } else if (localStorage.getItem('draw_data') || false) {
@@ -224,7 +214,7 @@
           return 0;
         }
 
-        var bbox = get(centroids).bounds([...q.oa]);
+        var bbox = $centroids.bounds([...q.oa]);
 
         $mapobject.fitBounds(bbox, {
           padding: 20,
@@ -238,6 +228,7 @@
       // Keep track of map zoom level
       zoom = $mapobject.getZoom();
       $mapobject.on('moveend', () => (zoom = $mapobject.getZoom()));
+      isLoading = false;
     });
 
     selected.subscribe(recolour);
@@ -248,7 +239,7 @@
     let file = uploader.files[0] ? uploader.files[0] : null;
 
     if (file) {
-      selected.set([{oa: new Set(), parents: []}]);
+      selected.set([{oa: new Set()}]);
 
       const reader = new FileReader();
 
@@ -271,8 +262,7 @@
           $selected = [
             $selected,
             {
-              oa: new Set(oa),
-              parents: get(centroids).parent(oa),
+              oa: new Set(oa)
             },
           ];
           $mapobject.fitBounds(bb, {padding: 20});
@@ -302,12 +292,7 @@
     }
   }
 
-  onMount(async () => {
-    await init();
-    setTimeout(() => {
-      isLoading = false;
-    }, 500);
-  });
+  onMount(init);
 
   /* 
 The save data and continue function
@@ -524,8 +509,7 @@ The save data and continue function
           $selected = [
             $selected,
             {
-              oa: oa,
-              parents: $centroids.parent([...oa]),
+              oa: oa
             },
           ];
           $mapobject.fitBounds(bbox, {padding: 20});
@@ -544,8 +528,7 @@ The save data and continue function
             $selected = [
               $selected,
               {
-                oa: oa,
-                parents: $centroids.parent([...oa]),
+                oa: oa
               },
             ];
           });
@@ -577,7 +560,7 @@ The save data and continue function
           class="btn-link"
           on:click={() => {
             let q = $selected[$selected.length - 1];
-            let bbox = get(centroids).bounds([...q.oa]);
+            let bbox = $centroids.bounds([...q.oa]);
             $mapobject.fitBounds(bbox, {padding: 20});
           }}>click here</button
         > to return to the area you have drawn.

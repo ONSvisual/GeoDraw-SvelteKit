@@ -5,7 +5,7 @@ import {
 
 // global variables shared between units. 
 export const draw_type = writable(undefined); // drawing tool type
-export const selected = writable([{oa:new Set(),parents:[]}]); // which layers contain data e.g. ['centroids']
+export const selected = writable([{oa:new Set()}]); // which layers contain data e.g. ['centroids']
 // export const select = writable([]); // selected areacodes
 
 export const mapsource = writable({}); // source dictionary

@@ -91,7 +91,7 @@ class Centroids {
     let oas = inPoly (this.geojson, bounds);
     oas = inPoly (oas, geo).features.map (oa => oa.properties.areacd);
 
-    return {bbox: bounds, oa: new Set (oas), parents: this.parent (oas)};
+    return {bbox: bounds, oa: new Set (oas)};
   }
 
   compress (oa_all) {

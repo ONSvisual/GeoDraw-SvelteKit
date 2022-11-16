@@ -223,18 +223,11 @@ export async function update (geo) {
 
   if (get (add_mode)) {
     current.push ({
-      oa: new Set ([...last.oa, ...features.oa]),
-      parents: [...last.parents, ...features.parents],
+      oa: new Set ([...last.oa, ...features.oa])
     });
   } else {
-    // drop matches individually
-    features.parents.forEach (d => {
-      var id = last.parents.indexOf (d);
-      if (id >= 0) last.parents.splice (id, 1);
-    });
     current.push ({
-      oa: new Set ([...last.oa].filter (x => !features.oa.has (x))),
-      parents: last.parents,
+      oa: new Set ([...last.oa].filter (x => !features.oa.has (x)))
     });
   }
 
@@ -251,22 +244,8 @@ function draw_point (e) {
   var last = Object.assign ({}, current[current.length - 1]);
 
   last = {
-    oa: new Set (last.oa),
-    parents: [...last.parents],
+    oa: new Set (last.oa)
   };
-
-  [...oalist].forEach (oa => {
-    const parent = get (centroids).parent (oa);
-
-    if (last.oa.has (oa)) {
-      last.oa.delete (oa);
-      var id = last.parents.indexOf (parent);
-      if (id > -1) last.parents.splice (id, 1);
-    } else {
-      last.oa.add (oa);
-      last.parents.push (parent);
-    }
-  });
 
   current.push (last);
   updatelocal (current);

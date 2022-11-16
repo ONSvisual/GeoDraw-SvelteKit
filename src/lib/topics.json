@@ -1,7 +1,7 @@
 [
   {
       "code": "population",
-      "label": "Total population",
+      "label": "Population",
       "desc": "The number of people on Census Day, 21 March 2021.",
       "tableCode": "NM_2028_1",
       "cellCode": "c_sex",
@@ -9,7 +9,7 @@
       "unit": "people",
       "categories": [
           {
-              "label": "Total population",
+              "label": "Population",
               "cells": [
                   0
               ]
