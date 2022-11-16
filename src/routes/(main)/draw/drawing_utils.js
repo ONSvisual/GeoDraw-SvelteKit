@@ -237,18 +237,19 @@ export async function update (geo) {
 
 function draw_point (e) {
   // update using select tool
-
-  console.debug (e.features.map (d => d.properties.areacd));
-  const oalist = new Set (e.features.map (d => d.properties.areacd));
-  const current = get (selected);
-  var last = Object.assign ({}, current[current.length - 1]);
-
-  last = {
-    oa: new Set (last.oa)
-  };
-
-  current.push (last);
-  updatelocal (current);
+  let feature = e.features[0];
+  if (feature) {
+    let code = feature.properties.areacd;
+    let current = get(selected);
+    let oas = current[current.length - 1].oa;
+    if (oas.has(code)) {
+      oas = new Set(Array.from(oas).filter(oa => oa !== code));
+    } else {
+      oas = new Set([...Array.from(oas), code]);
+    }
+    current.push({oa: oas});
+    updatelocal (current);
+  }
 }
 
 function updatelocal (current) {

@@ -13,6 +13,7 @@
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount} from 'svelte';
   import {update, simplify_geo, geo_blob} from './drawing_utils.js';
+  import {round} from './misc_utils.js';
   import {
     mapsource,
     maplayer,
@@ -588,7 +589,7 @@ The save data and continue function
   <div class="population">
     <span>
       {#if pselect}
-        <strong>{pselect.toLocaleString()}</strong> total population
+        Population selected: <strong>{round(pselect, -2).toLocaleString()}</strong>
       {:else}
         No areas selected
       {/if}

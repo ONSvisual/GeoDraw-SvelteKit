@@ -1,4 +1,5 @@
 import { csvParse, autoType } from "d3-dsv";
+import { round } from "../draw/misc_utils.js";
 
 function makeUrl(table, codes) {
   let url = `https://www.nomisweb.co.uk/api/v01/dataset/${table.tableCode}.data.csv?date=latest&geography=MAKE|MyCustomArea|${codes},K04000001&${table.cellCode}=${makeCells(table.categories)}&measures=${table.measures}&select=geography_name,${table.cellCode}_name,obs_value`;
@@ -39,5 +40,5 @@ export default async function (table, codes) {
   let str = (await res.text()).replace("GEOGRAPHY_NAME", "areanm").replace("OBS_VALUE", "value").replace(`${table.cellCode}_name`.toUpperCase(), "category");
   let data = csvParse(str, autoType);
   if (table.unit === "%" && table.measures === 20100) data = calcPercent(data);
-  return data.map(d => d.value);
+  return ["population", "households"].includes(table.code) ? data.map(d => round(d.value, -2)) : data.map(d => d.value);
 }
