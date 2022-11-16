@@ -584,7 +584,7 @@ The save data and continue function
           class="btn-link"
           on:click={() => {
             let q = $selected[$selected.length - 1];
-            let bbox = [q.lng[0], q.lat[0], q.lng[1], q.lat[1]];
+            let bbox = get(centroids).bounds([...q.oa]);
             $mapobject.fitBounds(bbox, {padding: 20});
           }}>click here</button
         > to return to the area you have drawn.

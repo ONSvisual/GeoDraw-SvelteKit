@@ -72,7 +72,10 @@ class Centroids {
         oas.includes (f.properties.areacd)
       ),
     };
-    return bbox (points);
+    let bounds = bbox (points);
+    bounds = [bounds[0] - 0.05, bounds[1] - 0.05, bounds[2] + 0.05, bounds[3] + 0.05];
+    console.log("bounds", bounds);
+    return bounds;
   }
 
   exists (oa) {
