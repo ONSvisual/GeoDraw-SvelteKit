@@ -98,9 +98,9 @@
             oa: comp.oa,
             lsoa: comp.lsoa,
             msoa: comp.msoa,
-            name: data.properties.areanm
-              ? data.properties.areanm
-              : data.properties.areacd,
+            name: data.properties.hclnm ? data.properties.hclnm :
+              data.properties.areanm ? data.properties.areanm :
+              data.properties.areacd,
           },
         };
         localStorage.setItem('onsbuild', JSON.stringify(info));
