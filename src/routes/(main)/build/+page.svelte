@@ -105,8 +105,8 @@
                 : data.properties.areacd,
             },
           };
+          localStorage.setItem('onsbuild', JSON.stringify(info));
         });
-        localStorage.setItem('onsbuild', JSON.stringify(info));
       }
       catch (err) {
         console.warn(err);
