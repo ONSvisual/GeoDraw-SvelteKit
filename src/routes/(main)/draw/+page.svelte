@@ -328,9 +328,6 @@ The save data and continue function
   $: console.log('selected', $selected);
 </script>
 
-<svelte:head>
-  <script src="https://cdn.jsdelivr.net/npm/flatbush"></script>
-</svelte:head>
 <ONSloader {isLoading} />
 <nav>
   <div class="nav-left" style="z-index:99;">
@@ -515,6 +512,7 @@ The save data and continue function
           $mapobject.fitBounds(bbox, {padding: 20});
           state.name = e.detail.areanm;
         } else if (e.detail.type == 'postcode') {
+
           let center = e.detail.center;
           $mapobject.flyTo({center: center, zoom: 14});
           $mapobject.once('idle', () => {
