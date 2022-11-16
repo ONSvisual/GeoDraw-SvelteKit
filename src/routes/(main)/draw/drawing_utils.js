@@ -16,6 +16,7 @@ import turf_simplify from '@turf/simplify';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/mapshaper';
+import bbox from "@turf/bbox";
 
 const mzm = 10;
 export var Draw;
@@ -222,18 +223,11 @@ export async function update (geo) {
 
   if (get (add_mode)) {
     current.push ({
-      oa: new Set ([...last.oa, ...features.oa]),
-      parents: [...last.parents, ...features.parents],
+      oa: new Set ([...last.oa, ...features.oa])
     });
   } else {
-    // drop matches individually
-    features.parents.forEach (d => {
-      var id = last.parents.indexOf (d);
-      if (id >= 0) last.parents.splice (id, 1);
-    });
     current.push ({
-      oa: new Set ([...last.oa].filter (x => !features.oa.has (x))),
-      parents: last.parents,
+      oa: new Set ([...last.oa].filter (x => !features.oa.has (x)))
     });
   }
 
@@ -243,32 +237,19 @@ export async function update (geo) {
 
 function draw_point (e) {
   // update using select tool
-
-  console.debug (e.features.map (d => d.properties.areacd));
-  const oalist = new Set (e.features.map (d => d.properties.areacd));
-  const current = get (selected);
-  var last = Object.assign ({}, current[current.length - 1]);
-
-  last = {
-    oa: new Set (last.oa),
-    parents: [...last.parents],
-  };
-
-  [...oalist].forEach (oa => {
-    const parent = get (centroids).parent (oa);
-
-    if (last.oa.has (oa)) {
-      last.oa.delete (oa);
-      var id = last.parents.indexOf (parent);
-      if (id > -1) last.parents.splice (id, 1);
+  let feature = e.features[0];
+  if (feature) {
+    let code = feature.properties.areacd;
+    let current = get(selected);
+    let oas = current[current.length - 1].oa;
+    if (oas.has(code)) {
+      oas = new Set(Array.from(oas).filter(oa => oa !== code));
     } else {
-      last.oa.add (oa);
-      last.parents.push (parent);
+      oas = new Set([...Array.from(oas), code]);
     }
-  });
-
-  current.push (last);
-  updatelocal (current);
+    current.push({oa: oas});
+    updatelocal (current);
+  }
 }
 
 function updatelocal (current) {
@@ -311,9 +292,10 @@ function circle_fast (clear = false, center = radius_center) {
 ////////////////////
 
 export function geo_blob (q) {
-  q.properties = {
+  let geojson = q.geojson;
+  geojson.properties = {
     name: q.properties.name,
-    bbox: q.properties.bbox,
+    bbox: bbox(geojson),
     codes: q.properties.oa_all,
     codes_compressed: {
       oa: q.properties.oa,
@@ -321,7 +303,7 @@ export function geo_blob (q) {
       msoa: q.properties.msoa,
     },
   };
-  return new Blob ([JSON.stringify (q)], {
-    type: 'application/geo+json;charset=utf-8',
+  return new Blob ([JSON.stringify (geojson)], {
+    type: 'application/json',
   });
 }

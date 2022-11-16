@@ -1,5 +1,9 @@
 <script context="module">
   import { csvParse, autoType } from "d3-dsv";
+  import Pbf from "pbf";
+  import vt from "@mapbox/vector-tile";
+  import tb from "@mapbox/tilebelt";
+  import inPolygon from "@turf/boolean-point-in-polygon";
 
 	// Config for places data
   const baseurl = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1";
@@ -58,6 +62,35 @@
       codes: geo.properties.codes
     };
 	}
+
+  export async function getOAfromLngLat(lng, lat) {
+    const tile = tb.pointToTile(lng, lat, 12);
+    const url = `https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v2/boundaries/${tile[2]}/${tile[0]}/${tile[1]}.pbf`;
+    try {
+      const geojson = await getTileAsGeoJSON(url, tile);
+      const pt = { type: "Point", coordinates: [lng, lat] };
+      for (const f of geojson.features) {
+        if (inPolygon(pt, f.geometry)) return f.properties.areacd;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function getTileAsGeoJSON(url, tile) {
+    const res = await fetch(url);
+    const buf = await res.arrayBuffer();
+    const pbf = new Pbf(buf);
+    const geojson = { type: "FeatureCollection", features: [] };
+    const t = new vt.VectorTile(pbf);
+    for (const key in t.layers) {
+      for (let i = 0; i < t.layers[key].length; i++) {
+        geojson.features.push(t.layers[key].feature(i).toGeoJSON(...tile));
+      }
+    }
+    return geojson;
+  }
 </script>
 <script>
   import { onMount, createEventDispatcher } from "svelte";
@@ -75,7 +108,12 @@
 		if (filterText.length > 2 && /\d/.test(filterText)) {
 			let res = await fetch(`https://api.postcodes.io/postcodes/${filterText}/autocomplete`);
 			let json = await res.json();
-			return json.result ? json.result.map(d => ({areacd: d, areanm: d, group: '', postcode: true})) : [];
+			return json.result ? json.result.map(d => ({
+        areacd: d,
+        areanm: d,
+        group: '',
+        postcode: true
+      })) : [];
 		} else if (filterText.length > 2) {
 			return items.filter(p => p.areanm.toLowerCase().slice(0, filterText.length) == filterText.toLowerCase());
 		}
@@ -83,15 +121,12 @@
 	}
 	async function doSelect(e) {
 		if (e.detail.postcode) {
-			let res = await fetch(`https://api.postcodes.io/postcodes/${e.detail.areacd}`);
+      let res = await fetch(`https://api.postcodes.io/postcodes/${e.detail.areacd}`);
 			let json = await res.json();
 			if (json.result) {
-        dispatch('select', {
-					type: "postcode",
-					postcode: json.result.postcode,
-					center: [json.result.longitude, json.result.latitude]
-        })
-			}
+        let oa = await getOAfromLngLat(json.result.longitude, json.result.latitude);
+        if (oa) dispatch('select', await getPlace(oa));
+      }
 		} else {
       dispatch('select', await getPlace(e.detail.areacd));
 		}

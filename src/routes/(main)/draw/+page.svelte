@@ -1,6 +1,5 @@
 <script>
   import ONSloader from '../ONSloader.svelte';
-  let isLoading = false;
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import tooltip from '$lib/ui/tooltip';
@@ -9,11 +8,12 @@
   import Icon from '$lib/ui/Icon.svelte';
   import {download, clip} from '$lib/util/functions.js';
   import {get} from 'svelte/store';
+  import bbox from '@turf/bbox';
   import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
-  import {onMount, onDestroy} from 'svelte';
-  import {update, simplify_geo} from './drawing_utils.js';
-  import {GetCentroids} from './centroid_utils.js';
+  import {onMount} from 'svelte';
+  import {update, simplify_geo, geo_blob} from './drawing_utils.js';
+  import {round} from './misc_utils.js';
   import {
     mapsource,
     maplayer,
@@ -38,6 +38,7 @@
   ];
 
   // variable custom testing
+  let isLoading = false;
   let advanced = true; //new Date()%2;
   $: modes = advanced ? modelist : modelist.slice(0, 2);
   let state = {
@@ -67,8 +68,8 @@
   }
 
   let newselect;
-
-  async function init() {
+  
+  function init() {
     isLoading = true;
       /* 
     A section to clear the local storage if past the last update date
@@ -79,10 +80,6 @@
     }
     localStorage.setItem('lastdate', +new Date());
 
-    // calculate the centroids and simplifications.
-    var centroid_dummy = await GetCentroids();
-    centroids.set(centroid_dummy);
-
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
     // console.clear();
 
@@ -90,18 +87,14 @@
     $mapsource = {
       area: {
         type: 'vector',
-        // maxzoom: 12, // This is the maximum zoom the tiles are available for
+        maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
         minzoom: minzoom,
         tiles: [`${server}/{z}/{x}/{y}.pbf`],
       },
 
       points: {
         type: 'geojson',
-        data: get(centroids).geojson,
-        // a hack since max and min zoom do not work.
-        cluster: true,
-        clusterMaxZoom: 9, // Max zoom to cluster points on
-        clusterRadius: 1000, // Radius of each cluster when clustering points (defaults to 50)
+        data: $centroids.geojson
       },
     };
 
@@ -123,6 +116,7 @@
         id: 'cpt',
         source: 'points',
         type: 'circle',
+        minzoom: 9,
         paint: {
           'circle-radius': 1,
           'circle-color': 'coral'
@@ -139,7 +133,7 @@
 
       pselect = items.oa.size
         ? [...items.oa]
-            .map((d) => get(centroids).population(d) || 0)
+            .map((d) => $centroids.population(d) || 0)
             .reduce((a, b) => a + b)
         : 0;
 
@@ -158,62 +152,39 @@
     $mapobject.on('load', async () => {
       newselect = function () {
         localStorage.clear();
-        selected.set([{oa: new Set(), parents: []}]);
+        selected.set([{oa: new Set()}]);
       };
 
       let hash = window.location.hash;
       if (hash === '#undefined') {
         hash = window.location.hash = '';
       } else if (hash.length == 10) {
-        let code = [hash.slice(1)];
-        newselect();
-
-
-        if (get(centroids).exists(code)) {
-          try {
-            bbox = get(centroids).bounds(code);
-
+        let code = hash.slice(1);
+        try {
+          fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`)
+          .then(res => res.json())
+          .then(data => {
+            newselect();
+            selected.set([{oa: new Set()}]);
+            localStorage.clear();
+            
             $selected = [
-              $selected,
+              ...$selected,
               {
-                oa: new Set(code),
-                parents: get(centroids).parent(code),
+                oa: new Set(data.properties.codes)
               },
             ];
 
-            $mapobject.fitBounds(bbox, {padding: 20});
-            state.name = code;
-          } catch (err) {
-            code = code[0];
+            $mapobject.fitBounds(data.properties.bounds, {padding: 20});
 
-            let data = await (
-              await fetch(
-                `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
-                  0,
-                  3
-                )}/${code}.json`
-              )
-            ).json();
-
-            selected.set([{oa: new Set(), parents: []}]);
-            localStorage.clear();
-
-            if (data.type == 'Feature') {
-              $selected = [
-                $selected,
-                {
-                  oa: new Set(data.properties.codes),
-                  parents: get(centroids).parent(data.properties.codes),
-                },
-              ];
-
-              $mapobject.fitBounds(data.properties.bounds, {padding: 20});
-
-              state.name = data.properties.areanm;
-            }
-          }
-
-          setDrawData();
+            state.name = data.properties.hclnm ? data.properties.hclnm :
+              data.properties.areanm ? data.properties.areanm :
+              data.properties.areacd;
+            setDrawData();
+          });
+        }
+        catch {
+          alert(`Requested GSS code ${code} is unavailable or invalid.`);
         }
 
         history.replaceState(null, null, ' ');
@@ -226,7 +197,7 @@
           return 0;
         }
 
-        var bbox = get(centroids).bounds([...q.oa_all]);
+        var bbox = $centroids.bounds([...q.oa_all]);
 
         $mapobject.fitBounds(bbox, {
           padding: 20,
@@ -235,8 +206,7 @@
 
         $selected = [
           {
-            oa: new Set(q.oa_all),
-            parents: get(centroids).parent(q.oa_all),
+            oa: new Set(q.oa_all)
           },
         ];
       } else if (localStorage.getItem('draw_data') || false) {
@@ -247,7 +217,7 @@
           return 0;
         }
 
-        var bbox = get(centroids).bounds([...q.oa]);
+        var bbox = $centroids.bounds([...q.oa]);
 
         $mapobject.fitBounds(bbox, {
           padding: 20,
@@ -261,6 +231,7 @@
       // Keep track of map zoom level
       zoom = $mapobject.getZoom();
       $mapobject.on('moveend', () => (zoom = $mapobject.getZoom()));
+      isLoading = false;
     });
 
     selected.subscribe(recolour);
@@ -271,7 +242,7 @@
     let file = uploader.files[0] ? uploader.files[0] : null;
 
     if (file) {
-      selected.set([{oa: new Set(), parents: []}]);
+      selected.set([{oa: new Set()}]);
 
       const reader = new FileReader();
 
@@ -289,27 +260,21 @@
           console.debug('reading uploaded codes');
           let bb = b.properties.bbox
             ? b.properties.bbox
-            : $centroids.getbbox(boundary);
-          let oa = new Set(b.properties.codes);
+            : bbox(b);
+          let oa = b.properties.codes;
           $selected = [
             $selected,
             {
-              oa: oa,
-              parents: get(centroids).parent(oa),
+              oa: new Set(oa)
             },
           ];
           $mapobject.fitBounds(bb, {padding: 20});
         } else if (b.geometry) {
           console.debug('reading uploaded geometry');
-          if (JSON.stringify(b.geometry).length > 10000)
-            b.geometry = simplify_geo(b.geometry, 10000);
+          if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
           let bb = bbox(b);
-          let center = [(bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2];
-          $mapobject.flyTo({center, zoom: 9});
-          $mapobject.once('idle', () => {
-            update(b.geometry);
-            $mapobject.fitBounds(bb, {padding: 20});
-          });
+          update(b.geometry);
+          $mapobject.fitBounds(bb, {padding: 20});
         } else {
           b = null;
           alert('Invalid geography file. Must be geojson format.');
@@ -330,12 +295,7 @@
     }
   }
 
-  onMount(async () => {
-    await init();
-    setTimeout(() => {
-      isLoading = false;
-    }, 500);
-  });
+  onMount(init);
 
   /* 
 The save data and continue function
@@ -371,13 +331,11 @@ The save data and continue function
   $: console.log('selected', $selected);
 </script>
 
-<svelte:head>
-  <script src="https://cdn.jsdelivr.net/npm/flatbush"></script>
-</svelte:head>
 <ONSloader {isLoading} />
 <nav>
   <div class="nav-left" style="z-index:99;">
     {#each modes as mode}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <label
         id={'init_' + mode.key}
         class:active={state.mode == mode.key}
@@ -475,15 +433,11 @@ The save data and continue function
       <input type="text" bind:value={state.name} placeholder="Type a name" />
       <button
         class="text"
-        on:click={() =>
-          savedata().then(() => {
-            var data = JSON.parse(localStorage.getItem('onsbuild'));
-            var file = new Blob([JSON.stringify(data.geojson)], {
-              type: 'text/plain',
-            });
-            download(file, state.name.replace(' ', '_') + '.geojson');
-          })}
-      >
+        on:click={async () => {
+          let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
+          let blob = geo_blob(data);
+          download(blob, state.name.replace(' ', '_') + '.json');
+        }}>
         <Icon type="download" /><span>Save geography</span>
       </button>
       <button
@@ -555,13 +509,13 @@ The save data and continue function
           $selected = [
             $selected,
             {
-              oa: oa,
-              parents: $centroids.parent([...oa]),
+              oa: oa
             },
           ];
           $mapobject.fitBounds(bbox, {padding: 20});
           state.name = e.detail.areanm;
         } else if (e.detail.type == 'postcode') {
+
           let center = e.detail.center;
           $mapobject.flyTo({center: center, zoom: 14});
           $mapobject.once('idle', () => {
@@ -575,8 +529,7 @@ The save data and continue function
             $selected = [
               $selected,
               {
-                oa: oa,
-                parents: $centroids.parent([...oa]),
+                oa: oa
               },
             ];
           });
@@ -608,7 +561,7 @@ The save data and continue function
           class="btn-link"
           on:click={() => {
             let q = $selected[$selected.length - 1];
-            let bbox = [q.lng[0], q.lat[0], q.lng[1], q.lat[1]];
+            let bbox = $centroids.bounds([...q.oa]);
             $mapobject.fitBounds(bbox, {padding: 20});
           }}>click here</button
         > to return to the area you have drawn.
@@ -638,7 +591,7 @@ The save data and continue function
   <div class="population">
     <span>
       {#if pselect}
-        <strong>{pselect.toLocaleString()}</strong> total population
+        Population selected: <strong>{round(pselect, -2).toLocaleString()}</strong>
       {:else}
         No areas selected
       {/if}

@@ -1,18 +1,18 @@
 <script>
   import ONSloader from '../ONSloader.svelte';
-  let isLoading = false;
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import pym from 'pym.js';
   import tooltip from '$lib/ui/tooltip';
   import Icon from '$lib/ui/Icon.svelte';
   // import {default as datasets} from '$lib/util/custom_profiles_tables.json';
-  import {default as datasets} from './newtables.json';
+  import topics from '$lib/topics.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
-  import {fauxdensity, get_pop, get_stats} from './gettable.js';
+  // import {fauxdensity, get_pop, get_stats} from './gettable.js';
+  import getTable from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
-  import {default as area} from '@turf/area'
+  import { centroids } from '../draw/mapstore.js';
 
   // let dataset_keys = Object.keys(datasets);
   // dataset_keys = dataset_keys.filter(
@@ -23,82 +23,19 @@
   // );
 
   /////
+  let isLoading = false;
   let pym_parent; // Variabl for pym
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
 
+  let topicsLookup = (() => {
+    let lookup = {};
+    topics.forEach(t => lookup[t.code] = t);
+    return lookup;
+  })();
 
   // alert('00 oa 01 lsoa 02 msoa e.g.E00')
-
-  let topics = [
-    {key: 'population', label: 'Total population', special: true},
-    {key: 'density', label: 'Population density', special: true},
-    // {key: 'agemed', label: 'Median age', special: true},
-    {key: 'age', label: 'Age profile (2011)', special: true},
-    // {key: 'sex', label: 'Sex'},
-    // {key: 'ethnicity', label: 'Ethnicity'},
-    // {key: 'religion', label: 'Religion'},
-    // {key: 'marital', label: 'Marital status'},
-    // {key: 'qualification', label: 'Highest qualification'},
-    // {key: 'grade', label: 'Social grade'},
-    // {key: 'economic', label: 'Economic activity'},
-    // {key: 'travel', label: 'Travel to work'},
-    // {key: 'hours', label: 'Hours worked'},
-    // {key: 'housing', label: 'Housing type'},
-    // {key: 'tenure', label: 'Housing tenure'},
-    // {key: 'bedrooms', label: 'Number of bedrooms'},
-    // {key: 'occupancy', label: 'Persons per bedroom'},
-    ////////////////////
-    // new tables
-    //////////////////////
-    // {
-    //   key: 'TS001',
-    //   label:
-    //     'Number of usual residents in households and communal establishments',
-    // },
-    {key: 'TS002', label: 'Legal partnership status'},
-    {key: 'TS003', label: 'Household composition'},
-    {key: 'TS004', label: 'Country of birth'},
-    // {key: 'TS005', label: 'Passports held'},
-    // {key: 'TS006', label: 'Population density'},
-    // {key: 'TS007', label: 'Age by single year'},
-    // {key: 'TS008', label: 'Sex'},
-    // {key: 'TS009', label: 'Sex by single year of age'},
-    // {key: 'TS010', label: 'Living arrangements'},
-    {key: 'TS011', label: 'Households by deprivation dimensions'},
-    // {key: 'TS012', label: 'Country of birth (detailed)'},
-    // {key: 'TS013', label: 'Passports held (detailed)'},
-    // {key: 'TS015', label: 'Year of arrival in UK'},
-    // {key: 'TS016', label: 'Length of residence'},
-    {key: 'TS017', label: 'Household size'},
-    // {key: 'TS018', label: 'Age of arrival in the UK'},
-    // {key: 'TS019', label: 'Migrant Indicator'},
-    // {key: 'TS020', label: 'Number of non-UK short-term residents by sex'},
-    // {key: 'TS041', label: 'Number of Households'},
-    // {key: 'TS071', label: 'Previously served in the UK armed forces'},
-    // {
-    //   key: 'TS072',
-    //   label:
-    //     'Number of people in household who have previously served in UK armed forces',
-    // },
-    // {
-    //   key: 'TS073',
-    //   label:
-    //     'Population who have previously served in UK armed forces in communal establishments and in households',
-    // },
-    // {
-    //   key: 'TS074',
-    //   label:
-    //     'Household Reference Person indicator of previous service in UK armed forces',
-    // },
-  ]
-    .map(function (topic) {
-      return Object.assign({}, topic, datasets[topic.key]);
-    })
-    .filter((d) => d['nomis'] || d.special);
-
-  topics.sort((a, b) => (a.key > b.key ? 1 : -1));
 
   let state = {
     mode: 'move',
@@ -107,7 +44,7 @@
     name: 'Area Name',
     showSave: false,
     showEmbed: false,
-    topics: topics.filter((d) => ['population', 'hours'].includes(d.key)),
+    topics: [topics[0]],
     topicsExpand: false,
     topicsFilter: '',
   };
@@ -138,42 +75,41 @@
 
   let store;
   let geojson;
-  let population, stats;
 
   async function init() {
     isLoading = true;
 
-    // incase we call for a pre loaded area as a hash string
+    // in case we call for a pre loaded area as a hash string
     let hash = window.location.hash;
     if (hash === '#undefined') {
       hash = '';
       window.location.hash = '';
     } else if (hash.length == 10) {
       let code = hash.slice(1);
-
-      let data = await (
-        await fetch(
-          `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
-            0,
-            3
-          )}/${code}.json`
-        )
-      ).json();
-
-      if (data.type === 'Feature') {
+      try {
+        let res = await fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`);
+        let data = await res.json();
+        let comp = $centroids.compress(data.properties.codes);
         const info = {
-          compressed: code,
+          compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(";"),
           geojson: data,
           properties: {
             oa_all: data.properties.codes,
-            name: data.properties.areanm
-              ? data.properties.areanm
-              : data.properties.areacd,
+            oa: comp.oa,
+            lsoa: comp.lsoa,
+            msoa: comp.msoa,
+            name: data.properties.hclnm ? data.properties.hclnm :
+              data.properties.areanm ? data.properties.areanm :
+              data.properties.areacd,
           },
         };
-
         localStorage.setItem('onsbuild', JSON.stringify(info));
       }
+      catch (err) {
+        console.warn(err);
+        alert(`Requested GSS code ${code} is unavailable or invalid.`);
+      }
+      history.replaceState(null, null, ' ');
     }
 
     // resume as normal
@@ -191,6 +127,7 @@
     state.start = true;
 
     let props = store.properties;
+    console.log("props", props);
 
     state.compressed =
       store.compressed ||
@@ -213,28 +150,7 @@
     // 	polygon: polygon,
     // };
 
-    population = await get_pop(state.compressed, state.name);
-    stats = await get_stats(state.compressed, state.name).then(d=>fauxdensity(d,area(store.geojson.geometry)));
-
-
-    console.debug('desnity adjustment',stats,stats['Population density'])
-
-
     // console.debug(stats,population)
-
-
-    setTimeout(() => {
-      update_profile(
-        state.start,
-        state.name,
-        state.topics,
-        includemap,
-        population,
-        stats
-      );
-
-      isLoading = false;
-    }, 1000);
   }
 
   onMount(init);
@@ -246,150 +162,19 @@
   let cache = {};
   async function get_data(data) {
     if (!state.start) return [];
-    let rtn = data
-      .filter((d) => !d.special)
-      .map(async function (table) {
-        if (table['nomis'] in cache) {
-          return cache[table['nomis']];
-        } else {
-
-          return await dfd
-            .readCSV(
-              `https://www.nomisweb.co.uk/api/v01/dataset/${table[
-                'nomis'
-              ].toLowerCase()}.bulk.csv?date=latest&geography=MAKE|MyCustomArea|${
-                state.compressed
-              },K04000001&measures=20100&select=geography_name,cell_name,obs_value`
-            )
-            .then((d) => d.setIndex({column: 'geography'}))
-            .then((de) => {
-              // var mappings = {};
-              var cols = de.columns.filter((d) => d.includes(':'));
-              // // cols.forEach((d, i) => {
-              // //   mappings[d] = d.replaceAll(/[\:\;]/g, ' ');
-              // //   ///:\s*(.+);/.exec(d)[1];
-              // // });
-
-              return de.loc({
-                rows: ['MyCustomArea', 'England and Wales'],
-                columns: cols,
-              });
-              // .loc({
-              //   rows: de.index.filter((d) => d),
-              //   columns: cols,
-              // })
-              // .rename(mappings, {inplace: false});
-            })
-
-            .then((df) => {
-
-              df.print();
-              //   // mandatory cleanup
-              //   var cols = df_old.$columns.filter(
-              //     (d) =>
-              //       !(
-              //         (
-              //           d.includes('count') ||
-              //           d.includes('All') ||
-              //           (d.match(/\;/g) || []).length === 1 ||
-              //           d.includes('sum') ||
-              //           d.includes('Total')
-              //         )
-              //         // d.includes('Mean')
-              //       )
-              //   );
-
-              //   df_old = df_old.loc({columns: cols});
-
-              //   // add headers to hash search algorithm
-              //   const matches = table['Cell name'].map((d) => {
-              //     var match = new Minhash();
-              //     d.match(/\w+/g).forEach((e) => match.update(e));
-              //     return [d, match];
-              //   });
-
-              //   // name cleanup
-              //   let colmap = new Map();
-              //   df_old.$columns.forEach((m) => {
-              //     const m0 = new Minhash();
-              //     m.match(/\w+/g).forEach((e) => m0.update(e));
-              //     var last = 0;
-              //     var keep = m;
-
-              //     for (const mx of matches) {
-              //       var j = m0.jaccard(mx[1]);
-              //       if (j > last) {
-              //         last = j;
-              //         keep = mx[0];
-              //       }
-              //     }
-              //     // create a hierarchical map
-              //     colmap.set([keep, [m, ...(colmap.get(keep) || [])]]);
-              //   });
-
-              //   // rebuild with grouped data
-              //   let df = {};
-              //   colmap.forEach((_, item) => {
-              //     var [key, value] = item;
-              //     df[key] = df_old.loc({columns: value}).sum({axis: 1}).$data;
-              //   });
-
-              //   df = new dfd.DataFrame(df);
-
-              //   // df.print();
-
-              //   var pc = df.div(df.sum(), {axis: 0});
-              //   // var bpc = df.div(df.max(), {axis: 0});
-
-              //   // pc.print()
-
-              //   var lists = [];
-              // let keepcol = table['Cell name'].filter((d) =>
-              //   df.$columns.includes(d)
-              // );
-              // columns to plot (must appear in both nomis and datasheet. )
-
-
-              console.warn('------')
-              
-              var pc = df[table['total']]
-              var lists = [];
-              Object.entries(table.columns).forEach((g) => {
-
-                if (g[1].length === 1) {
-                  var data = df[g[1][0]];
-                } else {
-                  var data = df.loc({columns: g[1]}).sum({axis: 1});
-                }
-                // 0.001 = 0.1%
-                data = data.div(pc).round(3).$data;
-
-
-                [0, 1].forEach((i) => {
-                  lists.push({
-                    z: ['CustomArea', 'England and Wales'][i],
-                    pc: data[i],
-                    column: g[0],
-                  });
-                });
-              });
-
-
-              cache[table['nomis']] = {
-                name: table['name'],
-                data: lists,
-                embed: {
-                  nid: table['nomis'],
-                  // did: keepcol.map((d) => table['Cell name'].indexOf(d)),
-                  did: Object.keys(table.columns),
-                  data: [...new Uint16Array(lists.map((d) => d.pc * 10000))],
-                },
-              };
-              return cache[table['nomis']];
-            });
-        }
-      });
-    return await Promise.all(rtn);
+    let tables = [];
+    for (let i = 0; i < data.length; i ++) {
+      let table;
+      if (cache[data[i].code]) {
+        table = cache[data[i].code];
+      } else {
+        table = await getTable(data[i], state.compressed);
+        cache[data[i].code] = table;
+      }
+      tables.push({code: data[i].code, data: table});
+    }
+    console.log(tables);
+    return tables;
   }
 
   async function update_profile(
@@ -397,38 +182,18 @@
     name,
     data,
     includemap,
-    population,
-    stats
   ) {
     if (start) {
       var ls = JSON.parse(localStorage.getItem('onsbuild'));
       ls.properties.name = name;
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
-      tables = await get_data(data);
+      let codes = data.map(d => d.code);
+      tables = await get_data(topics.filter(t => codes.includes(t.code)));
 
-      let dummystats;
-      var newstats = [];
-      if (stats) {
-        var usestats = data.filter((d) => d.special).map((d) => d.key);
-
-        if (usestats.includes('population')) newstats.push('Population');
-        if (usestats.includes('agemed')) newstats.push('Median Age');
-        if (usestats.includes('density')) newstats.push('Population density');
-
-        dummystats = newstats.map((d) => [d, stats[d]]);
-      }
       embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
-        JSON.stringify(tables).replaceAll('CustomArea', name)
-      )}${
-        usestats
-          ? usestats.includes('age')
-            ? `&population=${btoa(JSON.stringify(population))}`
-            : ''
-          : ''
-      }${
-        newstats.length > 0 ? `&stats=${btoa(JSON.stringify(dummystats))}` : ''
-      }${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
+        JSON.stringify(tables)
+      )}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
 
       // alert(population)
 
@@ -437,6 +202,7 @@
           name: 'embed',
           id: 'iframe',
         });
+        isLoading = false;
       } else {
         document.getElementById('iframe').contentWindow.location.hash =
           embed_hash;
@@ -449,8 +215,6 @@
     state.name,
     state.topics,
     includemap,
-    population,
-    stats
   );
 
   function makeEmbed(embed_hash) {
@@ -494,7 +258,7 @@
         class="text"
         on:click={async () => {
           let blob = geo_blob(store);
-          download(blob, `${state.name}.json`);
+          download(blob, `${state.name.replace(' ', '_')}.json`);
         }}
       >
         <Icon type="download" /><span>Save geography</span>
@@ -581,30 +345,18 @@
       <button
         disabled={!state.topics}
         on:click={async function () {
+          let csv = `"Custom area profile data for ${state.name}"\n`;
+          csv += `"Source: Census 2021, Office for National Statistics"\n`;
+          csv += `"Data generated by the ONS Build a custom area profile tool on ${(new Date()).toLocaleDateString('en-GB', {year: "numeric", month: "short", day: "numeric"})}"\n\n`;
+          csv += `"Variable","Category","${state.name}","England and Wales","Unit"\n`;
 
-var tables = await get_data(state.topics);
-      
-          // if (!tables.length) return alert('No tables selected. Please add some from the left hand side. ')
-
-          let csv = 'Dataset,Column,Area,Value,Unit\n'
-
-
-          Object.entries(stats).forEach(s=>{
-            s[1].slice(0,2).forEach((d,i)=>
-              csv += `${'General statistics'},${s[0]},${[state.name,'England and Wales'][i]},${+d},${s[1][2]}\n`
-            )
-          })
-
-          tables.forEach(t=>{
-            t.data.forEach(row=>
-              csv += `${t.name.replace(/[\n,]/, '')},${row.column.replace(/[\n,]/, '')},${row.z==='England and Wales'?row.z:state.name},${(row.pc*100).toFixed(1)},Percentage\n`
-            )
-
-          })
-
-          console.table(csv.split('\n').map(d=>d.split(',')))
-          
-          // var pretty = JSON.stringify(tables, null, 4);
+          tables.forEach(t => {
+            let meta = topicsLookup[t.code];
+            let len = meta.categories.length;
+            for (let i = 0; i < len; i ++) {
+              csv += `"${meta.label}","${meta.categories[i].label}",${t.data[i]},${t.data[len + i]},"${meta.unit}"\n`;
+            }
+          });
           var file = new Blob([csv], {type: 'text/csv'});
           download(file, state.name.replace(' ', '_') + '.csv');
 

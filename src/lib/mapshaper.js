@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import mproj from 'mproj';
 import iconv from 'iconv-lite';
-// import Flatbush from 'flatbush';
+import Flatbush from 'flatbush';
 
 var utils = /*#__PURE__*/Object.freeze({
   __proto__: null,
@@ -10097,6 +10097,6 @@ function dissolve2(layers, dataset, opts) {
 
 export function dissolve(geojson) {
   let dataset = importGeoJSON(geojson);
-  dataset.layers = dissolve2(dataset.layers, dataset);
+  dataset.layers = dissolve2(dataset.layers, dataset, {gap_fill_area: '1km2'});
   return exportDatasetAsGeoJSON(dataset, { geojson_type: 'Feature' });
 }

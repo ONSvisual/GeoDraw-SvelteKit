@@ -2,14 +2,13 @@
 	export let data;
 	export let xKey = "value";
 	export let yKey = "category";
-	export let zKey = "group";
+	export let zKey = "areanm";
 
 	// if less than 1% use decimal formatting
 	export let formatTick = num => num.toFixed(1);
 	export let suffix = "%";
 	export let barHeight = 25;
 	export let markerWidth = 3;
-	var bmax;
 	
 	function groupData(data, key) {
 		let data_indexed = {};
@@ -32,15 +31,12 @@
 	}
 	
 
-	$: yDomain = data.map(d => d[yKey]).filter((v, i, a) => a.indexOf(v) === i);
+	$: xMax = Math.max(...data.map(d => d[xKey]));
 	$: zDomain = data.map(d => d[zKey]).filter((v, i, a) => a.indexOf(v) === i);
+  $: console.log("zDomain", zDomain);
 	
-	$: xScale = (value) => value * 100;
+	$: xScale = (value) => (value / xMax) * 100;
 	$: data_grouped = groupData(data, yKey);
-
-	$: bmax = Math.max(...data.map(d=>+d[xKey]))
-
-
 </script>
 
 {#if zDomain[1]}
@@ -58,15 +54,15 @@
 	<div class="label-group">
 		{group.label}
 		{#each group.values as d, i}
-		<span class="label {i == 0 ? 'bold' : 'sml brackets'}">{formatTick(xScale(d[xKey]))}{suffix}</span>
+		<span class="label {i == 0 ? 'bold' : 'sml brackets'}">{formatTick(d[xKey])}{suffix}</span>
 		{/each}
 	</div>
 	<div class="bar-group" style:height="{barHeight}px">
 	{#each group.values as d, i}
 		{#if i == 0}
-		<div class="bar" style:left="0" style:width="{xScale(d[xKey]/bmax)}%"/>
+		<div class="bar" style:left="0" style:width="{xScale(d[xKey])}%"/>
 		{:else}
-		<div class="marker" style:left="calc({xScale(d[xKey]/bmax)}% - {markerWidth / 2}px)" style:border-left-width="{markerWidth}px"/>
+		<div class="marker" style:left="calc({xScale(d[xKey])}% - {markerWidth / 2}px)" style:border-left-width="{markerWidth}px"/>
 		{/if}
 	{/each}
 	</div>
