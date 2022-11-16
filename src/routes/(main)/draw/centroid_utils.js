@@ -4,6 +4,7 @@ import bbox from '@turf/bbox';
 import bboxPoly from '@turf/bbox-polygon';
 import inPoly from '@turf/points-within-polygon';
 import {dissolve} from '$lib/mapshaper';
+import {roundAll} from './misc_utils';
 const url = 'https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv';
 
 //'/oa21-data-v4.csv'
@@ -170,6 +171,7 @@ class Centroids {
         };
       }),
     });
+    merge.geojson.geometry.coordinates = roundAll(merge.geojson.geometry.coordinates, 6);
 
     console.debug ('---merge---', merge);
 

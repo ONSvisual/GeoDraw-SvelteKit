@@ -16,6 +16,7 @@ import turf_simplify from '@turf/simplify';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/mapshaper';
+import bbox from "@turf/bbox";
 
 const mzm = 10;
 export var Draw;
@@ -311,9 +312,10 @@ function circle_fast (clear = false, center = radius_center) {
 ////////////////////
 
 export function geo_blob (q) {
-  q.properties = {
+  let geojson = q.geojson;
+  geojson.properties = {
     name: q.properties.name,
-    bbox: q.properties.bbox,
+    bbox: bbox(geojson),
     codes: q.properties.oa_all,
     codes_compressed: {
       oa: q.properties.oa,
@@ -321,7 +323,7 @@ export function geo_blob (q) {
       msoa: q.properties.msoa,
     },
   };
-  return new Blob ([JSON.stringify (q)], {
-    type: 'application/geo+json;charset=utf-8',
+  return new Blob ([JSON.stringify (geojson)], {
+    type: 'application/json',
   });
 }

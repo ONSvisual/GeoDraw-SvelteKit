@@ -9,10 +9,11 @@
   import Icon from '$lib/ui/Icon.svelte';
   import {download, clip} from '$lib/util/functions.js';
   import {get} from 'svelte/store';
+  import bbox from '@turf/bbox';
   import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
-  import {onMount, onDestroy, getContext} from 'svelte';
-  import {update, simplify_geo} from './drawing_utils.js';
+  import {onMount} from 'svelte';
+  import {update, simplify_geo, geo_blob} from './drawing_utils.js';
   import {
     mapsource,
     maplayer,
@@ -167,7 +168,7 @@
               `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
                 0,
                 3
-              )}/${code}.json`
+              )}/${code}.geojson`
             )
           ).json();
 
@@ -265,27 +266,22 @@
           console.debug('reading uploaded codes');
           let bb = b.properties.bbox
             ? b.properties.bbox
-            : $centroids.getbbox(boundary);
-          let oa = new Set(b.properties.codes);
+            : bbox(b);
+          let oa = b.properties.codes;
           $selected = [
             $selected,
             {
-              oa: oa,
+              oa: new Set(oa),
               parents: get(centroids).parent(oa),
             },
           ];
           $mapobject.fitBounds(bb, {padding: 20});
         } else if (b.geometry) {
           console.debug('reading uploaded geometry');
-          if (JSON.stringify(b.geometry).length > 10000)
-            b.geometry = simplify_geo(b.geometry, 10000);
+          if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
           let bb = bbox(b);
-          let center = [(bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2];
-          $mapobject.flyTo({center, zoom: 9});
-          $mapobject.once('idle', () => {
-            update(b.geometry);
-            $mapobject.fitBounds(bb, {padding: 20});
-          });
+          update(b.geometry);
+          $mapobject.fitBounds(bb, {padding: 20});
         } else {
           b = null;
           alert('Invalid geography file. Must be geojson format.');
@@ -354,6 +350,7 @@ The save data and continue function
 <nav>
   <div class="nav-left" style="z-index:99;">
     {#each modes as mode}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <label
         id={'init_' + mode.key}
         class:active={state.mode == mode.key}
@@ -451,15 +448,11 @@ The save data and continue function
       <input type="text" bind:value={state.name} placeholder="Type a name" />
       <button
         class="text"
-        on:click={() =>
-          savedata().then(() => {
-            var data = JSON.parse(localStorage.getItem('onsbuild'));
-            var file = new Blob([JSON.stringify(data.geojson)], {
-              type: 'text/plain',
-            });
-            download(file, state.name.replace(' ', '_') + '.geojson');
-          })}
-      >
+        on:click={async () => {
+          let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
+          let blob = geo_blob(data);
+          download(blob, state.name.replace(' ', '_') + '.geojson');
+        }}>
         <Icon type="download" /><span>Save geography</span>
       </button>
       <button
