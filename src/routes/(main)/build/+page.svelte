@@ -5,24 +5,12 @@
   import pym from 'pym.js';
   import tooltip from '$lib/ui/tooltip';
   import Icon from '$lib/ui/Icon.svelte';
-  // import {default as datasets} from '$lib/util/custom_profiles_tables.json';
   import topics from '$lib/topics.json';
-  import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; // "$lib/draw/MapDraw.js";
-  // import {fauxdensity, get_pop, get_stats} from './gettable.js';
+  import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; 
   import getTable from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import { centroids } from '../draw/mapstore.js';
-
-  // let dataset_keys = Object.keys(datasets);
-  // dataset_keys = dataset_keys.filter(
-  //   (key) => !/UK\]| - | by |\[[^K]|WA\]/.test(datasets[key].name)
-  // ); // strip non k tables, welsh only, and bivariate tables
-  // let name2key = Object.fromEntries(
-  //   new Map(dataset_keys.map((d) => [datasets[d]['Table name'], d]))
-  // );
-
-  /////
   let isLoading = false;
   let pym_parent; // Variabl for pym
   let embed_hash; // Variable for embed hash string
@@ -143,18 +131,9 @@
   
     console.warn(state.compressed)
    
-    // var senddata = {
-    // 	tables: tlist,
-    // 	areas: alist,
-    // 	compressed,
-    // 	polygon: polygon,
-    // };
-
-    // console.debug(stats,population)
   }
 
   onMount(init);
-  // $: get_data(state.topics);
 
   ////////////////////////////////////////////////////////////////
   // Processing functions
