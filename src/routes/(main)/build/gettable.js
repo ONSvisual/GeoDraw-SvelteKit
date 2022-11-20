@@ -40,5 +40,5 @@ export default async function (table, codes) {
   let str = (await res.text()).replace("GEOGRAPHY_NAME", "areanm").replace("OBS_VALUE", "value").replace(`${table.cellCode}_name`.toUpperCase(), "category");
   let data = csvParse(str, autoType);
   if (table.unit === "%" && table.measures === 20100) data = calcPercent(data);
-  return ["population", "households"].includes(table.code) ? data.map(d => round(d.value, -2)) : data.map(d => d.value);
+  return ["population", "households"].includes(table.code) ? data.map(d => Math.round(d.value, -2)) : data.map(d => d.value);
 }

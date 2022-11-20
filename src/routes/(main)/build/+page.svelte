@@ -6,24 +6,28 @@
   import tooltip from '$lib/ui/tooltip';
   import Icon from '$lib/ui/Icon.svelte';
   import topics from '$lib/topics.json';
-  import {simplify_geo, geo_blob} from '../draw/drawing_utils.js'; 
+  import {simplify_geo, geo_blob} from '../draw/drawing_utils.js';
   import getTable from './gettable.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
-  import { centroids } from '../draw/mapstore.js';
+  import {centroids} from '../draw/mapstore.js';
+  import {InlineNotification} from 'carbon-components-svelte';
   let isLoading = false;
   let pym_parent; // Variabl for pym
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
+  let infobox = undefined;// information box for each table 
 
-  let topicsLookup = (() => {
-    let lookup = {};
-    topics.forEach(t => lookup[t.code] = t);
-    return lookup;
-  })();
+  let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
+  // would this not be better off as a MAP and not a dict?
 
-  // alert('00 oa 01 lsoa 02 msoa e.g.E00')
+  // (() => {
+  //   let lookup = {};
+  //   topics.forEach((t) => (lookup[t.code] = t));
+  //   return lookup;
+  // })();
+
 
   let state = {
     mode: 'move',
@@ -75,25 +79,31 @@
     } else if (hash.length == 10) {
       let code = hash.slice(1);
       try {
-        let res = await fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`);
+        let res = await fetch(
+          `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
+            0,
+            3
+          )}/${code}.json`
+        );
         let data = await res.json();
         let comp = $centroids.compress(data.properties.codes);
         const info = {
-          compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(";"),
+          compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(';'),
           geojson: data,
           properties: {
             oa_all: data.properties.codes,
             oa: comp.oa,
             lsoa: comp.lsoa,
             msoa: comp.msoa,
-            name: data.properties.hclnm ? data.properties.hclnm :
-              data.properties.areanm ? data.properties.areanm :
-              data.properties.areacd,
+            name: data.properties.hclnm
+              ? data.properties.hclnm
+              : data.properties.areanm
+              ? data.properties.areanm
+              : data.properties.areacd,
           },
         };
         localStorage.setItem('onsbuild', JSON.stringify(info));
-      }
-      catch (err) {
+      } catch (err) {
         console.warn(err);
         alert(`Requested GSS code ${code} is unavailable or invalid.`);
       }
@@ -115,22 +125,13 @@
     state.start = true;
 
     let props = store.properties;
-    console.log("props", props);
+    console.log('props', props);
 
     state.compressed =
       store.compressed ||
-      [
-        ...props.msoa,
-        ...props.lsoa,
-        ...props.oa,
-    ]
-        .flat()
-        .join(';');
+      [...props.msoa, ...props.lsoa, ...props.oa].flat().join(';');
 
-
-  
-    console.warn(state.compressed)
-   
+    console.warn(state.compressed);
   }
 
   onMount(init);
@@ -142,7 +143,7 @@
   async function get_data(data) {
     if (!state.start) return [];
     let tables = [];
-    for (let i = 0; i < data.length; i ++) {
+    for (let i = 0; i < data.length; i++) {
       let table;
       if (cache[data[i].code]) {
         table = cache[data[i].code];
@@ -156,23 +157,18 @@
     return tables;
   }
 
-  async function update_profile(
-    start,
-    name,
-    data,
-    includemap,
-  ) {
+  async function update_profile(start, name, data, includemap) {
     if (start) {
       var ls = JSON.parse(localStorage.getItem('onsbuild'));
       ls.properties.name = name;
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
-      let codes = data.map(d => d.code);
-      tables = await get_data(topics.filter(t => codes.includes(t.code)));
+      let codes = data.map((d) => d.code);
+      tables = await get_data(topics.filter((t) => codes.includes(t.code)));
 
-      embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(
-        JSON.stringify(tables)
-      )}${includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''}`;
+      embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(JSON.stringify(tables))}${
+        includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
+      }`;
 
       // alert(population)
 
@@ -189,12 +185,7 @@
     }
   }
 
-  $: update_profile(
-    state.start,
-    state.name,
-    state.topics,
-    includemap,
-  );
+  $: update_profile(state.start, state.name, state.topics, includemap);
 
   function makeEmbed(embed_hash) {
     let url = `${base}/embed/${embed_hash}`;
@@ -244,15 +235,12 @@
       </button>
       <button
         class="text"
-        on:click={() =>{
+        on:click={() => {
           var codes = store.properties.oa_all.join(',');
-          clip(
-            codes,
-            'Copied output area codes to clipboard'
-          )
-          console.log(codes)
-          console.log('codes copied to clipboard')
-          }}
+          clip(codes, 'Copied output area codes to clipboard');
+          console.log(codes);
+          console.log('codes copied to clipboard');
+        }}
       >
         <Icon type="copy" /><span>Copy area codes</span>
       </button>
@@ -286,6 +274,29 @@
           value={topic}
         />
         {@html highlight(topic.label, regex)}
+
+        <a
+          title="Show full description"
+          aria-label="Show full description for {topic.label}"
+          style="font-size:.8em;margin-left:.5em;float:right"
+          on:click={() => {
+            var id = topic.label.replace(/\s/, '_');
+            infobox = infobox === id ? undefined : id;
+            console.log(id, topic);
+          }}
+        >
+          &#9432;
+        </a>
+
+        {#if infobox === topic.label.replace(/\s/, '_')}
+          <InlineNotification
+            subtitle={topic.desc}
+            kind="info"
+            iconDescription={topic.desc}
+            lowContrast="false"
+            hideCloseButton="true"
+          />
+        {/if}
       </label>
     {/each}
     {#if !regex}
@@ -326,16 +337,22 @@
         on:click={async function () {
           let csv = `"Custom area profile data for ${state.name}"\n`;
           csv += `"Source: Census 2021, Office for National Statistics"\n`;
-          csv += `"Data generated by the ONS Build a custom area profile tool on ${(new Date()).toLocaleDateString('en-GB', {year: "numeric", month: "short", day: "numeric"})}"\n\n`;
+          csv += `"Data generated by the ONS Build a custom area profile tool on ${new Date().toLocaleDateString(
+            'en-GB',
+            {year: 'numeric', month: 'short', day: 'numeric'}
+          )}"\n\n`;
           csv += `"Variable","Category","${state.name}","England and Wales","Unit"\n`;
 
-          tables.forEach(t => {
+          tables.forEach((t) => {
             let meta = topicsLookup[t.code];
             let len = meta.categories.length;
-            for (let i = 0; i < len; i ++) {
-              csv += `"${meta.label}","${meta.categories[i].label}",${t.data[i]},${t.data[len + i]},"${meta.unit}"\n`;
+            for (let i = 0; i < len; i++) {
+              csv += `"${meta.label}","${meta.categories[i].label}",${
+                t.data[i]
+              },${t.data[len + i]},"${meta.unit}"\n`;
             }
           });
+
           var file = new Blob([csv], {type: 'text/csv'});
           download(file, state.name.replace(' ', '_') + '.csv');
 
@@ -376,5 +393,49 @@
     width: 100%;
     height: 100px;
     resize: none;
+  }
+
+  :global(.topics-box) {
+    width: clamp(200px, 20vw, 400px)!important;
+    max-width: 400px;
+  }
+  :global(.bx--inline-notification) {
+    width: clamp(190px, calc(20vw-4em), 380px);
+   
+    border-left: 3px solid #1a1a1a67 !important;
+    background: #dbdbdb3c !important;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: 0.16px;
+    box-sizing: border-box;
+    padding: 0!important;
+    border: 0;
+    margin: 0!important;
+    font: inherit;
+    font-size: 100%;
+    vertical-align: baseline;
+    position: relative;
+    display: flex;
+    height: auto;
+    min-height: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: nowrap;
+    color: #161616;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.28572;
+    letter-spacing: 0.16px;
+    word-break: break-word;
+  }
+
+  :global(.bx--inline-notification__subtitle) {
+    margin: 1em;
+  }
+  :global(.bx--inline-notification__details svg) {
+    visibility: hidden;
+    width: 0;
+    display: none;
   }
 </style>
