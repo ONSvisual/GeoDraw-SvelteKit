@@ -68,10 +68,14 @@ class Centroids {
   bounds (oas) {
     // get a boundary for a list of OA codes
     let points = {
-      type: 'FeatureCollection',
-      features: this.geojson.features.filter (f =>
-        oas.includes (f.properties.areacd)
-      ),
+      type: 'GeometryCollection',
+      geometries: oas.map(oa => {
+        let d = this.lookup[oa];
+        return {
+          type: 'Point',
+          coordinates: [d.lng, d.lat]
+        }
+      })
     };
     let bounds = bbox (points);
     bounds = [bounds[0] - 0.02, bounds[1] - 0.02, bounds[2] + 0.02, bounds[3] + 0.02];
@@ -155,25 +159,29 @@ class Centroids {
     };
     /// geo
 
-    // query whole page
-    mapobject.fitBounds (bbox, {padding: 20});
+    // move map to selection
+    mapobject.fitBounds (bbox, {padding: 20, animate: false});
 
-    var geometry = mapobject
-      .queryRenderedFeatures ({layers: ['bounds']})
-      .filter (e => selected.oa.has (e.properties.areacd));
+    merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
+      var geometry = mapobject
+        .queryRenderedFeatures ({layers: ['bounds']})
+        .filter (e => selected.oa.has (e.properties.areacd));
 
-    merge.geojson = dissolve ({
-      type: 'FeatureCollection',
-      features: geometry.map (f => {
-        return {
-          type: f.type,
-          geometry: f.geometry,
-        };
-      }),
-    });
-    merge.geojson.geometry.coordinates = roundAll(merge.geojson.geometry.coordinates, 6);
+      let geojson = dissolve ({
+        type: 'FeatureCollection',
+        features: geometry.map (f => {
+          return {
+            type: f.type,
+            geometry: f.geometry,
+          };
+        }),
+      });
+      geojson.geometry.coordinates = roundAll(geojson.geometry.coordinates, 6);
 
-    console.debug ('---merge---', merge);
+      console.debug ('---merge---', merge);
+
+      resolve(geojson);
+    }));
 
     return merge;
   }
