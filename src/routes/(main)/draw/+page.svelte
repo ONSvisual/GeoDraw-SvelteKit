@@ -88,7 +88,7 @@
       area: {
         type: 'vector',
         maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
-        minzoom: minzoom,
+        minzoom: 8, // IMPORTANT: This is the minimum zoom aailable
         tiles: [`${server}/{z}/{x}/{y}.pbf`],
       },
 
