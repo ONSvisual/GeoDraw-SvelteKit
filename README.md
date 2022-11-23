@@ -22,6 +22,4 @@ https://stately-salamander-b9768e.netlify.app/
 ```
 
 ## Dev Wiki
-A skeletal outline of the main files, and the functions inside them. 
-
-https://github.com/ONSvisual/BaCAP/wiki
+[A skeletal outline of the main files, and the functions inside them.](https://github.com/ONSvisual/BaCAP/wiki)
