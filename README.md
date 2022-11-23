@@ -2,12 +2,11 @@
 
 
 
-## Demo:
+## Demo
 https://stately-salamander-b9768e.netlify.app/
 
-### To run locally
-`npm i;`
-`npm run dev`
+### Running locally
+`npm i; npm run dev`
 
 
 ## Usage Instructions
