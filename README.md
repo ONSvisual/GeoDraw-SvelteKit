@@ -5,8 +5,7 @@
 ## Demo
 https://stately-salamander-b9768e.netlify.app/
 
-### Running locally
-`npm i; npm run dev`
+
 
 
 ## Usage Instructions
@@ -18,6 +17,10 @@ https://stately-salamander-b9768e.netlify.app/
 <iframe src="https://scribehow.com/embed/Build_A_Custom_Area_Profile__i4sDzHDJQsyS4Dv4rsCj6w" 
         width="640" height="640" allowfullscreen frameborder="0"></iframe>
 ```
+
+
+## Running locally
+`npm i; npm run dev`
 
 ## Dev Wiki
 [A skeletal outline of the main files, and the functions inside them.](https://github.com/ONSvisual/BaCAP/wiki)
