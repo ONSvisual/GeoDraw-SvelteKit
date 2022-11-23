@@ -10,4 +10,4 @@ To run locally -
 https://stately-salamander-b9768e.netlify.app/
 
 ## Usage Instructions
-https://scribehow.com/shared/Netlify_Workflow__pQ2zKFPKQwqnxt3J0fpogA
+https://scribehow.com/shared/Netlify_Workflow__i4sDzHDJQsyS4Dv4rsCj6w
