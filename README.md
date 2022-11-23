@@ -1,5 +1,4 @@
-# BaCAP (formerly geodraw)
-## Build a Custom Area Profile
+# BaCAP (Build a Custom Area Profile)
 
 
 
