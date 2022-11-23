@@ -1,6 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/504045615.svg)](https://zenodo.org/badge/latestdoi/504045615)
 # BaCAP (Build a Custom Area Profile)
-
-
 
 ## Demo
 https://stately-salamander-b9768e.netlify.app/
