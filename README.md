@@ -12,7 +12,7 @@ https://stately-salamander-b9768e.netlify.app/
 
 
 ## Usage Instructions
-[https://scribehow.com/shared/Netlify_Workflow__i4sDzHDJQsyS4Dv4rsCj6w](https://scribehow.com/shared/Build_A_Custom_Area_Profile__i4sDzHDJQsyS4Dv4rsCj6w)
+[Build a Custom Area Usage Instructions](https://scribehow.com/shared/Build_A_Custom_Area_Profile__i4sDzHDJQsyS4Dv4rsCj6w)
 
 
 ### Embed link:
