@@ -75,7 +75,7 @@
   });
 </script>
 
-<svelte:window on:hashchange={update}>
+<svelte:window on:hashchange={update} />
   
   
 <svelte:head>
