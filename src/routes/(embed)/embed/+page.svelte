@@ -72,7 +72,7 @@
     update();
 //     window.onhashchange = update; 
     
-    doocument.addEventListener('hashchange',update)
+    document.addEventListener('hashchange',update)
   });
 </script>
 
