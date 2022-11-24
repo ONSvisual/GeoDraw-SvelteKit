@@ -32,7 +32,8 @@
   };
 
   function update() {
-    let hash = window.location.hash;
+    
+    let hash = document.location.hash;
 
     if (hash && hash.includes('name=')) {
       let props = {};
@@ -69,7 +70,9 @@
     pym_child = new pym.Child({id: 'embed', polling: 1000});
     pym_child.onMessage('makePNG', makePNG);
     update();
-    window.onhashchange = update;
+//     window.onhashchange = update; 
+    
+    doocument.addEventListener('hashchange',update)
   });
 </script>
 
