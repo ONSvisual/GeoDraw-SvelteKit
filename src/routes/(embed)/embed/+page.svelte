@@ -71,11 +71,13 @@
     pym_child.onMessage('makePNG', makePNG);
     update();
 //     window.onhashchange = update; 
-    
-    document.addEventListener('hashchange',update)
+//     document.addEventListener('hashchange',update)
   });
 </script>
 
+<svelte:window on:hashchange={update}>
+  
+  
 <svelte:head>
   <title>Custom area profile{name ? ` for ${name}` : ''}</title>
 </svelte:head>
