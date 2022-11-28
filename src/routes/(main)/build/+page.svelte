@@ -275,10 +275,11 @@
         />
         {@html highlight(topic.label, regex)}
 
-        <a
+        <button
           title="Show full description"
           aria-label="Show full description for {topic.label}"
-          style="font-size:.8em;margin-left:.5em;float:right"
+          style="font-size:.8em;margin-left:.02em;background: transparent;
+          border: none !important;"
           on:click={() => {
             var id = topic.label.replace(/\s/, '_');
             infobox = infobox === id ? undefined : id;
@@ -286,7 +287,7 @@
           }}
         >
           &#9432;
-        </a>
+        </button>
 
         {#if infobox === topic.label.replace(/\s/, '_')}
           <InlineNotification
