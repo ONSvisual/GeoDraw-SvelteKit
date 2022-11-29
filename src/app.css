@@ -80,16 +80,37 @@ header {
   display: flex;
   flex-direction: column;
 }
-
 .container {
-  display: flex;
-  direction: row;
-  flex-wrap: wrap;
-  flex-grow: 1;
-  width: calc(100% - 32px);
-  max-width: 980px;
-  margin: 0 auto 0 16px;
+  position: relative;
 }
+article.profile {
+  position: absolute;
+  left: 316px;
+  width: calc(100% - 332px);
+  max-width: 980px;
+}
+
+aside.topics-box {
+  position: absolute;
+  left: 16px;
+  width: 280px;
+}
+aside.topics-box input[type=text] {
+  width: 100%;
+}
+@media (max-width: 640px) {
+  article.profile {
+    position: relative;
+    width: calc(100% - 32px);
+    left: 16px;
+  }
+  aside.topics-box {
+    position: relative;
+    width: calc(100% - 32px);
+    left: 16px;
+  }
+}
+
 nav {
   position: relative;
   display: flex;
@@ -206,13 +227,6 @@ aside.info-box > .population > button {
 aside.info-box > .population > span {
   padding: 8px 16px;
 }
-aside.topics-box {
-  padding-right: 20px;
-  min-width: 280px;
-}
-aside.topics-box input[type=text] {
-  width: 100%;
-}
 nav.tray {
   z-index: 9;
   position: absolute;
@@ -275,8 +289,8 @@ input[type=text]:focus {
   height: auto !important;
   background: none !important;
   border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  padding: 0;
+  margin: 0;
   color: #206095 !important;
   font-weight: normal;
   text-decoration: underline;

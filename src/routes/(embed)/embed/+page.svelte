@@ -109,12 +109,7 @@
     {/each}
   </Cards>
 
-  <span class="footnote"
-    >Source: Census 2021 data. Office for National Statistics | <a
-      href="/"
-      target="_blank">Build a custom area profile</a
-    ></span
-  >
+  <span class="footnote">Source: Census 2021, Office for National Statistics</span>
 {/if}
 
 <style>
