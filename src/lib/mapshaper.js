@@ -10097,7 +10097,6 @@ function dissolve2(layers, dataset, opts) {
 
 export function dissolve(geojson) {
   let dataset = importGeoJSON(geojson);
-  // dataset.layers = dissolve2(dataset.layers, dataset, {gap_fill_area: '1km2'});
-  dataset.layers = dissolve2(dataset.layers, dataset);
+  dataset.layers = dissolve2(dataset.layers, dataset, {gap_fill_area: '1km2'});
   return exportDatasetAsGeoJSON(dataset, { geojson_type: 'Feature' });
 }

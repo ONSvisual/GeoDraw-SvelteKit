@@ -3,6 +3,8 @@ import {csvParse, autoType} from 'd3-dsv';
 import bbox from '@turf/bbox';
 import bboxPoly from '@turf/bbox-polygon';
 import inPoly from '@turf/points-within-polygon';
+import buffer from '@turf/buffer';
+import area from '@turf/area';
 import {dissolve} from '$lib/mapshaper';
 import {roundAll} from './misc_utils';
 const url = 'https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv';
@@ -160,27 +162,32 @@ class Centroids {
     /// geo
 
     // move map to selection
-    mapobject.fitBounds (bbox, {padding: 20, animate: false});
+    mapobject.fitBounds (bbox, {padding: 0, animate: false});
 
     merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
       var geometry = mapobject
         .queryRenderedFeatures ({layers: ['bounds']})
         .filter (e => selected.oa.has (e.properties.areacd));
 
-      let geojson = dissolve ({
+      let geojson = {
         type: 'FeatureCollection',
-        features: geometry.map (f => {
+        features: geometry.map(f => {
           return {
             type: f.type,
             geometry: f.geometry,
           };
-        }),
-      });
-      geojson.geometry.coordinates = roundAll(geojson.geometry.coordinates, 6);
+        })
+      };
+
+      if (geojson.features.length < 20) geojson = buffer(geojson, 10, {units: 'meters'});
+      let dissolved = dissolve (geojson, area_sqm);
+      if (geojson.features.length < 20) dissolved = buffer(dissolved, -10, {units: 'meters'});
+      // let area_sqm = area(geojson);
+      dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
 
       console.debug ('---merge---', merge);
 
-      resolve(geojson);
+      resolve(dissolved);
     }));
 
     return merge;
