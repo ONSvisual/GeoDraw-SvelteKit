@@ -29,6 +29,9 @@ export function roundAll (arr, decimals) {
   return newarr;
 }
 
+export function roundCount (num) {
+  return num > 1000 ? (Math.round(num / 100) * 100) : (Math.round(num / 10) * 10);
+}
 
 // function geomean (c1, c2, thresh = 30) {
 //   c1 = get (mapobject).project (c1);
