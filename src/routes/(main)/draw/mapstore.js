@@ -21,7 +21,7 @@ export const centroids = writable();
 // map constants
 
 export let minzoom = 6;
-export let maxzoom = 13;
+export let maxzoom = 14;
 export let drawtools = true
 
 export let location = {

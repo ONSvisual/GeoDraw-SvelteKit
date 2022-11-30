@@ -16,6 +16,20 @@ function u(x){
   return [...new Set(x)]
 }
 
+// Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
+function filterGeo(geojson, area_sqm) {
+  const filterByArea = (coords) => area({type: "Polygon", coordinates: [coords]}) > (area_sqm / 500);
+  if (geojson.geometry.type === "Polygon") {
+    geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => filterByArea(coords));
+  }
+  if (geojson.geometry.type === "MultiPolygon") {
+    geojson.geometry.coordinates.forEach((poly, i) => {
+      geojson.geometry.coordinates[i] = poly.filter(coords => filterByArea(coords));
+    });
+    geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => coords[0]);
+  }
+}
+
 
 class Centroids {
   async initialize () {
@@ -179,17 +193,20 @@ class Centroids {
         })
       };
 
-      if (geojson.features.length < 20) geojson = buffer(geojson, 10, {units: 'meters'});
-      let dissolved = dissolve (geojson, area_sqm);
-      if (geojson.features.length < 20) dissolved = buffer(dissolved, -10, {units: 'meters'});
-      // let area_sqm = area(geojson);
-      dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
+      let len = geojson.features.length;
+      if (len > 1 && len < 20) geojson = buffer(geojson, 10, {units: 'meters'});
+      let dissolved = dissolve (geojson);
 
-      console.debug ('---merge---', merge);
+      if (len > 1 && len < 20) dissolved = buffer(dissolved, -10, {units: 'meters'});
+      dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
+      
+      let area_sqm = area(dissolved);
+      filterGeo(dissolved, area_sqm);
 
       resolve(dissolved);
     }));
 
+    console.debug ('---merge---', merge);
     return merge;
   }
 
