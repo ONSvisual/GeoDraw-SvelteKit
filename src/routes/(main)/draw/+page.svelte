@@ -343,6 +343,8 @@ The save data and continue function
         title={mode.label}
         on:click={function () {
           $draw_type = mode.key == 'move' ? null : mode.key;
+          // update the select icons (changing state.select does not trigger an update)
+          document.getElementById('addbutton').click()
         }}
         use:tooltip
       >
@@ -352,6 +354,7 @@ The save data and continue function
           name="mode"
           value={mode.key}
           disabled={zoom < zoomstop}
+          
         />
         <Icon type={mode.key} />
       </label>
@@ -472,6 +475,7 @@ The save data and continue function
           type="radio"
           on:click={() => ($add_mode = true)}
           bind:group={state.select}
+          id ='addbutton'
           name="select"
           value="add"
         />
