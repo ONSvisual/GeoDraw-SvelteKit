@@ -30,7 +30,7 @@
 <div class="topic-info">
 {topic.desc}
 {#if topic.url}
-<a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}">Read more</a>
+<a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}" target="_blank">Read more</a>
 {/if}
 </div>
 {/if}
