@@ -462,7 +462,7 @@ The save data and continue function
       </div>
     {/if}
     <div class="select-mode">
-      <span>Selection mode</span>
+      <span>Selection mode </span>
       <label
         class:active={state.select == 'add'}
         title="Add to selection"
@@ -479,7 +479,7 @@ The save data and continue function
       </label>
       <label
         class:active={state.select == 'subtract'}
-        title="Subtract from selection"
+        title="Remove from selection"
         use:tooltip
       >
         <input
@@ -570,18 +570,32 @@ The save data and continue function
         Zoom in to an area on the map to start drawing, or use the search box above
         to find a ready-made area.
       {:else if state.mode == 'polygon'}
-        <strong>Draw a polygon mode</strong><br />
+
+      
+      
+
+        <strong>Draw a polygon mode</strong>
+        <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> {state.select=='add'?'+':'–'}
+          <Icon type={state.mode} />
+        </span>
+        <br />
         Click on the map to draw a polygon. Click again on the first or last point
         to close the polygon.
       {:else if state.mode == 'radius'}
-        <strong>Draw a radius mode</strong><br />
+        <strong>Draw a radius mode</strong> <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> {state.select=='add'?'+':'–'}
+          <Icon type={state.mode} />
+        </span><br />
         Select a radius in kilometres from the menu, then click on the map to draw
         a circle.
       {:else if state.mode == 'select'}
-        <strong>Click and select mode</strong><br />
+        <strong>Click and select mode</strong> <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> 
+          <Icon type={state.mode} />
+        </span><br />
         Click an individual area to add or remove it from your selection.
       {:else}
-        <strong>Pan and zoom mode</strong><br />
+        <strong>Pan and zoom mode</strong> <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> 
+          <Icon type={state.mode} />
+        </span><br />
         Explore the map to find a location of interest, then select a drawing tool
         from the menu.
       {/if}
@@ -607,6 +621,23 @@ The save data and continue function
 </aside>
 
 <style>
+
+  label.active {
+  content: '';
+
+  -webkit-box-shadow: 0 0 15px 12px rgba(0, 115, 255, 0.047),0 0 6px 1px rgb(75, 75, 75);
+  /* box-shadow: 0 0 15px 12px rgba(0, 115, 255, 0.047),0 0 6px 1px rgba(68, 70, 73, 0.598); */
+  z-index: -1;
+  -webkit-animation-name: cyan-shadow;
+          animation-name: cyan-shadow;
+  -webkit-animation-timing-function: ease;
+          animation-timing-function: ease;
+  -webkit-animation-duration: 2s;
+          animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+}
+
   div.maplibregl-control-container {
     position: absolute;
     z-index: 999999;

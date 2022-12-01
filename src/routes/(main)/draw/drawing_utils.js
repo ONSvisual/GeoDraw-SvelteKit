@@ -16,7 +16,7 @@ import turf_simplify from '@turf/simplify';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/mapshaper';
-import bbox from "@turf/bbox";
+import bbox from '@turf/bbox';
 
 const mzm = 10;
 export var Draw;
@@ -214,8 +214,7 @@ export async function update (geo) {
   // update all polygon like draw items
   document.querySelector ('#mapcontainer div canvas').style.cursor = 'wait';
 
-  const features = await get(centroids).contains(geo)
-
+  const features = await get (centroids).contains (geo);
 
   var current = get (selected);
   var last = current[current.length - 1];
@@ -223,11 +222,11 @@ export async function update (geo) {
 
   if (get (add_mode)) {
     current.push ({
-      oa: new Set ([...last.oa, ...features.oa])
+      oa: new Set ([...last.oa, ...features.oa]),
     });
   } else {
     current.push ({
-      oa: new Set ([...last.oa].filter (x => !features.oa.has (x)))
+      oa: new Set ([...last.oa].filter (x => !features.oa.has (x))),
     });
   }
 
@@ -240,19 +239,24 @@ function draw_point (e) {
   let feature = e.features[0];
   if (feature) {
     let code = feature.properties.areacd;
-    let current = get(selected);
+    let current = get (selected);
     let oas = current[current.length - 1].oa;
-    if (oas.has(code)) {
-      oas = new Set(Array.from(oas).filter(oa => oa !== code));
+    if (oas.has (code)) {
+      oas = new Set (Array.from (oas).filter (oa => oa !== code));
     } else {
-      oas = new Set([...Array.from(oas), code]);
+      oas = new Set ([...Array.from (oas), code]);
     }
-    current.push({oa: oas});
+    current.push ({oa: oas});
     updatelocal (current);
   }
 }
 
 function updatelocal (current) {
+  // limit our undo list to 20
+  if (current.length >= 20)
+    current = current.slice (current.length - 20, current.length);
+  console.error (current.length, current);
+
   selected.set (current);
   var items = current[current.length - 1];
   // we cannot stringify sets!
@@ -295,7 +299,7 @@ export function geo_blob (q) {
   let geojson = q.geojson;
   geojson.properties = {
     name: q.properties.name,
-    bbox: bbox(geojson),
+    bbox: bbox (geojson),
     codes: q.properties.oa_all,
     codes_compressed: {
       oa: q.properties.oa,
