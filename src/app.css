@@ -156,6 +156,18 @@ nav button:disabled:hover {
   color: white;
   background-color: #333A45 !important;
 }
+nav.tray label {
+  background-color: #F5F5F5;
+  color: #333A45;
+}
+nav.tray label:hover {
+  background-color: #333A45CC !important;
+  color: #F5F5F5 !important;
+}
+nav.tray label.active {
+  background-color: #333A45;
+  color: #F5F5F5;
+}
 .nav-left > button, .nav-left > label {
   border-right: 1px solid rgba(255,255,255,0.3);
 }

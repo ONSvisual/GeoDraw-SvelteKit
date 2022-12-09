@@ -569,7 +569,7 @@ The save data and continue function
             $mapobject.fitBounds(bbox, {padding: 20});
           }}>click here</button
         > to return to the area you have drawn.
-      {:else if !zoom || zoom < 9}
+      {:else if !zoom || zoom < zoomstop}
         <strong>How to get started</strong><br />
         Zoom in to an area on the map to start drawing, or use the search box above
         to find a ready-made area.
@@ -619,28 +619,3 @@ The save data and continue function
     </button>
   </div>
 </aside>
-
-<style>
-
-  label.active {
-  content: '';
-
-  -webkit-box-shadow: 0 0 15px 12px rgba(0, 115, 255, 0.047),0 0 6px 1px rgb(75, 75, 75);
-  /* box-shadow: 0 0 15px 12px rgba(0, 115, 255, 0.047),0 0 6px 1px rgba(68, 70, 73, 0.598); */
-  z-index: -1;
-  -webkit-animation-name: cyan-shadow;
-          animation-name: cyan-shadow;
-  -webkit-animation-timing-function: ease;
-          animation-timing-function: ease;
-  -webkit-animation-duration: 2s;
-          animation-duration: 2s;
-  -webkit-animation-iteration-count: infinite;
-          animation-iteration-count: infinite;
-}
-
-  div.maplibregl-control-container {
-    position: absolute;
-    z-index: 999999;
-    bottom: 0;
-  }
-</style>
