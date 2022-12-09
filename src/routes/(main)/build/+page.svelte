@@ -2,6 +2,7 @@
   import ONSloader from '../ONSloader.svelte';
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
+	import {flip} from 'svelte/animate';
   import pym from 'pym.js';
   import tooltip from '$lib/ui/tooltip';
   import Notice from '$lib/ui/Notice.svelte';
@@ -220,7 +221,7 @@
   <div class="nav-left">
     <button
       class="text"
-      on:click={() => goto(`${base}/draw/${'#' + (store.compressed || '')}`)}
+      on:click={() => goto(`${base}/draw/`)}
     >
       <Icon type="chevron" rotation={180} /><span>Edit area</span>
     </button>
@@ -284,6 +285,7 @@
       bind:value={state.topicsFilter}
     />
     {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i (topic.code)}
+    <div animate:flip={{duration: 250}} style:z-index={state.topics.includes(topic) ? 10 : 0}>
       <TopicItem {topic} {regex} show={i < 6 || state.topicsExpand}>
         <input
           type="checkbox"
@@ -292,6 +294,7 @@
           value={topic}
         />
       </TopicItem>
+    </div>
     {/each}
     {#if !regex}
       <button class="btn-link" style:margin="6px 0" on:click={() => (state.topicsExpand = !state.topicsExpand)}>

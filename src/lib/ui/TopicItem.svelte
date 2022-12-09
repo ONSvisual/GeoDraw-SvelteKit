@@ -30,6 +30,7 @@
 <div class="topic-info">
 {topic.desc}
 {#if topic.url}
+<!-- svelte-ignore security-anchor-rel-noreferrer -->
 <a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}" target="_blank">Read more</a>
 {/if}
 </div>
@@ -41,6 +42,7 @@
     flex-direction: row;
     justify-content: space-between;
     margin: 4px 0 1px;
+    background-color: white;
   }
   .topic-item > label:focus-within {
     outline: 2px solid orange;

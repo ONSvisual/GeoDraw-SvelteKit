@@ -13,7 +13,7 @@
   import '$lib/draw/css/mapbox-gl.css';
   import {onMount} from 'svelte';
   import {update, simplify_geo, geo_blob} from './drawing_utils.js';
-  import {round} from './misc_utils.js';
+  import {roundCount} from './misc_utils.js';
   import {
     mapsource,
     maplayer,
@@ -574,10 +574,6 @@ The save data and continue function
         Zoom in to an area on the map to start drawing, or use the search box above
         to find a ready-made area.
       {:else if state.mode == 'polygon'}
-
-      
-      
-
         <strong>Draw a polygon mode</strong>
         <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> {state.select=='add'?'+':'–'}
           <Icon type={state.mode} />
@@ -609,7 +605,7 @@ The save data and continue function
   <div class="population">
     <span>
       {#if pselect}
-        Population selected: <strong>{round(pselect, -2).toLocaleString()}</strong>
+        Population selected: <strong>{roundCount(pselect).toLocaleString('en-GB')}</strong>
       {:else}
         No areas selected
       {/if}

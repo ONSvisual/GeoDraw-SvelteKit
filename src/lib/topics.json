@@ -493,5 +493,265 @@
         "cells": [5]
       }
     ]
+  },
+  {
+    "code": "workplace_travel",
+    "label": "Distance travelled to work",
+    "desc": "The distance between home and work, in kilometres.",
+    "url": "traveltoworkvariablescensus2021/distancetravelledtowork",
+    "tableCode": "NM_2075_1",
+    "cellCode": "c2021_ttwdist_11",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "Less than 10km",
+        "cells": [1, 2, 3]
+      },
+      {
+        "label": "10km to less than 30km",
+        "cells": [4, 5]
+      },
+      {
+        "label": "30km and over",
+        "cells": [6, 7, 8]
+      },
+      {
+        "label": "Works mainly from home",
+        "cells": [9]
+      },
+      {
+        "label": "Other",
+        "cells": [10]
+      }
+    ]
+  },
+  {
+    "code": "transport_to_workplace",
+    "label": "Method of travel to workplace",
+    "desc": "How people travel from their home to their workplace.",
+    "url": "traveltoworkvariablescensus2021/methodoftraveltoworkplace",
+    "tableCode": "NM_2078_1",
+    "cellCode": "c2021_ttwmeth_12",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "Work mainly at or from home",
+        "cells": [1]
+      },
+      {
+        "label": "Underground, metro, light rail, tram",
+        "cells": [2]
+      },
+      {
+        "label": "Train",
+        "cells": [3]
+      },
+      {
+        "label": "Bus, minibus or coach",
+        "cells": [4]
+      },
+      {
+        "label": "Taxi",
+        "cells": [5]
+      },
+      {
+        "label": "Motorcycle, scooter or moped",
+        "cells": [6]
+      },
+      {
+        "label": "Driving a car or van",
+        "cells": [7]
+      },
+      {
+        "label": "Passenger in a car or van",
+        "cells": [8]
+      },
+      {
+        "label": "Bicycle",
+        "cells": [9]
+      },
+      {
+        "label": "On foot",
+        "cells": [10]
+      },
+      {
+        "label": "Other method of travel to work",
+        "cells": [11]
+      }
+    ]
+  },
+  {
+    "code": "economic_activity",
+    "label": "Economic activity status",
+    "desc": "People in employment, looking for work, waiting to start a job or economically inactive.",
+    "url": "labourmarketvariablescensus2021/economicactivitystatus",
+    "tableCode": "NM_2083_1",
+    "cellCode": "c2021_eastat_20",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "Economically active: In employment",
+        "cells": [1002, 1007]
+      },
+      {
+        "label": "Economically active: Unemployed",
+        "cells": [7, 14]
+      },
+      {
+        "label": "Economically inactive",
+        "cells": [1011]
+      }
+    ]
+  },
+  {
+    "code": "has_ever_worked",
+    "label": "Employment history",
+    "desc": "The employment history of people who are currently not working.",
+    "url": "labourmarketvariablescensus2021/employmenthistory",
+    "tableCode": "NM_2082_1",
+    "cellCode": "c2021_worked_4",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "Not in employment: Worked in the last 12 months",
+        "cells": [1]
+      },
+      {
+        "label": "Not in employment: Not worked in the last 12 months",
+        "cells": [2]
+      },
+      {
+        "label": "Not in employment: Never worked",
+        "cells": [3]
+      }
+    ]
+  },
+  {
+    "code": "occupation_current",
+    "label": "Occupation",
+    "desc": "People's main jobs.",
+    "url": "labourmarketvariablescensus2021/occupationcurrent",
+    "tableCode": "NM_2080_1",
+    "cellCode": "c2021_occ_10",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "1. Managers, directors and senior officials",
+        "cells": [1]
+      },
+      {
+        "label": "2. Professional occupations",
+        "cells": [2]
+      },
+      {
+        "label": "3. Associate professional and technical occupations",
+        "cells": [3]
+      },
+      {
+        "label": "4. Administrative and secretarial occupations",
+        "cells": [4]
+      },
+      {
+        "label": "5. Skilled trades occupations",
+        "cells": [5]
+      },
+      {
+        "label": "6. Caring, leisure and other service occupations",
+        "cells": [6]
+      },
+      {
+        "label": "7. Sales and customer service occupations",
+        "cells": [7]
+      },
+      {
+        "label": "8. Process, plant and machine operatives",
+        "cells": [8]
+      },
+      {
+        "label": "9. Elementary occupations",
+        "cells": [9]
+      }
+    ]
+  },
+  {
+    "code": "ns_sec",
+    "label": "NS-SeC",
+    "desc": "People's socioeconomic position based on their occupation and other job characteristics.",
+    "url": "labourmarketvariablescensus2021/occupationcurrent",
+    "tableCode": "NM_2079_1",
+    "cellCode": "c2021_nssec_10",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "L1, L2 and L3: Higher managerial, administrative and professional occupations",
+        "cells": [1]
+      },
+      {
+        "label": "L4, L5 and L6: Lower managerial, administrative and professional occupations",
+        "cells": [2]
+      },
+      {
+        "label": "L7: Intermediate occupations",
+        "cells": [3]
+      },
+      {
+        "label": "L8 and L9: Small employers and own account workers",
+        "cells": [4]
+      },
+      {
+        "label": "L10 and L11: Lower supervisory and technical occupations",
+        "cells": [5]
+      },
+      {
+        "label": "L12: Semi-routine occupations",
+        "cells": [6]
+      },
+      {
+        "label": "L13: Routine occupations",
+        "cells": [7]
+      },
+      {
+        "label": "L14.1 and L14.2: Never worked and long-term unemployed",
+        "cells": [8]
+      },
+      {
+        "label": "L15: Full-time students",
+        "cells": [9]
+      }
+    ]
+  },
+  {
+    "code": "hours_per_week_worked",
+    "label": "Hours worked",
+    "desc": "The number of hours people work per week.",
+    "url": "labourmarketvariablescensus2021/hoursworked",
+    "tableCode": "NM_2076_1",
+    "cellCode": "c2021_hours_5",
+    "measures": 20301,
+    "unit": "%",
+    "categories": [
+      {
+        "label": "Part-time: 15 hours or less worked",
+        "cells": [1]
+      },
+      {
+        "label": "Part-time: 16 to 30 hours worked",
+        "cells": [2]
+      },
+      {
+        "label": "Full-time: 31 to 48 hours worked",
+        "cells": [3]
+      },
+      {
+        "label": "Full-time: 49 or more hours worked",
+        "cells": [4]
+      }
+    ]
   }
 ]

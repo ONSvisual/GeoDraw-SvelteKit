@@ -96,9 +96,9 @@
       <Card title={topicsLookup[tab.code].label}>
         {#if ["population", "households", "population_density", "median_age"].includes(tab.code)}
         <BigNumber
-          value={tab.data[0].toLocaleString()}
+          value={tab.data[0].toLocaleString('en-GB')}
           unit={topicsLookup[tab.code].unit}
-          description={`<mark>${tab.data[1].toLocaleString()}</mark>  in England and Wales`}
+          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark>  in England and Wales`}
         />
         {:else if tab.code === "resident_age"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name)} />

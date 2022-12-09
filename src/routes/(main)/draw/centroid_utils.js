@@ -194,10 +194,10 @@ class Centroids {
       };
 
       let len = geojson.features.length;
-      if (len > 1 && len < 20) geojson = buffer(geojson, 10, {units: 'meters'});
+      if (len > 1 && len < 50) geojson = buffer(geojson, 10, {units: 'meters'});
       let dissolved = dissolve (geojson);
 
-      if (len > 1 && len < 20) dissolved = buffer(dissolved, -10, {units: 'meters'});
+      if (len > 1 && len < 50) dissolved = buffer(dissolved, -10, {units: 'meters'});
       dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
       
       let area_sqm = area(dissolved);
