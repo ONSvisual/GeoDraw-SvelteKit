@@ -7,7 +7,7 @@
 	<h1>{title}</h1>
   {#if badge}
   <!-- svelte-ignore security-anchor-rel-noreferrer -->
-  <a href="https://www.ons.gov.uk/feedback" target="_blank" class="ons-phase-banner__badge">
+  <a href="https://www.ons.gov.uk/feedback" target="_blank" class="ons-phase-banner__badge" title="This is a new service. Share your feedback">
     <h3>{badge}</h3>
   </a>
   {/if}
