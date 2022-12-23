@@ -2,6 +2,7 @@
 import adapter from '@sveltejs/adapter-static';
 
 const production = process.env.NODE_ENV === 'production';
+const ons_path = process.env.APP_PATH && process.env.APP_PATH.includes('ons');
 
 const config = {
 	kit: {
@@ -17,7 +18,7 @@ const config = {
 			handleHttpError: 'warn'
 		},
 		paths: {
-			base: production ? '' : ''
+			base: production && ons_path ? '/visualisations/customprofiles' : ''
 		},
 		trailingSlash: 'always'
 	}
