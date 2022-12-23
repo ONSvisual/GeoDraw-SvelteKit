@@ -48,6 +48,7 @@ input:disabled {
 }
 
 button {
+  cursor: pointer;
 	color: #333;
 	background-color: #f4f4f4;
 	outline: none;
@@ -204,6 +205,20 @@ nav button.confirm {
 nav input {
   height: 36px;
   margin: auto 4px;
+}
+button.copy-embed {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: #0F8243;
+  height: 42px;
+  padding: 0 0.5em;
+  border: none;
+  border-radius: 0;
+}
+button.copy-embed > span {
+  padding-left: 0.4em;
 }
 aside.info-box {
   position: absolute;

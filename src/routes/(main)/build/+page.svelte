@@ -185,7 +185,7 @@
   $: update_profile(state.start, state.name, state.topics, includemap);
 
   function makeEmbed(embed_hash) {
-    let url = `${base}/embed/${embed_hash}`;
+    let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
     return `<div id="profile"></div>
 <script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
 <script>var pymParent = new pym.Parent("profile", "${url}", {name: "profile"});<\/script>`;
@@ -198,7 +198,7 @@
       'en-GB',
       {year: 'numeric', month: 'short', day: 'numeric'}
     )}"\n`;
-    csv += `"The data in this table is aggregated from small area data. The values may vary slightly from official ONS datasets."\n\n`;
+    csv += `"The data in this table is aggregated from small area data. The values may vary slightly from published ONS datasets."\n\n`;
     csv += `"Variable","Category","${state.name}","England and Wales","Unit"\n`;
 
     tables.forEach((t) => {
@@ -306,9 +306,18 @@
     <h2>Profile preview</h2>
 
     <div id="embed" />
-    <Notice/>
+    <Notice>
+      The data displayed in this profile is aggregated from small area data. The values and boundaries may vary slightly from published ONS datasets.
+    </Notice>
     <div class="embed-actions">
-      <button
+      <button class="btn-link" on:click={() => pym_parent.sendMessage('makePNG', null)}>
+        Download as image (PNG)
+      </button> |
+      <button class="btn-link"
+        disabled={!state.topics}
+        on:click={downloadData}>Download data (CSV)</button
+      > |
+      <button class="btn-link"
         on:click|preventDefault={() => {
           state.showEmbed = !state.showEmbed;
 
@@ -324,16 +333,14 @@
       >
         {state.showEmbed ? 'Hide embed code' : 'Show embed code'}
       </button>
-      <button on:click={() => pym_parent.sendMessage('makePNG', null)}>
-        Download PNG
-      </button>
-      <button
-        disabled={!state.topics}
-        on:click={downloadData}>Download Data</button
-      >
       {#if embed_hash && state.showEmbed}
         <p style:margin-bottom={0}>Embed code</p>
-        <textarea>{makeEmbed(embed_hash)}</textarea>
+        <textarea rows="4" readonly>{makeEmbed(embed_hash)}</textarea>
+        <button class="copy-embed"
+          on:click={() => clip(makeEmbed(embed_hash), 'Copied embed code to clipboard')}>
+          <Icon type="copy"/>
+          <span>Copy embed code</span>
+        </button>
       {/if}
     </div>
   </article>
@@ -345,11 +352,14 @@
     filter: invert(0.9);
     opacity: 0.9;
   }
-
+  .embed-actions {
+    margin: 0 0 20px;
+  }
   .embed-actions textarea {
     width: 100%;
-    height: 100px;
     resize: none;
+    color: #555;
+    margin-bottom: 3px;
   }
   :global(.bx--inline-notification__subtitle) {
     margin: 1em;

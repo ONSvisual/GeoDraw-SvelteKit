@@ -6,7 +6,7 @@
   <div class="notice-icon">
     <Icon type="error"/>
   </div>
-  The data displayed in this profile is aggregated from small area data. The values and boundaries may vary slightly from official ONS datasets.
+  <slot/>
 </div>
 
 <style>
