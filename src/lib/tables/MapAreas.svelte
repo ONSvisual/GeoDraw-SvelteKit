@@ -2,11 +2,12 @@
 	import maplibre from 'maplibre-gl';
 	import bbox from '@turf/bbox';
 	import { onMount } from 'svelte';
+  import { base } from '$app/paths';
 
-	const style = "https://bothness.github.io/ons-basemaps/data/style-outdoor.json";
+	const style = `${base}/data/style.json`;
 
 	export let geojson = null;
-	export let color = '#1f8ab0' //"#206095";
+	export let color = '#1f8ab0'; //"#206095"
 	export let lineWidth = 2;
 	export let fillOpacity = 0.2;
 	

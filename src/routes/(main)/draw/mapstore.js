@@ -2,6 +2,7 @@ import {
     writable,
     get
 } from 'svelte/store';
+import { base } from '$app/paths';
 
 // global variables shared between units. 
 export const draw_type = writable(undefined); // drawing tool type
@@ -40,6 +41,6 @@ export const server = 'https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v2
 //'https://onsvisual.github.io/ONS_CensusDraw_TileGen/geodraw_tileset'
 
 //http://localhost:7113
-export const mapstyle = `https://bothness.github.io/ons-basemaps/data/style-outdoor.json`
+export const mapstyle = `${base}/data/style.json`
 
 

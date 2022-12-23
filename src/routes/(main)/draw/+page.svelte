@@ -423,15 +423,18 @@ The save data and continue function
     <button
       class="text confirm"
       disabled={!$selected[$selected.length - 1].oa.size > 0}
-      on:click={() =>
+      on:click={() => {
+        isLoading = true;
         savedata().then((rdir) => {
           // console.warn(rdir);
           if (rdir) {
             goto(`${base}/build/`);
           } else {
             console.error('not redirecting', rdir);
+            isLoading = false;
           }
-        })}
+        })
+      }}
     >
       <span>Build profile</span><Icon type="chevron" />
     </button>

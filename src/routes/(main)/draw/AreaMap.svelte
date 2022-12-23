@@ -51,8 +51,8 @@
       maxZoom: maxzoom,
       maxBounds: maxbounds,
       //   pitch: 10, // 30,
-      center: [0, 53],
-      zoom: 4,
+      center: [-1, 52.2],
+      zoom: 7,
       hash: false, // set options in hash string
     });
 
