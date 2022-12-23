@@ -36,7 +36,7 @@ function calcPercent(data) {
 
 export default async function (table, codes) {
   let url = makeUrl(table, codes);
-  console.log("url", url);
+  // console.log("url", url);
   let res = await fetch(url);
   let str = (await res.text()).replace("GEOGRAPHY_NAME", "areanm").replace("OBS_VALUE", "value").replace(`${table.cellCode}_name`.toUpperCase(), "category");
   let data = csvParse(str, autoType);

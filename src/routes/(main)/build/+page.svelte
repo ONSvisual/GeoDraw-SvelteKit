@@ -101,7 +101,7 @@
         };
         localStorage.setItem('onsbuild', JSON.stringify(info));
       } catch (err) {
-        console.warn(err);
+        // console.warn(err);
         alert(`Requested GSS code ${code} is unavailable or invalid.`);
       }
       history.replaceState(null, null, ' ');
@@ -122,13 +122,13 @@
     state.start = true;
 
     let props = store.properties;
-    console.log('props', props);
+    // console.log('props', props);
 
     state.compressed =
       store.compressed ||
       [...props.msoa, ...props.lsoa, ...props.oa].flat().join(';');
 
-    console.warn(state.compressed);
+    // console.warn(state.compressed);
   }
 
   onMount(init);
@@ -150,7 +150,7 @@
       }
       tables.push({code: data[i].code, data: table});
     }
-    console.log(tables);
+    // console.log(tables);
     return tables;
   }
 
@@ -259,8 +259,8 @@
         on:click={() => {
           var codes = store.properties.oa_all.join(',');
           clip(codes, 'Copied output area codes to clipboard');
-          console.log(codes);
-          console.log('codes copied to clipboard');
+          // console.log(codes);
+          // console.log('codes copied to clipboard');
         }}
       >
         <Icon type="copy" /><span>Copy area codes</span>

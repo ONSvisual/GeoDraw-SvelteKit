@@ -56,7 +56,7 @@
   }
 
   async function makePNG(e) {
-    console.log('pngbtn', e);
+    // console.log('pngbtn', e);
 
     let canvas = await html2canvas(document.body);
     const base64 = canvas.toDataURL();

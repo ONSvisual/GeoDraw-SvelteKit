@@ -72,5 +72,5 @@ export function fauxdensity (stats, area) {
   return stats;
 }
 
-console.error ('AGE PROFILE AND MEDIAN AGE STILL USING 2011 DATA');
-console.error ('AGE DENSITY USING fauxdensity');
+// console.error ('AGE PROFILE AND MEDIAN AGE STILL USING 2011 DATA');
+// console.error ('AGE DENSITY USING fauxdensity');

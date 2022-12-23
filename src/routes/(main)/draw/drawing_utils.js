@@ -253,9 +253,7 @@ function draw_point (e) {
 
 function updatelocal (current) {
   // limit our undo list to 20
-  if (current.length >= 20)
-    current = current.slice (current.length - 20, current.length);
-  console.error (current.length, current);
+  if (current.length >= 20) current = current.slice (current.length - 20, current.length);
 
   selected.set (current);
   var items = current[current.length - 1];

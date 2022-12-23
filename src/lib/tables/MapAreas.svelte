@@ -49,7 +49,7 @@
 	});
 	
 	function fitBounds(bounds) {
-    console.log("refitting");
+    // console.log("refitting");
 		if (map) {
       map.resize();
       map.fitBounds(bounds, {padding: 20, animate: false});

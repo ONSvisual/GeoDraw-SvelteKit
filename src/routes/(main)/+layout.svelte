@@ -17,7 +17,7 @@
   });
 
   let path = $page.url.pathname;
-  console.warn('path', path);
+  // console.warn('path', path);
 </script>
 
 <svelte:head>

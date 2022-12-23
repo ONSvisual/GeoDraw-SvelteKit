@@ -33,7 +33,6 @@
 
 	$: xMax = Math.max(...data.map(d => d[xKey]));
 	$: zDomain = data.map(d => d[zKey]).filter((v, i, a) => a.indexOf(v) === i);
-  $: console.log("zDomain", zDomain);
 	
 	$: xScale = (value) => (value / xMax) * 100;
 	$: data_grouped = groupData(data, yKey);

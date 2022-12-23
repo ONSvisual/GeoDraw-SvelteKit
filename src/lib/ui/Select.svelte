@@ -49,7 +49,7 @@
       geo = await geo_raw.json();
     }
     catch(err) {
-      console.log(err);
+      // console.log(err);
       return {type: null};
     }
 

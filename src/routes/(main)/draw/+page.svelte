@@ -328,7 +328,21 @@ The save data and continue function
       });
   }
 
-  $: console.log('selected', $selected);
+  function updateDrawMode(mode) {
+    let draw_type_new = mode === "move" ? null : mode;
+    if ($draw_type !== draw_type_new) {
+      $draw_type = draw_type_new;
+      state.select = "add";
+    }
+  }
+  $: updateDrawMode(state.mode);
+
+  function updateAddSubtract(select) {
+    $add_mode = select === "add" ? true : false;
+  }
+  $: updateAddSubtract(state.select);
+
+  // $: console.log('selected', $selected);
 </script>
 
 <ONSloader {isLoading} />
@@ -341,11 +355,6 @@ The save data and continue function
         class:active={state.mode == mode.key}
         class:disabled={zoom < zoomstop}
         title={mode.label}
-        on:click={function () {
-          $draw_type = mode.key == 'move' ? null : mode.key;
-          // update the select icons (changing state.select does not trigger an update)
-          document.getElementById('addbutton').click()
-        }}
         use:tooltip
       >
         <input
@@ -354,7 +363,6 @@ The save data and continue function
           name="mode"
           value={mode.key}
           disabled={zoom < zoomstop}
-          
         />
         <Icon type={mode.key} />
       </label>
@@ -417,7 +425,7 @@ The save data and continue function
       disabled={!$selected[$selected.length - 1].oa.size > 0}
       on:click={() =>
         savedata().then((rdir) => {
-          console.warn(rdir);
+          // console.warn(rdir);
           if (rdir) {
             goto(`${base}/build/`);
           } else {
@@ -467,29 +475,26 @@ The save data and continue function
     <div class="select-mode">
       <span>Selection mode </span>
       <label
-        class:active={state.select == 'add'}
+        class:active={state.select === 'add'}
         title="Add to selection"
         use:tooltip
       >
         <input
           type="radio"
-          on:click={() => ($add_mode = true)}
           bind:group={state.select}
-          id ='addbutton'
           name="select"
           value="add"
         />
         <Icon type="select_add" />
       </label>
       <label
-        class:active={state.select == 'subtract'}
+        class:active={state.select === 'subtract'}
         title="Remove from selection"
         use:tooltip
       >
         <input
           type="radio"
           bind:group={state.select}
-          on:click={() => ($add_mode = false)}
           name="select"
           value="subtract"
         />

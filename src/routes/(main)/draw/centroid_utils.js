@@ -138,7 +138,7 @@ class Centroids {
         }
       }
     }
-    console.warn('ssss', {oa,lsoa,msoa,oa_all});
+    // console.warn('ssss', {oa,lsoa,msoa,oa_all});
     return {oa, lsoa, msoa};
   }
 
