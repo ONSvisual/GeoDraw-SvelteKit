@@ -1,9 +1,16 @@
 <script>
+  import { onMount } from "svelte";
   import { base } from "$app/paths";
+  import pym from "pym.js";
   import Select from "$lib/ui/Select.svelte";
   import Icon from "$lib/ui/Icon.svelte";
 
+  let pym_child;
   let code = null;
+
+  onMount(() => {
+    pym_child = new pym.Child({id: 'embed', polling: 1000});
+  });
 </script>
 
 <svelte:head>

@@ -70,8 +70,6 @@
     pym_child = new pym.Child({id: 'embed', polling: 1000});
     pym_child.onMessage('makePNG', makePNG);
     update();
-//     window.onhashchange = update; 
-//     document.addEventListener('hashchange',update)
   });
 </script>
 
