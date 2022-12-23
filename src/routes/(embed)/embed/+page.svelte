@@ -80,6 +80,7 @@
   
 <svelte:head>
   <title>Custom area profile{name ? ` for ${name}` : ''}</title>
+  <meta name="googlebot" content="noindex,indexifembedded" />
 </svelte:head>
 
 {#if tables}

@@ -97,10 +97,12 @@
 	import Select from "./SelectInner.svelte";
 
   const dispatch = createEventDispatcher();
+
+  export let autoClear = true;
+  export let placeholder = "Find an area or postcode";
 	
 	// Data and state for select box
 	let items;
-	const placeholder = "Find an area or postcode";
 	let filterText;
 	
   // Function for select box
@@ -136,5 +138,5 @@
 </script>
 
 {#if items}
-<Select id="select" mode="search" idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} bind:filterText loadOptions={getOptions} on:select={doSelect} autoClear/>
+<Select id="select" mode="search" idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} bind:filterText loadOptions={getOptions} on:select={doSelect} {autoClear}/>
 {/if}

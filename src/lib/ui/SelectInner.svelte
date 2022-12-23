@@ -154,9 +154,12 @@
 	:global(.selectbox.selected .selectedItem) {
 		color: white !important;
 		font-weight: bold;
+    overflow: hidden;
 	}
 	:global(.selectbox .selectedItem .group) {
-		display: none;
+		font-size: smaller;
+    font-weight: normal;
+		opacity: 0.85;
 	}
 	:global(.selectbox .item > .group) {
 		font-size: smaller;
