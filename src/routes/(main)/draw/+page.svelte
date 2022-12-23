@@ -581,6 +581,8 @@ The save data and continue function
         <strong>How to get started</strong><br />
         Zoom in to an area on the map to start drawing, or use the search box above
         to find a ready-made area.
+        <a href="https://digitalblog.ons.gov.uk/2023/01/16/custom-profiles/" target="_blank" rel="noreferrer">Read more</a>
+        <span style:font-size="0.8em" style:margin-left="2px"><Icon type="launch"/></span>
       {:else if state.mode == 'polygon'}
         <strong>Draw a polygon mode</strong>
         <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> {state.select=='add'?'+':'–'}

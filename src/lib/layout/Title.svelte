@@ -1,11 +1,12 @@
 <script>
-  export let title="Build a custom area profile";
-  export let badge="Alpha";
+  export let title = "Build a custom area profile";
+  export let badge = "Beta";
 </script>
 
 <div class="title-block">
 	<h1>{title}</h1>
   {#if badge}
+  <!-- svelte-ignore security-anchor-rel-noreferrer -->
   <a href="https://www.ons.gov.uk/feedback" target="_blank" class="ons-phase-banner__badge">
     <h3>{badge}</h3>
   </a>
