@@ -38,7 +38,7 @@
   }
   main {
     background-color: #F4F7FA;
-    max-width: 680px;
+    max-width: 980px;
     margin: 0 auto;
     padding: 24px;
     font-size: 1rem;

@@ -18,7 +18,7 @@ export default function tooltip(element) {
 			props: {
 				title: title,
 				x: x,
-				y: y,
+				y: y - body.y,
 				width: body.width
 			},
 			target: document.body,

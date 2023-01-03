@@ -7,6 +7,7 @@
     "cellCode": "c_sex",
     "measures": 20100,
     "unit": "people",
+    "base": "all people",
     "categories": [
       {
         "label": "Population",
@@ -22,6 +23,7 @@
     "cellCode": "cell",
     "measures": 20100,
     "unit": "people per square km",
+    "base": "all people",
     "queryExt": "&rural_urban=0",
     "categories": [
       {
@@ -38,6 +40,7 @@
     "cellCode": "c2021_hh_1",
     "measures": 20100,
     "unit": "households",
+    "base": "all households",
     "categories": [
       {
         "label": "Total households",
@@ -53,6 +56,7 @@
     "cellCode": "cell",
     "measures": 20100,
     "unit": "years",
+    "base": "all people",
     "queryExt": "&rural_urban=0",
     "categories": [
       {
@@ -70,6 +74,7 @@
     "cellCode": "c_age",
     "measures": 20100,
     "unit": "%",
+    "base": "all people, 5 year bands",
     "queryExt": "&c_residence_type=0&c_sex=0",
     "categories": [
       {
@@ -155,6 +160,7 @@
     "cellCode": "c_sex",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "Female",
@@ -175,6 +181,7 @@
     "cellCode": "c2021_lpstat_12",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over",
     "categories": [
       {
         "label": "Never married and never registered a civil partnership",
@@ -207,6 +214,7 @@
     "cellCode": "c2021_cob_12",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "Born in the UK",
@@ -227,6 +235,7 @@
     "cellCode": "c2021_pass_18",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "UK passport",
@@ -251,6 +260,7 @@
     "cellCode": "c2021_resuk_6",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "Born in the UK",
@@ -283,6 +293,7 @@
     "cellCode": "c2021_hhsize_10",
     "measures": 20301,
     "unit": "%",
+    "base": "all households",
     "categories": [
       {
         "label": "1 person in household",
@@ -311,6 +322,7 @@
     "cellCode": "c2021_hhcomp_15",
     "measures": 20301,
     "unit": "%",
+    "base": "all households",
     "categories": [
       {
         "label": "One person household",
@@ -335,6 +347,7 @@
     "cellCode": "c2021_dep_6",
     "measures": 20301,
     "unit": "%",
+    "base": "all households",
     "categories": [
       {
         "label": "Household is not deprived in any dimension",
@@ -367,6 +380,7 @@
     "cellCode": "c2021_eth_20",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "Asian, Asian British or Asian Welsh",
@@ -399,18 +413,19 @@
     "cellCode": "c2021_natiduk_17",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "One or more UK identity only",
-        "cells": [1, 2, 3, 4, 5, 9995, 13, 14]
+        "cells": [1, 2, 3, 4, 5, 9995]
       },
       {
         "label": "UK identity and non-UK identity",
-        "cells": [16]
+        "cells": [9997]
       },
       {
         "label": "Non-UK identity only",
-        "cells": [15]
+        "cells": [9996]
       }
     ]
   },
@@ -423,6 +438,7 @@
     "cellCode": "c2021_religion_10",
     "measures": 20301,
     "unit": "%",
+    "base": "all people",
     "categories": [
       {
         "label": "No religion",
@@ -471,6 +487,7 @@
     "cellCode": "c2021_engprf_6",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged three and over",
     "categories": [
       {
         "label": "Main language is English (English or Welsh in Wales)",
@@ -503,6 +520,7 @@
     "cellCode": "c2021_ttwdist_11",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over in employment",
     "categories": [
       {
         "label": "Less than 10km",
@@ -535,6 +553,7 @@
     "cellCode": "c2021_ttwmeth_12",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over in employment",
     "categories": [
       {
         "label": "Work mainly at or from home",
@@ -591,6 +610,7 @@
     "cellCode": "c2021_eastat_20",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over",
     "categories": [
       {
         "label": "Economically active: In employment",
@@ -615,6 +635,7 @@
     "cellCode": "c2021_worked_4",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over not in employment",
     "categories": [
       {
         "label": "Not in employment: Worked in the last 12 months",
@@ -639,6 +660,7 @@
     "cellCode": "c2021_occ_10",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over in employment",
     "categories": [
       {
         "label": "1. Managers, directors and senior officials",
@@ -687,6 +709,7 @@
     "cellCode": "c2021_nssec_10",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over in employment",
     "categories": [
       {
         "label": "L1, L2 and L3: Higher managerial, administrative and professional occupations",
@@ -735,6 +758,7 @@
     "cellCode": "c2021_hours_5",
     "measures": 20301,
     "unit": "%",
+    "base": "people aged 16 and over in employment",
     "categories": [
       {
         "label": "Part-time: 15 hours or less worked",

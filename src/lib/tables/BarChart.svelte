@@ -7,6 +7,7 @@
 	// if less than 1% use decimal formatting
 	export let formatTick = num => num.toFixed(1);
 	export let suffix = "%";
+  export let base = null;
 	export let barHeight = 25;
 	export let markerWidth = 3;
 	
@@ -66,6 +67,9 @@
 	{/each}
 	</div>
 {/each}
+{#if base}
+<small>{base}</small>
+{/if}
 
 <style>
 	.label-group {
@@ -119,4 +123,9 @@
 		display: inline-block;
 		transform: translate(0,3px);
 	}
+  small {
+    display: block;
+    margin-top: 6px;
+    color: #777;
+  }
 </style>

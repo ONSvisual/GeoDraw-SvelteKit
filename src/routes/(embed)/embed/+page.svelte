@@ -100,9 +100,9 @@
           description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark>  in England and Wales`}
         />
         {:else if tab.code === "resident_age"}
-        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name)} />
+        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name)} base="% of {topicsLookup[tab.code].base}" />
         {:else}
-        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name)} />
+        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name)} base="% of {topicsLookup[tab.code].base}" />
         {/if}
       </Card>
     {/each}
@@ -117,7 +117,6 @@
     margin: 0 0 -12px 0;
     font-weight: bold;
   }
-
   h3 {
     font-size: 1.3rem;
     font-weight: bold;

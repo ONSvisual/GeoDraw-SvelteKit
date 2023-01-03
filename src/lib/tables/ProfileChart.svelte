@@ -1,4 +1,6 @@
 <script>
+  import tooltip from "$lib/ui/tooltip";
+
 	export let data;
 	export let xKey = "category";
 	export let yKey = "value";
@@ -6,6 +8,7 @@
 	export let height = 100;
 	export let markerWidth = 2.5;
 	export let minmax = ["0 years", "85+"];
+  export let base = null;
 	
 	function stackData(data, key) {
 		let data_indexed = {};
@@ -51,12 +54,12 @@
 	{#each data_stacked as stack, i}
 	{#if i == 0}
 	{#each stack.values as d, j}
-	<div class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="{(j / xDomain.length) * 100}%" style:width="calc({(1 / xDomain.length) * 100}% + 0.2px)"/>
+	<div use:tooltip title="{d[xKey]}: {d[yKey]}% ({data_stacked[i + 1].values[j][yKey]}%)" class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
 	{/each}
 	
 	{:else}
 	{#each stack.values as d, j}
-	<div class="marker" style:bottom="calc({yScale(d[yKey])}% - {markerWidth / 2}px)" style:height="0px" style:left="{(j / xDomain.length) * 100}%" style:width="{(1 / xDomain.length) * 100}%" style:border-bottom-width="{markerWidth}px"/>
+	<div class="marker" style:bottom="calc({yScale(d[yKey])}% - {markerWidth / 2}px)" style:height="0px" style:left="{(j / xDomain.length) * 100}%" style:width="calc({(1 / xDomain.length) * 100}% - 2px)" style:border-bottom-width="{markerWidth}px"/>
 	{/each}
 	{/if}
 	{/each}
@@ -66,6 +69,10 @@
 	<div style:left="0">{minmax[0]}</div>
 	<div style:right="0">{minmax[1]}</div>
 </div>
+
+{#if base}
+<small>{base}</small>
+{/if}
 
 <style>
 	.bold {
@@ -80,12 +87,13 @@
 	.bar-group, .x-scale {
 		display: block;
 		position: relative;
-		width: 100%;
+		width: calc(100% + 2px);
 	}
 	.x-scale {
 		position: relative;
 		border-top: 1.5px solid #555;
 		font-size: 0.9rem;
+		width: 100%;
 	}
 	.bar-group > div {
 		position: absolute;
@@ -124,4 +132,9 @@
 		height: 1rem;
 		transform: translate(0,3px);
 	}
+  small {
+    display: block;
+    margin-top: 10px;
+    color: #777;
+  }
 </style>
