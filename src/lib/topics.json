@@ -74,7 +74,7 @@
     "cellCode": "c_age",
     "measures": 20100,
     "unit": "%",
-    "base": "all people, 5 year bands",
+    "base": "all people",
     "queryExt": "&c_residence_type=0&c_sex=0",
     "categories": [
       {
