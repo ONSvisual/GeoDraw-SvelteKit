@@ -5,7 +5,7 @@
 		"dev": "vite dev",
 		"debug": "vite dev --debug",
 		"build": "vite build",
-    "build-ons": "set APP_PATH=ons && vite build",
+    "build-ons": "set APP_PATH=ons && vite build && node js-fix",
 		"buildgit": "vite build && cp -r build docs",
 		"start": "vite preview",
 		"deploy": "netlify build && netlify deploy -p",
