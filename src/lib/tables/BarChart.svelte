@@ -13,21 +13,23 @@
 	
 	function groupData(data, key) {
 		let data_indexed = {};
+    let keys = [];
 		for (const d of data) {
 			if (!data_indexed[d[key]]) {
 				data_indexed[d[key]] = {
 					label: d[key],
 					values: []
 				};
+        keys.push(d[key]);
 			}
 			data_indexed[d[key]].values.push(d);
 		}
 		
 		let data_grouped = [];
-		for (const key in data_indexed) {
+		keys.forEach(key => {
 			data_grouped.push(data_indexed[key]);
-		}
-		
+		});
+    
 		return data_grouped;
 	}
 	
