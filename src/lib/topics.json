@@ -16,23 +16,6 @@
     ]
   },
   {
-    "code": "population_density",
-    "label": "Population density (2011)",
-    "desc": "The number of people resident per square kilometre.",
-    "tableCode": "NM_144_1",
-    "cellCode": "cell",
-    "measures": 20100,
-    "unit": "people per square km",
-    "base": "all people",
-    "queryExt": "&rural_urban=0",
-    "categories": [
-      {
-        "label": "Population density",
-        "cells": [7]
-      }
-    ]
-  },
-  {
     "code": "households",
     "label": "Number of households",
     "desc": "The number of households on Census Day, 21 March 2021.",
@@ -45,23 +28,6 @@
       {
         "label": "Total households",
         "cells": [0]
-      }
-    ]
-  },
-  {
-    "code": "median_age",
-    "label": "Median age (2011)",
-    "desc": "The median age of people on Census Day, 21 March 2021.",
-    "tableCode": "NM_145_1",
-    "cellCode": "cell",
-    "measures": 20100,
-    "unit": "years",
-    "base": "all people",
-    "queryExt": "&rural_urban=0",
-    "categories": [
-      {
-        "label": "Median age",
-        "cells": [18]
       }
     ]
   },
@@ -512,6 +478,197 @@
     ]
   },
   {
+    "code": "accommodation_type",
+    "label": "Accommodation type",
+    "desc": "The type of buildings people live in.",
+    "url": "housingvariablescensus2021/accommodationtype",
+    "tableCode": "NM_2062_1",
+    "cellCode": "c2021_acctype_9",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "Whole house or bungalow",
+        "cells": [1, 2, 3]
+      },
+      {
+        "label": "Flat, maisonette or apartment",
+        "cells": [4, 5, 6, 7]
+      },
+      {
+        "label": "A caravan or other mobile or temporary structure",
+        "cells": [8]
+      }
+    ]
+  },
+  {
+    "code": "number_of_cars",
+    "label": "Number of cars or vans",
+    "desc": "Cars or vans owned or available for use by a household.",
+    "url": "housingvariablescensus2021/numberofcarsorvans",
+    "tableCode": "NM_2063_1",
+    "cellCode": "c2021_cars_5",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "No cars or vans in household",
+        "cells": [1]
+      },
+      {
+        "label": "1 car or van in household",
+        "cells": [2]
+      },
+      {
+        "label": "2 cars or vans in household",
+        "cells": [3]
+      },
+      {
+        "label": "3 or more cars or vans in household",
+        "cells": [4]
+      }
+    ]
+  },
+  {
+    "code": "heating_type",
+    "label": "Central heating",
+    "desc": "The type of central heating in a household.",
+    "url": "housingvariablescensus2021/typeofcentralheatinginhousehold",
+    "tableCode": "NM_2064_1",
+    "cellCode": "c2021_heating_13",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "Does not have central heating",
+        "cells": [1]
+      },
+      {
+        "label": "Does have central heating",
+        "cells": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      }
+    ]
+  },
+  {
+    "code": "number_bedrooms",
+    "label": "Number of bedrooms",
+    "desc": "The number of bedrooms in a household.",
+    "url": "housingvariablescensus2021/numberofbedrooms",
+    "tableCode": "NM_2068_1",
+    "cellCode": "c2021_bedrooms_5",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "1 bedroom",
+        "cells": [1]
+      },
+      {
+        "label": "2 bedrooms",
+        "cells": [2]
+      },
+      {
+        "label": "3 bedrooms",
+        "cells": [3]
+      },
+      {
+        "label": "4 or more bedrooms",
+        "cells": [4]
+      }
+    ]
+  },
+  {
+    "code": "occupancy_rating_bedrooms",
+    "label": "Occupancy rating for bedrooms",
+    "desc": "Whether homes are overcrowded, ideally occupied or under-occupied, based on bedrooms.",
+    "url": "housingvariablescensus2021/occupancyratingforbedrooms",
+    "tableCode": "NM_2070_1",
+    "cellCode": "c2021_occrat_bedrooms_6",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "+2 or more",
+        "cells": [1]
+      },
+      {
+        "label": "+1",
+        "cells": [2]
+      },
+      {
+        "label": "0",
+        "cells": [3]
+      },
+      {
+        "label": "-1",
+        "cells": [4]
+      },
+      {
+        "label": "-2 or more",
+        "cells": [5]
+      }
+    ]
+  },
+  {
+    "code": "hh_tenure",
+    "label": "Tenure of household",
+    "desc": "Whether a household owns or rents.",
+    "url": "housingvariablescensus2021/tenureofhousehold",
+    "tableCode": "NM_2072_1",
+    "cellCode": "c2021_tenure_9",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "Owns outright",
+        "cells": [1]
+      },
+      {
+        "label": "Owns with a mortgage or loan or shared ownership",
+        "cells": [2, 3]
+      },
+      {
+        "label": "Social rented",
+        "cells": [4, 5]
+      },
+      {
+        "label": "Private rented or lives rent free",
+        "cells": [6, 7]
+      }
+    ]
+  },
+  {
+    "code": "alternative_address_indicator",
+    "label": "Second address indicator",
+    "desc": "An address (in or out of the UK) a person stays at for more than 30 days per year that isn't their place of usual residence.",
+    "url": "housingvariablescensus2021/secondaddressindicator",
+    "tableCode": "NM_2074_1",
+    "cellCode": "c2021_2addr_4",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all households",
+    "categories": [
+      {
+        "label": "No second address",
+        "cells": [1]
+      },
+      {
+        "label": "Second address is in the UK",
+        "cells": [2]
+      },
+      {
+        "label": "Second address is outside the UK",
+        "cells": [3]
+      }
+    ]
+  },
+  {
     "code": "workplace_travel",
     "label": "Distance travelled to work",
     "desc": "The distance between home and work, in kilometres.",
@@ -702,14 +859,14 @@
   },
   {
     "code": "ns_sec",
-    "label": "NS-SeC",
+    "label": "Socio-economic Classification (NS-SeC)",
     "desc": "People's socioeconomic position based on their occupation and other job characteristics.",
-    "url": "labourmarketvariablescensus2021/occupationcurrent",
+    "url": "labourmarketvariablescensus2021/nationalstatisticssocio-economicclassificationns-sec",
     "tableCode": "NM_2079_1",
     "cellCode": "c2021_nssec_10",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over in employment",
+    "base": "people aged 16 and over",
     "categories": [
       {
         "label": "L1, L2 and L3: Higher managerial, administrative and professional occupations",
