@@ -4,8 +4,12 @@
 	export let suffix = "";
 	export let unit = null;
 	export let description = null;
-	export let format = d => d;
+	export let format = d => d.toLocaleString('en-GB');
 	export let highlightColor = "lightgrey";
+
+  $: rounded = value > 1000 ? `Numbers to the nearest 100 ${unit}` :
+    value > 100 ? `Number to the nearest 10 ${unit} (100 for England and Wales)` :
+    null;
 </script>
 
 <div class="num-big">{prefix}{format(value)}{suffix}</div>
@@ -14,6 +18,9 @@
 {/if}
 {#if description}
 <div class="num-desc" style="--highlightColor: {highlightColor}">{@html description}</div>
+{/if}
+{#if rounded}
+<small>{rounded}</small>
 {/if}
 
 <style>
@@ -34,7 +41,7 @@
 	.num-desc {
 		display: block;
 		margin-top: 18px;
-		color: #666;
+		color: #555;
 		line-height: 1.6;
 	}
 	:global(.num-desc mark) {
@@ -42,4 +49,10 @@
 		background-color: var(--highlightColor, lightgrey);
 		padding: 0 4px;
 	}
+  small {
+    font-size: 0.8em;
+    display: block;
+    margin-top: 6px;
+    color: #777;
+  }
 </style>

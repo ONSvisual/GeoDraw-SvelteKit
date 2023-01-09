@@ -47,7 +47,7 @@
         }
       }
 
-      name = props.name;
+      name = props.name ? props.name : "Selected area";
       geojson = props.poly;
       population = props.population;
       tables = props.tabs;
@@ -82,7 +82,9 @@
 </svelte:head>
 
 {#if tables}
-  <h1>{name ? name : ''}</h1>
+  {#if name && name !== "Selected area"}
+  <h1>{name}</h1>
+  {/if}
   <Cards>
     {#if geojson}
       <Card title="Area map">
@@ -95,9 +97,9 @@
       <Card title={topicsLookup[tab.code].label}>
         {#if ["population", "households", "population_density", "median_age"].includes(tab.code)}
         <BigNumber
-          value={tab.data[0].toLocaleString('en-GB')}
+          value={tab.data[0]}
           unit={topicsLookup[tab.code].unit}
-          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark>  in England and Wales`}
+          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in England and Wales`}
         />
         {:else if tab.code === "resident_age"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name)} base="% of {topicsLookup[tab.code].base}" />
@@ -108,7 +110,7 @@
     {/each}
   </Cards>
 
-  <span class="footnote">Source: Census 2021, Office for National Statistics</span>
+  <span class="footnote">Source: Office for National Statistics - Census 2021</span>
 {/if}
 
 <style>

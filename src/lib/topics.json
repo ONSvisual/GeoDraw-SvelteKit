@@ -147,7 +147,7 @@
     "cellCode": "c2021_lpstat_12",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over",
+    "base": "people aged 16 years and over",
     "categories": [
       {
         "label": "Never married and never registered a civil partnership",
@@ -453,7 +453,7 @@
     "cellCode": "c2021_engprf_6",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged three and over",
+    "base": "people aged three years and over",
     "categories": [
       {
         "label": "Main language is English (English or Welsh in Wales)",
@@ -677,7 +677,7 @@
     "cellCode": "c2021_ttwdist_11",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over in employment",
+    "base": "people aged 16 years and over in employment",
     "categories": [
       {
         "label": "Less than 10km",
@@ -710,7 +710,7 @@
     "cellCode": "c2021_ttwmeth_12",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over in employment",
+    "base": "people aged 16 years and over in employment",
     "categories": [
       {
         "label": "Work mainly at or from home",
@@ -767,7 +767,7 @@
     "cellCode": "c2021_eastat_20",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over",
+    "base": "people aged 16 years and over",
     "categories": [
       {
         "label": "Economically active: In employment",
@@ -792,7 +792,7 @@
     "cellCode": "c2021_worked_4",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over not in employment",
+    "base": "people aged 16 years and over not in employment",
     "categories": [
       {
         "label": "Not in employment: Worked in the last 12 months",
@@ -817,7 +817,7 @@
     "cellCode": "c2021_occ_10",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over in employment",
+    "base": "people aged 16 years and over in employment",
     "categories": [
       {
         "label": "1. Managers, directors and senior officials",
@@ -866,7 +866,7 @@
     "cellCode": "c2021_nssec_10",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over",
+    "base": "people aged 16 years and over",
     "categories": [
       {
         "label": "L1, L2 and L3: Higher managerial, administrative and professional occupations",
@@ -915,7 +915,7 @@
     "cellCode": "c2021_hours_5",
     "measures": 20301,
     "unit": "%",
-    "base": "people aged 16 and over in employment",
+    "base": "people aged 16 years and over in employment",
     "categories": [
       {
         "label": "Part-time: 15 hours or less worked",

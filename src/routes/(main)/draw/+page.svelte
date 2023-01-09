@@ -45,7 +45,7 @@
     mode: 'move',
     radius: 5,
     select: 'add',
-    name: 'Area Name',
+    name: '',
     showSave: false,
     topics: [],
     topicsExpand: false,
@@ -287,7 +287,7 @@
               ? props.areanm
               : props && props.name
               ? props.name
-              : 'Area Name';
+              : '';
           setDrawData();
         }
       };
@@ -401,7 +401,7 @@ The save data and continue function
       use:tooltip
       on:click={() => {
         newselect();
-        state.name = 'Area Name';
+        state.name = '';
       }}
     >
       <Icon type="clear" />
@@ -444,13 +444,13 @@ The save data and continue function
   <nav class="tray">
     <div />
     <div class="save-buttons">
-      <input type="text" bind:value={state.name} placeholder="Type a name" />
+      <input type="text" bind:value={state.name} placeholder="Type your area name" />
       <button
         class="text"
         on:click={async () => {
           let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
           let blob = geo_blob(data);
-          download(blob, state.name.replace(' ', '_') + '.json');
+          download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
         }}>
         <Icon type="download" /><span>Save geography</span>
       </button>

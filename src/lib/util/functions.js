@@ -15,6 +15,8 @@ export function clip(str, msg) {
   navigator.clipboard.writeText(str).then(() => alert(msg));
 }
 
-
+export function capitalise(str) {
+  return str[0].toUpperCase() + str.slice(1);
+}
 // export json2blob = functio
 // var file = new Blob([text], {type: type});

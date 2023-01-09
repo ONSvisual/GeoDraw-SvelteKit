@@ -55,9 +55,11 @@
 {#each data_grouped as group}
 	<div class="label-group">
 		{group.label}
-		{#each group.values as d, i}
-		<span class="label {i == 0 ? 'bold' : 'sml brackets'}">{formatTick(d[xKey])}{suffix}</span>
-		{/each}
+    <span class="nowrap">
+      {#each group.values as d, i}
+      <span class="label {i == 0 ? 'bold' : 'sml brackets'}">{formatTick(d[xKey])}{suffix}</span>
+      {/each}
+    </span>
 	</div>
 	<div class="bar-group" style:height="{barHeight}px">
 	{#each group.values as d, i}
@@ -129,5 +131,8 @@
     display: block;
     margin-top: 6px;
     color: #777;
+  }
+  .nowrap {
+    white-space: nowrap;
   }
 </style>
