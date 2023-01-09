@@ -128,6 +128,7 @@
 		transform: translate(0,3px);
 	}
   small {
+    font-size: 0.8em;
     display: block;
     margin-top: 6px;
     color: #777;
