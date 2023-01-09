@@ -7,8 +7,8 @@
 	export let format = d => d.toLocaleString('en-GB');
 	export let highlightColor = "lightgrey";
 
-  $: rounded = value > 1000 ? `Numbers to the nearest 100 ${unit}` :
-    value > 100 ? `Number to the nearest 10 ${unit} (100 for England and Wales)` :
+  $: rounded = value > 1000 ? `Rounded to the nearest 100 ${unit}` :
+    value > 100 ? `Rounded to the nearest 10 ${unit} (100 for England and Wales)` :
     null;
 </script>
 
