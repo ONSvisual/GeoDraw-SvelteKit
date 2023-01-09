@@ -908,7 +908,7 @@
   },
   {
     "code": "hours_per_week_worked",
-    "label": "Hours worked",
+    "label": "Hours per week worked",
     "desc": "The number of hours people work per week.",
     "url": "labourmarketvariablescensus2021/hoursworked",
     "tableCode": "NM_2076_1",
