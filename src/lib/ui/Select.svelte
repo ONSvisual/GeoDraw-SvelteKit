@@ -100,6 +100,7 @@
 
   export let autoClear = true;
   export let placeholder = "Find an area or postcode";
+  export let listMaxHeight = 250;
 	
 	// Data and state for select box
 	let items;
@@ -138,5 +139,5 @@
 </script>
 
 {#if items}
-<Select id="select" mode="search" idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} bind:filterText loadOptions={getOptions} on:select={doSelect} {autoClear}/>
+<Select id="select" mode="search" idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} {listMaxHeight} bind:filterText loadOptions={getOptions} on:select={doSelect} {autoClear}/>
 {/if}

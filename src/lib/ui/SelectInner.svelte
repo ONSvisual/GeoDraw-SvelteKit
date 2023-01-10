@@ -22,6 +22,7 @@
 	export let loadOptions = undefined;
 	export let fontSize = "1em";
 	export let height = 42;
+  export let listMaxHeight = 250;
 	export let isMulti = false;
 	export let maxSelected = 4;
 	export let colors = ["#206095", "#a8bd3a", "#871a5b", "#27a0cc"];
@@ -73,6 +74,7 @@
 	
 	onMount(() => {
 		let style = el.style;
+		style.setProperty("--listMaxHeight", `${listMaxHeight}px`);
 		style.setProperty("--firstItem", colors[0 % colors.length]);
 		style.setProperty("--secondItem", colors[1 % colors.length]);
 		style.setProperty("--thirdItem", colors[2 % colors.length]);
