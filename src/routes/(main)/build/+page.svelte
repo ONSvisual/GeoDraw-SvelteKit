@@ -291,7 +291,7 @@
     />
     {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i (topic.code)}
     <div animate:flip={{duration: 250}} style:z-index={state.topics.includes(topic) ? 10 : 0}>
-      <TopicItem {topic} {regex} show={i < 6 || state.topicsExpand}>
+      <TopicItem {topic} {regex} show={state.topics.includes(topic) || i < 6 || state.topicsExpand}>
         <input
           type="checkbox"
           bind:group={state.topics}
@@ -303,7 +303,7 @@
     {/each}
     {#if !regex}
       <button class="btn-link" style:margin="6px 0" on:click={() => (state.topicsExpand = !state.topicsExpand)}>
-        {state.topicsExpand ? 'Show fewer' : `Show ${topics.length - 6} more`}
+        {state.topicsExpand ? 'Show fewer' : `Show ${state.topics.length > 6 ? topics.length - state.topics.length : topics.length - 6} more`}
       </button>
     {/if}
   </aside>

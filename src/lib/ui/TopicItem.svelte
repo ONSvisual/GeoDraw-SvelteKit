@@ -28,11 +28,23 @@
 
 {#if show && showInfo}
 <div class="topic-info">
-{topic.desc}
-{#if topic.url}
-<!-- svelte-ignore security-anchor-rel-noreferrer -->
-<a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}" target="_blank">Read more</a>
-{/if}
+  <p>
+    {topic.desc}
+    {#if topic.url}
+    <!-- svelte-ignore security-anchor-rel-noreferrer -->
+    <a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}" target="_blank">Read more</a>
+    {/if}
+  </p>
+  {#if topic.caveat_text}
+  <p>
+    <span class="inline-icon"><Icon type="error"/></span>
+    {topic.caveat_text}
+    {#if topic.caveat_url}
+    <!-- svelte-ignore security-anchor-rel-noreferrer -->
+    <a href="https://www.ons.gov.uk/{topic.caveat_url}" target="_blank">Read more</a>
+    {/if}
+  </p>
+  {/if}
 </div>
 {/if}
 
@@ -69,5 +81,16 @@
   }
   .topic-toggle:focus {
     outline: 2px solid orange;
+  }
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 16px;
+  }
+  .inline-icon {
+    display: inline-block;
+    transform: translateY(3px);
+    margin-right: 3px;
   }
 </style>
