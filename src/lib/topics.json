@@ -952,5 +952,59 @@
         "cells": [4]
       }
     ]
+  },
+  {
+    "code": "highest_qualification",
+    "label": "Highest level of qualification",
+    "desc": "The highest level of qualification a person has reported.",
+    "url": "educationvariablescensus2021/highestlevelofqualification",
+    "tableCode": "NM_2084_1",
+    "cellCode": "c2021_hiqual_8",
+    "measures": 20301,
+    "unit": "%",
+    "base": "people aged 16 years and over",
+    "categories": [
+      {
+        "label": "No qualifications",
+        "cells": [1]
+      },
+      {
+        "label": "Level 1, 2 or 3 qualifications",
+        "cells": [2, 3, 5]
+      },
+      {
+        "label": "Apprenticeship",
+        "cells": [4]
+      },
+      {
+        "label": "Level 4 qualifications and above",
+        "cells": [6]
+      },
+      {
+        "label": "Other qualifications",
+        "cells": [7]
+      }
+    ]
+  },
+  {
+    "code": "in_full_time_education",
+    "label": "Schoolchildren and full-time students",
+    "desc": "People in full-time education.",
+    "url": "educationvariablescensus2021/schoolchildorfull-timestudentindicator",
+    "tableCode": "NM_2085_1",
+    "cellCode": "c2021_student_3",
+    "measures": 20301,
+    "unit": "%",
+    "base": "people aged five years and over",
+    "categories": [
+      {
+        "label": "Student",
+        "cells": [1]
+      },
+      {
+        "label": "Not a student",
+        "cells": [2]
+      }
+    ]
   }
 ]

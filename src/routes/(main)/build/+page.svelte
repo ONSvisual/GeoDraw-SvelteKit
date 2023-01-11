@@ -191,9 +191,9 @@
 
   function makeEmbed(embed_hash) {
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
-    return `<div id="profile"></div>
+    return `<div id="custom-profile"></div>
 <script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
-<script>var pymParent = new pym.Parent("profile", "${url}", {name: "profile"});<\/script>`;
+<script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile"});<\/script>`;
   }
 
   async function downloadData() {
@@ -290,7 +290,7 @@
       bind:value={state.topicsFilter}
     />
     {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i (topic.code)}
-    <div animate:flip={{duration: 250}} style:z-index={state.topics.includes(topic) ? 10 : 0}>
+    <div animate:flip={{duration: 500}} style:z-index={state.topics.includes(topic) ? 10 : 0}>
       <TopicItem {topic} {regex} show={state.topics.includes(topic) || i < 6 || state.topicsExpand}>
         <input
           type="checkbox"

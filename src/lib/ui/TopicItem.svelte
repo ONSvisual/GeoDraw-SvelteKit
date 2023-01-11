@@ -4,6 +4,7 @@
   export let topic; // Topic of this item
   export let regex;
   export let show;
+  export let hovered = false;
 
   let showInfo = false;
 
@@ -21,8 +22,10 @@
     class="topic-toggle"
     title="{showInfo ? 'Hide' : 'Show'} description for {topic.label}"
     on:click={() => showInfo = !showInfo}
+    on:mouseenter={() => hovered = true}
+    on:mouseleave={() => hovered = false}
     >
-    <Icon type="info"/>
+    <Icon type="info" scale={hovered ? 1.2 : 1}/>
   </button>
 </div>
 
