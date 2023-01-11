@@ -209,7 +209,7 @@
       'en-GB',
       {year: 'numeric', month: 'short', day: 'numeric'}
     )}"\n`;
-    csv += `"The data in this table is aggregated from small area data on a best-fit basis. The values may vary slightly from published ONS datasets."\n\n`;
+    csv += `"The data in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources."\n\n`;
     csv += `"Variable","Category","${getName("capitalise")}","England and Wales","Unit","Base population"\n`;
 
     tables.forEach((t) => {
@@ -319,7 +319,7 @@
 
     <div id="embed" />
     <Notice>
-      The data displayed in this profile is aggregated from small area data on a best-fit basis. The values and boundaries may vary slightly from published ONS datasets.
+      The data and boundaries displayed in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources.
     </Notice>
     <div class="embed-actions">
       <button class="btn-link" on:click={() => {
