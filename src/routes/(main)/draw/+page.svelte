@@ -28,6 +28,7 @@
     minzoom,
     maxzoom,
   } from './mapstore.js';
+  import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 
   const modelist = [
@@ -181,6 +182,12 @@
               data.properties.areanm ? data.properties.areanm :
               data.properties.areacd;
             setDrawData();
+
+            analyticsEvent({
+              event: "hashSelect",
+              areaCode: data.properties.areacd,
+              areaName: state.name
+            });
           });
         }
         catch {
@@ -289,6 +296,7 @@
               ? props.name
               : '';
           setDrawData();
+          analyticsEvent({event: "geoUpload", areaName: state.name});
         }
       };
       reader.readAsText(file);
@@ -451,17 +459,19 @@ The save data and continue function
           let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
           let blob = geo_blob(data);
           download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
+          analyticsEvent({event: "geoDownload", areaName: state.name});
         }}>
         <Icon type="download" /><span>Save geography</span>
       </button>
       <button
         class="text"
-        on:click={() =>
+        on:click={() => {
           clip(
             Array.from($selected[$selected.length - 1].oa).join(','),
             'Copied output area codes to clipboard'
-          )}
-      >
+          );
+          analyticsEvent({event: "geoCopy", areaName: state.name});
+        }}>
         <Icon type="copy" /><span>Copy area codes</span>
       </button>
     </div>

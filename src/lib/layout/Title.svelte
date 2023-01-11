@@ -1,13 +1,13 @@
 <script>
   export let title = "Build a custom area profile";
-  export let badge = "Beta";
+  export let badge = "Alpha";
 </script>
 
 <div class="title-block">
 	<h1>{title}</h1>
   {#if badge}
   <!-- svelte-ignore security-anchor-rel-noreferrer -->
-  <a href="https://www.ons.gov.uk/feedback" target="_blank" class="ons-phase-banner__badge" title="This is a new service. Share your feedback">
+  <a href="https://www.surveymonkey.co.uk/r/2SGF6X2" target="_blank" class="ons-phase-banner__badge" title="This is a new service. Share your feedback">
     <h3>{badge}</h3>
   </a>
   {/if}

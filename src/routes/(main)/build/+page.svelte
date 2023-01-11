@@ -14,6 +14,7 @@
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import {centroids} from '../draw/mapstore.js';
+  import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
   let isLoading = false;
   let pym_parent; // Variabl for pym
   let embed_hash; // Variable for embed hash string
@@ -96,10 +97,15 @@
               ? data.properties.hclnm
               : data.properties.areanm
               ? data.properties.areanm
-              : data.properties.areacd,
+              : code,
           },
         };
         localStorage.setItem('onsbuild', JSON.stringify(info));
+        analyticsEvent({
+          event: "hashSelect",
+          areaCode: code,
+          areaName: info.properties.name
+        });
       } catch (err) {
         // console.warn(err);
         alert(`Requested GSS code ${code} is unavailable or invalid.`);
@@ -218,6 +224,7 @@
 
     var file = new Blob([csv], {type: 'text/csv'});
     download(file, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area_data'}.csv`);
+    analyticsEvent({event: "dataDownload", areaName: state.name});
   }
 </script>
 
@@ -255,6 +262,7 @@
         on:click={async () => {
           let blob = geo_blob(store);
           download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
+          analyticsEvent({event: "geoDownload", areaName: state.name});
         }}
       >
         <Icon type="download" /><span>Save geography</span>
@@ -264,8 +272,7 @@
         on:click={() => {
           var codes = store.properties.oa_all.join(',');
           clip(codes, 'Copied output area codes to clipboard');
-          // console.log(codes);
-          // console.log('codes copied to clipboard');
+          analyticsEvent({event: "geoCopy", areaName: state.name});
         }}
       >
         <Icon type="copy" /><span>Copy area codes</span>
@@ -315,7 +322,10 @@
       The data displayed in this profile is aggregated from small area data on a best-fit basis. The values and boundaries may vary slightly from published ONS datasets.
     </Notice>
     <div class="embed-actions">
-      <button class="btn-link" on:click={() => pym_parent.sendMessage('makePNG', null)}>
+      <button class="btn-link" on:click={() => {
+        pym_parent.sendMessage('makePNG', null);
+        analyticsEvent({event: "imageDownload", areaName: state.name});
+      }}>
         Save as image (PNG)
       </button> |
       <button class="btn-link"
@@ -342,7 +352,10 @@
         <p style:margin-bottom={0}>Embed code</p>
         <textarea rows="4" readonly>{makeEmbed(embed_hash)}</textarea>
         <button class="copy-embed"
-          on:click={() => clip(makeEmbed(embed_hash), 'Copied embed code to clipboard')}>
+          on:click={() => {
+            clip(makeEmbed(embed_hash), 'Copied embed code to clipboard');
+            analyticsEvent({event: "embed", areaName: state.name});
+          }}>
           <Icon type="copy"/>
           <span>Copy embed code</span>
         </button>

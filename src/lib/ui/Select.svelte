@@ -1,5 +1,6 @@
 <script context="module">
   import { csvParse, autoType } from "d3-dsv";
+  import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
   import Pbf from "pbf";
   import vt from "@mapbox/vector-tile";
   import tb from "@mapbox/tilebelt";
@@ -8,6 +9,9 @@
 	// Config for places data
   const baseurl = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1";
   const geotypes = [
+    {keys: ["E00", "W00"], label: "Output area"},
+    {keys: ["E01", "W01"], label: "LSOA"},
+    {keys: ["E02", "W02"], label: "MSOA"},
     {keys: ["E04", "W04"], label: "Parish"},
     {keys: ["E05", "W05"], label: "Ward"},
     {keys: ["E06", "W06"], label: "Unitary authority"},
@@ -20,8 +24,11 @@
     {keys: ["E34", "K05", "W37"], label: "Built-up area"},
     {keys: ["E35", "K06", "W38"], label: "Built-up area, sub-division"}
   ];
-  let geotypes_lookup = {};
-  geotypes.forEach(g => g.keys.forEach(k => geotypes_lookup[k] = g.label));
+  export const geotypes_lookup = (() => {
+    let lookup = {};
+    geotypes.forEach(g => g.keys.forEach(k => lookup[k] = g.label));
+    return lookup;
+  })();
 
 	async function getData(url) {
     let res = await fetch(url);
@@ -53,14 +60,23 @@
       return {type: null};
     }
 
-    return {
+    let place = {
       type: 'place',
-      areanm: geo.properties.areanm,
+      areanm: geo.properties.areanm ? geo.properties.areanm : geo.properties.areacd,
       areacd: geo.properties.areacd,
       geometry: geo.geometry,
       bbox: geo.properties.bounds,
       codes: geo.properties.codes
     };
+
+    analyticsEvent({
+      event: "searchSelect",
+      areaCode: place.areacd,
+      areaName: place.areanm,
+      areaType: geotypes_lookup[place.areacd.slice(0, 3)]
+    });
+
+    return place;
 	}
 
   export async function getOAfromLngLat(lng, lat) {

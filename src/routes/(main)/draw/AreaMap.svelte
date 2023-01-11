@@ -4,7 +4,7 @@
 
 <style>
   #mapcontainer {
-    position: fixed;
+    position: absolute;
     top: 142px;
     bottom: 0;
     width: 100%;

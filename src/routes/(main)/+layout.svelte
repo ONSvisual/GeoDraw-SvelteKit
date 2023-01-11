@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
   import { centroids } from './draw/mapstore.js';
   import { GetCentroids } from './draw/centroid_utils.js';
+  import AnalyticsBanner from '$lib/layout/AnalyticsBanner.svelte';
   import ONSHeader from '$lib/layout/ONSHeader.svelte';
   import Title from '$lib/layout/Title.svelte';
 
@@ -18,6 +19,15 @@
 
   let path = $page.url.pathname;
   // console.warn('path', path);
+
+  // GOOGLE ANALYTICS
+  // Settings for page analytics. Values must be shared with <AnalyticsBanner> component
+  const analyticsId = "GTM-MBCBVQS";
+  const analyticsProps = {
+    "contentTitle": "Build a custom area profile",
+    "releaseDate": "20230117",
+    "contentType": "exploratory"
+  };
 </script>
 
 <svelte:head>
@@ -30,9 +40,9 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta property="og:description" content="Create your own profile for local areas in England and Wales using Census 2021 data." />
 	<meta name="description" content="Create your own profile for local areas in England and Wales using Census 2021 data. Data topics include population, age, sex, ethnicity, religion, the work people do, and the homes they live in." />
-
 </svelte:head>
 
+<AnalyticsBanner {analyticsId} {analyticsProps}/>
 <main>
   <header>
     <ONSHeader />
