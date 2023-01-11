@@ -4,12 +4,12 @@
   }
 </script>
 <script>
-  import { onMount } from "svelte"
+  import { onMount } from "svelte";
+  import { page } from "$app/stores";
 
   export let analyticsId; // Required. Google analytics/tag manager ID
   export let analyticsProps = {}; // Optional props to describe the content
   export let usageCookies = false; // True if usage cookies are allowed (to be read from parent component)
-  export let page = null; // Pass Svelte Kit's $page to track navigation in multi-page apps
 
   let live; // Don't run analytics unless page is live on ONS site (re-set in the onMount function)
   let initialised = false;
@@ -73,7 +73,7 @@
 
   // This code is only relevant for multi-page Svelte Kit apps. It sends an analytics event when the URL changes
   function pageView(page) {
-    let newlocation = page.url.href;
+    let newlocation = page.url.hostname + page.url.pathname + page.url.searchParams;
     if (newlocation !== location) {
       location = newlocation;
 
