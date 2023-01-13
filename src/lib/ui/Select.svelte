@@ -21,7 +21,7 @@
     {keys: ["E11"], label: "Metropolitan county"},
     {keys: ["E14", "W07"], label: "Parliamentary constituency"},
     {keys: ["E30", "K01", "W22"], label: "Travel to work area"},
-    {keys: ["E34", "K05", "W37"], label: "Built-up area"},
+    {keys: ["E34", "K05", "W37", "E63", "K08", "W45"], label: "Built-up area"},
     {keys: ["E35", "K06", "W38"], label: "Built-up area, sub-division"}
   ];
   export const geotypes_lookup = (() => {
