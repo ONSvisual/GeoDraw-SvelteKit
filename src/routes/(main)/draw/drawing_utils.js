@@ -33,16 +33,21 @@ function cursor () {
   const dt = get (draw_type);
 
   // if (de | dt === undefined ){document.querySelector('#mapcontainer div canvas').style.cursor = 'no-drop';}
-
-  switch (dt) {
-    case 'select':
-      document.querySelector ('#mapcontainer div canvas').style.cursor = 'auto';
-      break;
-    case 'move':
-      document.querySelector ('#mapcontainer div canvas').style.cursor = 'grab';
-      break;
-    default:
-      document.querySelector ('#mapcontainer div canvas').style.cursor = 'auto';
+  let canvas = document.querySelector ('#mapcontainer div canvas');
+  if (canvas) {  
+    switch (dt) {
+      case 'select':
+        canvas.style.cursor = 'auto';
+        break;
+      case 'polygon':
+        canvas.style.cursor = 'crosshair';
+        break;
+      case 'radius':
+        canvas.style.cursor = 'crosshair';
+        break;
+      default:
+        canvas.style.cursor = 'grab';
+    }
   }
 }
 

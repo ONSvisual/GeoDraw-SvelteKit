@@ -18,7 +18,7 @@ function u(x){
 
 // Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
 function filterGeo(geojson, area_sqm) {
-  const filterByArea = (coords) => area({type: "Polygon", coordinates: [coords]}) > (area_sqm / 500);
+  const filterByArea = (coords) => area({type: "Polygon", coordinates: [coords]}) > (area_sqm / 1000);
   if (geojson.geometry.type === "Polygon") {
     geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => filterByArea(coords));
   }
@@ -206,7 +206,7 @@ class Centroids {
       resolve(dissolved);
     }));
 
-    console.debug ('---merge---', merge);
+    // console.debug ('---merge---', merge);
     return merge;
   }
 

@@ -262,6 +262,7 @@
         on:click={async () => {
           let blob = geo_blob(store);
           download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
+          state.showSave = false;
           analyticsEvent({event: "geoDownload", areaName: state.name});
         }}
       >
@@ -272,6 +273,7 @@
         on:click={() => {
           var codes = store.properties.oa_all.join(',');
           clip(codes, 'Copied output area codes to clipboard');
+          state.showSave = false;
           analyticsEvent({event: "geoCopy", areaName: state.name});
         }}
       >

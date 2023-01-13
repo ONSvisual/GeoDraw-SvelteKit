@@ -139,7 +139,7 @@
         : 0;
 
       // if (!items.oa.size) return;
-      console.debug('---recolour', items);
+      // console.debug('---recolour', items);
       if ($mapobject.getLayer('bounds'))
         $mapobject.setPaintProperty('bounds', 'fill-color', [
           'match',
@@ -459,6 +459,7 @@ The save data and continue function
           let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
           let blob = geo_blob(data);
           download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
+          state.showSave = false;
           analyticsEvent({event: "geoDownload", areaName: state.name});
         }}>
         <Icon type="download" /><span>Save geography</span>
@@ -470,6 +471,7 @@ The save data and continue function
             Array.from($selected[$selected.length - 1].oa).join(','),
             'Copied output area codes to clipboard'
           );
+          state.showSave = false;
           analyticsEvent({event: "geoCopy", areaName: state.name});
         }}>
         <Icon type="copy" /><span>Copy area codes</span>
@@ -591,7 +593,7 @@ The save data and continue function
         <strong>How to get started</strong><br />
         Zoom in to an area on the map to start drawing, or use the search box above
         to find a ready-made area.
-        <a href="https://digitalblog.ons.gov.uk/2023/01/17/custom-profiles/" target="_blank" rel="noreferrer">Read more</a>
+        <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/articles/buildacustomareaprofile/2023-01-17" target="_blank" rel="noreferrer">Read more</a>
         <span style:font-size="0.8em" style:margin-left="2px"><Icon type="launch"/></span>
       {:else if state.mode == 'polygon'}
         <strong>Draw a polygon mode</strong>
