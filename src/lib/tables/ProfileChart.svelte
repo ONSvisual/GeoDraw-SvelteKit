@@ -5,6 +5,7 @@
 	export let xKey = "category";
 	export let yKey = "value";
 	export let zKey = "areanm";
+  export let formatTick = num => num.toFixed(1);
 	export let height = 100;
 	export let markerWidth = 2.5;
 	export let minmax = ["0 years", "85+"];
@@ -55,7 +56,7 @@
 	{#each data_stacked as stack, i}
 	{#if i == 0}
 	{#each stack.values as d, j}
-	<div use:tooltip title="{d[xKey]}: {d[yKey]}% ({data_stacked[i + 1].values[j][yKey]}%)" class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
+	<div use:tooltip title="{d[xKey]}: {formatTick(d[yKey])}% ({formatTick(data_stacked[i + 1].values[j][yKey])}%)" class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
 	{/each}
 	
 	{:else}
