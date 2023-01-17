@@ -19,7 +19,7 @@
 
 <main>
   <h2>Find your area</h2>
-  <label for="search">Find a ready-made area to start building your custom profile. Available areas include local authorities, wards, parishes and parliamentary constituences.</label>
+  <label for="search">Find a ready-made area to start building your custom profile. Available areas include local authorities, wards, parishes and parliamentary constituencies.</label>
   <Select autoClear={false} placeholder="Type an area name or postcode" listMaxHeight={130} on:select={(e) => code = e.detail.areacd} />
     <button disabled={!code} on:click={() => window.top.location.href = `${base}/draw/#${code}`}>
       <span>Edit on map</span>
