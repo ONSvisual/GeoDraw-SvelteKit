@@ -1,4 +1,5 @@
 <script context="module">
+  import { base } from "$app/paths";
   import { csvParse, autoType } from "d3-dsv";
   import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
   import Pbf from "pbf";
@@ -36,7 +37,7 @@
 	}
 
 	export async function getPlaces() {
-		let data = await getData(`${baseurl}/places-list.csv`);
+		let data = await getData(`${base}/data/places-list.csv`);
     data = data.filter(d => d.areanm); // Hack for faulty areas. Filter out rows without a name
     let lookup = {};
     data.forEach(d => lookup[d.areacd] = d);
