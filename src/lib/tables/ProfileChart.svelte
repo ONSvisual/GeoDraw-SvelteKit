@@ -9,7 +9,7 @@
 	export let markerWidth = 2.5;
 	export let minmax = ["0 years", "85+"];
   export let base = null;
-  export let base_ext = ", 5 year bands";
+  export let base_ext = ", 5 year age bands";
 	
 	function stackData(data, key) {
 		let data_indexed = {};
