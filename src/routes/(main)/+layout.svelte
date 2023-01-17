@@ -26,7 +26,8 @@
   const analyticsProps = {
     "contentTitle": "Build a custom area profile",
     "releaseDate": "20230117",
-    "contentType": "exploratory"
+    "contentType": "exploratory",
+    "outputSeries": "buildacustomareaprofile"
   };
 </script>
 

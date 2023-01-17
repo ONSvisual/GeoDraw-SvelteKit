@@ -224,7 +224,8 @@
 
     var file = new Blob([csv], {type: 'text/csv'});
     download(file, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area_data'}.csv`);
-    analyticsEvent({event: "dataDownload", areaName: state.name});
+    let opts = state.name ? {areaName: state.name} : {};
+    analyticsEvent({event: "fileDownload", fileExtension: "csv", ...opts});
   }
 </script>
 
@@ -263,7 +264,8 @@
           let blob = geo_blob(store);
           download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
           state.showSave = false;
-          analyticsEvent({event: "geoDownload", areaName: state.name});
+          let opts = state.name ? {areaName: state.name} : {};
+          analyticsEvent({event: "fileDownload", fileExtension: "json", ...opts});
         }}
       >
         <Icon type="download" /><span>Save geography</span>
@@ -274,7 +276,8 @@
           var codes = store.properties.oa_all.join(',');
           clip(codes, 'Copied output area codes to clipboard');
           state.showSave = false;
-          analyticsEvent({event: "geoCopy", areaName: state.name});
+          let opts = state.name ? {areaName: state.name} : {};
+          analyticsEvent({event: "geoCopy", ...opts});
         }}
       >
         <Icon type="copy" /><span>Copy area codes</span>
@@ -326,7 +329,8 @@
     <div class="embed-actions">
       <button class="btn-link" on:click={() => {
         pym_parent.sendMessage('makePNG', null);
-        analyticsEvent({event: "imageDownload", areaName: state.name});
+        let opts = state.name ? {areaName: state.name} : {};
+        analyticsEvent({event: "fileDownload", fileExtension: "png", ...opts});
       }}>
         Save as image (PNG)
       </button> |
@@ -356,7 +360,8 @@
         <button class="copy-embed"
           on:click={() => {
             clip(makeEmbed(embed_hash), 'Copied embed code to clipboard');
-            analyticsEvent({event: "embed", areaName: state.name});
+            let opts = state.name ? {areaName: state.name} : {};
+            analyticsEvent({event: "embed", ...opts});
           }}>
           <Icon type="copy"/>
           <span>Copy embed code</span>

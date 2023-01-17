@@ -148,6 +148,7 @@
           'rgba(32, 96, 149, 0.4)',
           'transparent',
         ]);
+      if (selected.length > 1 && state.name) state.name = "";
     }
 
     $mapobject.on('load', async () => {
@@ -296,7 +297,8 @@
               ? props.name
               : '';
           setDrawData();
-          analyticsEvent({event: "geoUpload", areaName: state.name});
+          let opts = state.name ? {areaName: state.name} : {};
+          analyticsEvent({event: "geoUpload", ...opts});
         }
       };
       reader.readAsText(file);
@@ -460,7 +462,8 @@ The save data and continue function
           let blob = geo_blob(data);
           download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
           state.showSave = false;
-          analyticsEvent({event: "geoDownload", areaName: state.name});
+          let opts = state.name ? {areaName: state.name} : {};
+          analyticsEvent({event: "fileDownload", fileExtension: "json", ...opts});
         }}>
         <Icon type="download" /><span>Save geography</span>
       </button>
@@ -472,7 +475,8 @@ The save data and continue function
             'Copied output area codes to clipboard'
           );
           state.showSave = false;
-          analyticsEvent({event: "geoCopy", areaName: state.name});
+          let opts = state.name ? {areaName: state.name} : {};
+          analyticsEvent({event: "geoCopy", ...opts});
         }}>
         <Icon type="copy" /><span>Copy area codes</span>
       </button>

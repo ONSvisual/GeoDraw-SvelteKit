@@ -143,7 +143,7 @@ class Centroids {
   }
 
   async simplify (
-    name = 'Enter Area Name',
+    name = '',
     selected,
     mapobject
     // options = {simplify_geo: false},
