@@ -116,9 +116,9 @@
     // resume as normal
     store = JSON.parse(localStorage.getItem('onsbuild'));
 
-    console.debug('build-', store);
+    // console.debug('build-', store);
     if (!store) {
-      alert('Warning, no area selected! Redirecting to the drawing page.');
+      // alert('Warning, no area selected! Redirecting to the drawing page.');
       goto(`${base}/draw/`);
     }
 

@@ -169,10 +169,10 @@ export function simplify_geo (geometry, max_length = 3000) {
     length = JSON.stringify (simple).length;
     precision -= 0.5;
   }
-  console.debug (
-    'simplified polygon',
-    `string length: ${length}, precision: ${precision}`
-  );
+  // console.debug (
+  //   'simplified polygon',
+  //   `string length: ${length}, precision: ${precision}`
+  // );
   return simple;
 }
 
@@ -223,7 +223,7 @@ export async function update (geo) {
 
   var current = get (selected);
   var last = current[current.length - 1];
-  console.debug ('update,last', last, current);
+  // console.debug ('update,last', last, current);
 
   if (get (add_mode)) {
     current.push ({

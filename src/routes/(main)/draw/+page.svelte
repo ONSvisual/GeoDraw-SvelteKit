@@ -247,8 +247,6 @@
 
   function load_geo() {
     let file = uploader.files[0] ? uploader.files[0] : null;
-    
-    console.log("loading geo", !file ? null : "file");
 
     if (file) {
       selected.set([{oa: new Set()}]);
@@ -266,7 +264,6 @@
         }
 
         if (b.properties && b.properties.codes) {
-          console.debug('reading uploaded codes');
           let bb = b.properties.bbox
             ? b.properties.bbox
             : bbox(b);
@@ -279,7 +276,6 @@
           ];
           $mapobject.fitBounds(bb, {padding: 20});
         } else if (b.geometry) {
-          console.debug('reading uploaded geometry');
           if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
           let bb = bbox(b);
           update(b.geometry);
