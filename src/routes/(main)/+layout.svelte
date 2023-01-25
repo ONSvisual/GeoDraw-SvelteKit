@@ -6,6 +6,7 @@
   import { GetCentroids } from './draw/centroid_utils.js';
   import AnalyticsBanner from '$lib/layout/AnalyticsBanner.svelte';
   import ONSHeader from '$lib/layout/ONSHeader.svelte';
+  import ONSFooter from '$lib/layout/ONSFooter.svelte';
   import Title from '$lib/layout/Title.svelte';
 
   let loaded = false;
@@ -16,9 +17,6 @@
     centroids.set(centroid_dummy);
     loaded = true;
   });
-
-  let path = $page.url.pathname;
-  // console.warn('path', path);
 
   // GOOGLE ANALYTICS
   // Settings for page analytics. Values must be shared with <AnalyticsBanner> component
@@ -55,3 +53,6 @@
   {/if}
 </main>
 
+{#if $page.url.pathname.includes("build")}
+<ONSFooter/>
+{/if}

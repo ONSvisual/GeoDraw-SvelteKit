@@ -5,7 +5,8 @@
   export let regex;
   export let show;
   export let hovered = false;
-
+  export let selected = false;
+  
   let showInfo = false;
 
   function highlight(str, regex) {
@@ -29,7 +30,9 @@
   </button>
 </div>
 
-{#if show && showInfo}
+{#if show}
+
+{#if showInfo}
 <div class="topic-info">
   <p>
     {topic.desc}
@@ -38,7 +41,11 @@
     <a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}" target="_blank">Read more</a>
     {/if}
   </p>
-  {#if topic.caveat_text}
+</div>
+{/if}
+
+{#if topic.caveat_text && (selected || showInfo)}
+<div class="topic-info">
   <p>
     <span class="inline-icon"><Icon type="error"/></span>
     {topic.caveat_text}
@@ -47,8 +54,9 @@
     <a href="https://www.ons.gov.uk/{topic.caveat_url}" target="_blank">Read more</a>
     {/if}
   </p>
-  {/if}
 </div>
+{/if}
+
 {/if}
 
 <style>
@@ -68,6 +76,9 @@
     padding: 16px;
     background-color: rgb(245,245,246);
     border-left: 4px solid rgb(112,112,113);
+  }
+  .topic-info + .topic-info {
+    padding-top: 0;
   }
   .topic-toggle {
     margin: 0;

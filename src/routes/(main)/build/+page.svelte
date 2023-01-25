@@ -303,7 +303,7 @@
     />
     {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i (topic.code)}
     <div animate:flip={{duration: 500}} style:z-index={state.topics.includes(topic) ? 10 : 0}>
-      <TopicItem {topic} {regex} show={state.topics.includes(topic) || i < 6 || state.topicsExpand}>
+      <TopicItem {topic} {regex} show={state.topics.includes(topic) || i < 6 || state.topicsExpand} selected={state.topics.includes(topic)}>
         <input
           type="checkbox"
           bind:group={state.topics}
@@ -318,6 +318,17 @@
         {state.topicsExpand ? 'Show fewer' : `Show ${state.topics.length > 6 ? topics.length - state.topics.length : topics.length - 6} more`}
       </button>
     {/if}
+
+    <div class="related-content">
+      <p><strong>Looking for another topic?</strong></p>
+      <p>
+        Due to technical constraints, not all Census 2021 topics can be included in this tool.
+      </p>
+      <p>
+        Data for a wider range of topics can be <a href="https://www.nomisweb.co.uk/sources/census_2021" target="_blank" rel="noreferrer">downloaded from Nomis</a>.
+        <span style:font-size="0.8em" style:margin-left="2px"><Icon type="launch" /></span>
+      </p>
+    </div>
   </aside>
   <article class="profile">
     <h2>Profile preview</h2>
@@ -376,15 +387,6 @@
   :global(#lmap) {
     filter: invert(0.9);
     opacity: 0.9;
-  }
-  .embed-actions {
-    margin: 0 0 20px;
-  }
-  .embed-actions textarea {
-    width: 100%;
-    resize: none;
-    color: #555;
-    margin-bottom: 3px;
   }
   :global(.bx--inline-notification__subtitle) {
     margin: 1em;
