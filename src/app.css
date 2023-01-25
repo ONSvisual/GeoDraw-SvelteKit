@@ -95,7 +95,7 @@ article.profile {
 aside.topics-box {
   position: relative;
   float: left;
-  margin: 0 4px 0 24px;
+  margin: 0 0 0 24px;
   width: 270px;
 }
 aside.topics-box input[type=text] {
