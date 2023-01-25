@@ -7,7 +7,6 @@
   import Slider from '$lib/ui/Slider.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import {download, clip} from '$lib/util/functions.js';
-  import {get} from 'svelte/store';
   import bbox from '@turf/bbox';
   import AreaMap from './AreaMap.svelte';
   import '$lib/draw/css/mapbox-gl.css';
