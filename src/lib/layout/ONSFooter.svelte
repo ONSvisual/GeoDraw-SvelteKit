@@ -78,7 +78,7 @@
   .col-wide {
     width: 100%;
     max-width: 980px;
-    margin: 0 16px;
+    margin: 0 24px;
   }
 	ul {
 		padding: 0;
