@@ -247,6 +247,8 @@
 
   function load_geo() {
     let file = uploader.files[0] ? uploader.files[0] : null;
+    
+    console.log("loading geo", !file ? null : "file");
 
     if (file) {
       selected.set([{oa: new Set()}]);
@@ -576,7 +578,7 @@ The save data and continue function
       accept=".geojson,.json"
       style="display:none"
       bind:this={uploader}
-      on:change={load_geo}
+      on:input={load_geo}
     />
   </div>
   {#if state.infoExpand}
