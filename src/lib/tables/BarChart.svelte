@@ -128,9 +128,10 @@
 		transform: translate(0,3px);
 	}
   small {
-    font-size: 0.8em;
+    font-size: 14px;
+    line-height: 1.3;
     display: block;
-    margin-top: 6px;
+    margin-top: 8px;
     color: #777;
   }
   .nowrap {
