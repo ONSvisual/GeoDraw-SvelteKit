@@ -448,6 +448,95 @@
     ]
   },
   {
+    "code": "health_in_general",
+    "label": "General health",
+    "desc": "How people rate their general health.",
+    "url": "healthdisabilityandunpaidcarevariablescensus2021/generalhealth",
+    "caveat_text": "Values for this variable will differ from sources that are age-standardised.",
+    "caveat_url": "peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/healthdisabilityandunpaidcarequalityinformationforcensus2021",
+    "tableCode": "NM_2055_1",
+    "cellCode": "c2021_health_6",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all people",
+    "categories": [
+      {
+        "label": "Very good health",
+        "cells": [1]
+      },
+      {
+        "label": "Good health",
+        "cells": [2]
+      },
+      {
+        "label": "Fair health",
+        "cells": [3]
+      },
+      {
+        "label": "Bad health",
+        "cells": [4]
+      },
+      {
+        "label": "Very bad health",
+        "cells": [5]
+      }
+    ]
+  },
+  {
+    "code": "disability",
+    "label": "Disability",
+    "desc": "People with a long-term health problem or disability, including conditions or illnesses relating to old-age.",
+    "url": "healthdisabilityandunpaidcarevariablescensus2021/disability",
+    "caveat_text": "Values for this variable will differ from sources that are age-standardised.",
+    "caveat_url": "peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/healthdisabilityandunpaidcarequalityinformationforcensus2021",
+    "tableCode": "NM_2056_1",
+    "cellCode": "c2021_disability_5",
+    "measures": 20301,
+    "unit": "%",
+    "base": "all people",
+    "categories": [
+      {
+        "label": "Disabled under the Equality Act",
+        "cells": [1001]
+      },
+      {
+        "label": "Not disabled under the Equality Act",
+        "cells": [1002]
+      }
+    ]
+  },
+  {
+    "code": "is_carer",
+    "label": "Provision of unpaid care",
+    "desc": "Hours of unpaid care provided per week.",
+    "url": "healthdisabilityandunpaidcarevariablescensus2021/provisionofunpaidcare",
+    "caveat_text": "Values for this variable will differ from sources that are age-standardised.",
+    "caveat_url": "peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/healthdisabilityandunpaidcarequalityinformationforcensus2021",
+    "tableCode": "NM_2057_1",
+    "cellCode": "c2021_carer_7",
+    "measures": 20301,
+    "unit": "%",
+    "base": "people aged five years and over",
+    "categories": [
+      {
+        "label": "Provides no unpaid care",
+        "cells": [1]
+      },
+      {
+        "label": "Provides 19 hours or less unpaid care a week",
+        "cells": [101]
+      },
+      {
+        "label": "Provides 20 to 49 hours unpaid care a week",
+        "cells": [102]
+      },
+      {
+        "label": "Provides 50 or more hours unpaid care a week",
+        "cells": [6]
+      }
+    ]
+  },
+  {
     "code": "english_proficiency",
     "label": "Proficiency in English",
     "desc": "How well people whose main language is not English (or in Wales, English or Welsh) speak English.",
