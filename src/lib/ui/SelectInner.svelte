@@ -200,4 +200,7 @@
 	:global(.selectbox .multiSelectItem .group) {
 		display: none;
 	}
+  :global(.selectbox .listContainer) {
+    margin-right: -42px;
+  }
 </style>

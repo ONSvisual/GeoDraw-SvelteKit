@@ -13,7 +13,8 @@
     {keys: ["E00", "W00"], label: "Output area"},
     {keys: ["E01", "W01"], label: "LSOA"},
     {keys: ["E02", "W02"], label: "MSOA"},
-    {keys: ["E04", "W04"], label: "Parish"},
+    {keys: ["E04"], label: "Parish"},
+    {keys: ["W04"], label: "Community"},
     {keys: ["E05", "W05"], label: "Ward"},
     {keys: ["E06", "W06"], label: "Unitary authority"},
     {keys: ["E07", "E08"], label: "Local authority district"},
@@ -21,7 +22,7 @@
     {keys: ["E10"], label: "County"},
     {keys: ["E11"], label: "Metropolitan county"},
     {keys: ["E14", "W07"], label: "Parliamentary constituency"},
-    {keys: ["E30", "K01", "W22"], label: "Travel to work area"},
+    {keys: ["E30", "K01", "W22"], label: "2011 Travel to work area"},
     {keys: ["E34", "K05", "W37", "E63", "K08", "W45"], label: "Built-up area"},
     {keys: ["E35", "K06", "W38"], label: "Built-up area, sub-division"}
   ];
