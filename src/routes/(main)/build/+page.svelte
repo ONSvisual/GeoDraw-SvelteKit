@@ -305,7 +305,7 @@
 
     <label>
       <input type="checkbox" bind:checked={includemap} />
-      Include Map
+      Include map
     </label>
     
     {#if state.comparison && parents}
