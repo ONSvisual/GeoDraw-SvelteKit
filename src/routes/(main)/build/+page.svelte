@@ -11,6 +11,7 @@
   import topics from '$lib/topics.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js';
   import getTable from './gettable.js';
+  import getParents from './getparents.js';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import {centroids} from '../draw/mapstore.js';
@@ -20,6 +21,7 @@
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
+  let parents;
 
   let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
   // would this not be better off as a MAP and not a dict?
@@ -41,6 +43,7 @@
     topics: [topics[0]],
     topicsExpand: false,
     topicsFilter: '',
+    comparison: null
   };
 
   function filterTopics(topics, selected, regex) {
@@ -125,7 +128,6 @@
     geojson = simplify_geo(store.geojson.geometry);
 
     state.name = store.properties.name;
-    state.start = true;
 
     let props = store.properties;
     // console.log('props', props);
@@ -133,7 +135,13 @@
     state.compressed =
       store.compressed ||
       [...props.msoa, ...props.lsoa, ...props.oa].flat().join(';');
+    
+    parents = (
+      await getParents(geojson, state.compressed.split(';'))
+    ).filter(p => p.areanm !== state.name);
+    state.comparison = parents[0];
 
+    state.start = true;
     // console.warn(state.compressed);
   }
 
@@ -143,16 +151,17 @@
   // Processing functions
   ////////////////////////////////////////////////////////////////
   let cache = {};
-  async function get_data(data) {
+  async function get_data(data, comp) {
     if (!state.start) return [];
+    if (!cache[comp]) cache[comp] = {};
     let tables = [];
     for (let i = 0; i < data.length; i++) {
       let table;
-      if (cache[data[i].code]) {
-        table = cache[data[i].code];
+      if (cache[comp][data[i].code]) {
+        table = cache[comp][data[i].code];
       } else {
-        table = await getTable(data[i], state.compressed);
-        cache[data[i].code] = table;
+        table = await getTable(data[i], state.compressed, comp);
+        cache[comp][data[i].code] = table;
       }
       tables.push({code: data[i].code, data: table});
     }
@@ -160,16 +169,16 @@
     return tables;
   }
 
-  async function update_profile(start, name, data, includemap) {
+  async function update_profile(start, name, comp, data, includemap) {
     if (start) {
       var ls = JSON.parse(localStorage.getItem('onsbuild'));
       ls.properties.name = name;
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
       let codes = data.map((d) => d.code);
-      tables = await get_data(topics.filter((t) => codes.includes(t.code)));
+      tables = await get_data(topics.filter((t) => codes.includes(t.code)), comp.areacd);
 
-      embed_hash = `#/?name=${btoa(name)}&tabs=${btoa(JSON.stringify(tables))}${
+      embed_hash = `#/?name=${btoa(name)}&comp=${btoa(comp.areanm)}&tabs=${btoa(JSON.stringify(tables))}${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
       }`;
 
@@ -193,7 +202,7 @@
     return mode === "capitalise" ? name[0].toUpperCase() + name.slice(1) : name;
   }
 
-  $: update_profile(state.start, state.name, state.topics, includemap);
+  $: update_profile(state.start, state.name, state.comparison, state.topics, includemap);
 
   function makeEmbed(embed_hash) {
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
@@ -294,6 +303,15 @@
       <input type="checkbox" bind:checked={includemap} />
       Include Map
     </label>
+    
+    {#if state.comparison && parents}
+    <h2>Select comparison</h2>
+    <select bind:value={state.comparison}>
+      {#each parents as parent}
+      <option value={parent}>{parent.areanm}</option>
+      {/each}
+    </select>
+    {/if}
 
     <h2>Select topics</h2>
     <input

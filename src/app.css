@@ -98,7 +98,7 @@ aside.topics-box {
   margin: 0 0 0 24px;
   width: 270px;
 }
-aside.topics-box input[type=text] {
+aside.topics-box input[type=text], aside.topics-box select {
   width: 100%;
 }
 @media (max-width: 640px) {
@@ -291,7 +291,7 @@ nav.tray label, nav.tray button {
   width: 50px;
   margin: 0 4px 0 8px;
 }
-input[type=text]:focus {
+input[type=text]:focus, select:focus {
   outline: 3px solid orange;
   border-color: black;
 }

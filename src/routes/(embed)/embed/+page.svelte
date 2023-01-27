@@ -10,7 +10,8 @@
   import ProfileChart from '$lib/tables/ProfileChart.svelte';
   import BigNumber from '$lib/tables/cards/BigNumber.svelte';
 
-  let pym_child, name,geojson,tables,population,stats = [];
+  let pym_child, name, comp, geojson, tables, population;
+  let stats = [];
 
   let topicsLookup = (() => {
     let lookup = {};
@@ -18,11 +19,11 @@
     return lookup;
   })();
 
-  function expandTable(table, areaName) {
+  function expandTable(table, areaName, compName) {
     let def = topicsLookup[table.code];
     let data = [];
     let i = 0;
-    [areaName, "England and Wales"].forEach(name => {
+    [areaName, compName].forEach(name => {
       def.categories.forEach(cat => {
         data.push({areanm: name, category: cat.label, value: table.data[i]})
         i ++;
@@ -40,7 +41,7 @@
       let searchParams = new URLSearchParams(hash.slice(3));
 
       for (let pair of searchParams.entries()) {
-        if (pair[0] == 'name') {
+        if (['name', 'comp'].includes(pair[0])) {
           props[pair[0]] = atob(pair[1]);
         } else if (['tabs', 'poly', 'population', 'stats'].includes(pair[0])) {
           props[pair[0]] = JSON.parse(atob(pair[1]));
@@ -48,6 +49,7 @@
       }
 
       name = props.name ? props.name : "Selected area";
+      comp = props.comp ? props.comp : "England and Wales";
       geojson = props.poly;
       population = props.population;
       tables = props.tabs;
@@ -99,12 +101,12 @@
         <BigNumber
           value={tab.data[0]}
           unit={topicsLookup[tab.code].unit}
-          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in England and Wales`}
+          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}`}
         />
         {:else if tab.code === "resident_age"}
-        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name)} base="% of {topicsLookup[tab.code].base}" />
+        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {:else}
-        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name)} base="% of {topicsLookup[tab.code].base}" />
+        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {/if}
       </Card>
     {/each}
