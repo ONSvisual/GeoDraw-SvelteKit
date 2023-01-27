@@ -374,8 +374,6 @@
     "label": "National identity",
     "desc": "People's national identity (where they feel they belong or could think of as home).",
     "url": "ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/nationalidentity",
-    "caveat_text": "There are quality considerations for this variable.",
-    "caveat_url": "peoplepopulationandcommunity/culturalidentity/ethnicity/methodologies/ethnicgroupnationalidentitylanguageandreligionqualityinformationforcensus2021",
     "tableCode": "NM_2046_1",
     "cellCode": "c2021_natiduk_17",
     "measures": 20301,
