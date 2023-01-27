@@ -219,7 +219,7 @@
       {year: 'numeric', month: 'short', day: 'numeric'}
     )}"\n`;
     csv += `"The data in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources."\n\n`;
-    csv += `"Variable","Category","${getName("capitalise")}","England and Wales","Unit","Base population"\n`;
+    csv += `"Variable","Category","${getName("capitalise")}","${state.comparison.areanm}","Unit","Base population"\n`;
 
     tables.forEach((t) => {
       let meta = topicsLookup[t.code];
