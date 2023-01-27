@@ -9,9 +9,9 @@ const topojson = `${base}/data/lad-cty-rgn.json`;
 
 export default async function(poly, codes) {
   // Check if area is in England and/or Wales
-  let prefixes = codes.map(c => c[0]);
-  let eng = prefixes.includes("E");
-  let wal = prefixes.includes("W");
+  let coverage = Array.from(new Set(codes.map(c => c[0])));
+  let eng = coverage.includes("E");
+  let wal = coverage.includes("W");
 
   // Add countries
   let parents = [{areacd: "K04000001", areanm: "England and Wales"}];
@@ -33,9 +33,10 @@ export default async function(poly, codes) {
   let boundsPoly = bboxPoly(bounds);
   geo.forEach(g => {
     let filtered = g.features.filter(f => intersects(f, boundsPoly));
+    if (filtered[1]) filtered.sort((a, b) => a.properties.areanm.localeCompare(b.properties.areanm));
     filtered.forEach(f => {
       if (intersects(f, buffered)) parents.push(f.properties);
     });
   });
-  return parents;
+  return {parents, coverage};
 }

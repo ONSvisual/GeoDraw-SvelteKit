@@ -23,7 +23,8 @@
     let def = topicsLookup[table.code];
     let data = [];
     let i = 0;
-    [areaName, compName].forEach(name => {
+    let names = table.data.length === def.categories.length ? [areaName] : [areaName, compName];
+    names.forEach(name => {
       def.categories.forEach(cat => {
         data.push({areanm: name, category: cat.label, value: table.data[i]})
         i ++;

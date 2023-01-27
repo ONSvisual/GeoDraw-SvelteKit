@@ -8,7 +8,7 @@
   import Notice from '$lib/ui/Notice.svelte';
   import TopicItem from '$lib/ui/TopicItem.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import topics from '$lib/topics.json';
+  import topics_all from '$lib/topics.json';
   import {simplify_geo, geo_blob} from '../draw/drawing_utils.js';
   import getTable from './gettable.js';
   import getParents from './getparents.js';
@@ -22,6 +22,8 @@
   let tables = []; // Array to hold table data
   let includemap = true;
   let parents;
+  let coverage = ["E", "W"];
+  let topics = [...topics_all]; // Topics might be filtered based on coverage
 
   let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
   // would this not be better off as a MAP and not a dict?
@@ -51,6 +53,7 @@
     let topics_start = [];
     let topics_end = [];
     [...topics]
+      .filter(t => !t.coverage || t.coverage.every(c => coverage.includes(c)))
       .sort((a, b) => a.label.localeCompare(b.label))
       .forEach((topic) => {
         if (selected.includes(topic)) {
@@ -136,9 +139,10 @@
       store.compressed ||
       [...props.msoa, ...props.lsoa, ...props.oa].flat().join(';');
     
-    parents = (
-      await getParents(geojson, state.compressed.split(';'))
-    ).filter(p => p.areanm !== state.name);
+    let par = await getParents(geojson, state.compressed.split(';'));
+    coverage = par.coverage;
+    parents = par.parents.filter(p => p.areanm !== state.name);
+    topics = topics_all.filter(t => !t.coverage || t.coverage.every(c => coverage.includes(c)));
     state.comparison = parents[0];
 
     state.start = true;

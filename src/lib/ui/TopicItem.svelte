@@ -44,14 +44,14 @@
 </div>
 {/if}
 
-{#if topic.caveat_text && (selected || showInfo)}
+{#if topic.caveatText && (selected || showInfo)}
 <div class="topic-info">
   <p>
     <span class="inline-icon"><Icon type="error"/></span>
-    {topic.caveat_text}
-    {#if topic.caveat_url}
+    {topic.caveatText}
+    {#if topic.caveatUrl}
     <!-- svelte-ignore security-anchor-rel-noreferrer -->
-    <a href="https://www.ons.gov.uk/{topic.caveat_url}" target="_blank">Read more</a>
+    <a href="https://www.ons.gov.uk/{topic.caveatUrl}" target="_blank">Read more</a>
     {/if}
   </p>
 </div>
