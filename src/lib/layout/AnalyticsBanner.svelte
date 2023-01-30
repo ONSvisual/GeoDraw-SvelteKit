@@ -61,7 +61,7 @@
       "gtm.blacklist": ["customScripts","sp","adm","awct","k","d","j"],
       ...analyticsProps
       }];
-      if (page) location = `${page.url.protocol}//${page.url.hostname}${page.url.pathname}`;
+      if ($page) location = `${$page.url.protocol}//${$page.url.hostname}${$page.url.pathname}`;
 
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.head,
@@ -73,7 +73,7 @@
 
   // This code is only relevant for multi-page Svelte Kit apps. It sends an analytics event when the URL changes
   function pageView(page) {
-    let newlocation = page.url.hostname + page.url.pathname + page.url.searchParams;
+    let newlocation = `${page.url.protocol}//${page.url.hostname}${page.url.pathname}`;
     if (newlocation !== location) {
       location = newlocation;
 

@@ -1,5 +1,6 @@
 import {csvParse, autoType} from 'd3-dsv';
 import {roundCount} from '../draw/misc_utils';
+import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 function makeUrl(table, codes, comp) {
   let url = `https://www.nomisweb.co.uk/api/v01/dataset/${table.tableCode}.data.csv?date=latest&geography=MAKE|MyCustomArea|${codes},${comp}&${table.cellCode}=${makeCells(table.categories)}&measures=${table.measures}&select=geography_name,${table.cellCode}_name,obs_value`;
@@ -41,5 +42,10 @@ export default async function (table, codes, comp = "K04000001") {
   let str = (await res.text()).replace("GEOGRAPHY_NAME", "areanm").replace("OBS_VALUE", "value").replace(`${table.cellCode}_name`.toUpperCase(), "category");
   let data = csvParse(str, autoType);
   if (table.unit === "%" && table.measures === 20100) data = calcPercent(data);
+  analyticsEvent({
+    event: "topicLoad",
+    topicName: table.label,
+    topicCode: table.code
+  });
   return ["population", "households"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
 }
