@@ -230,8 +230,10 @@
       let len = meta.categories.length;
       for (let i = 0; i < len; i++) {
         csv += `"${meta.label}","${meta.categories[i].label}",${
-          t.data[i]
-        },${t.data[len + i]},"${meta.unit}","${meta.base}"\n`;
+          t.data[i] ? t.data[i] : "NA"
+        },${
+          t.data[len + i] ? t.data[len + i] : "NA"
+        },"${meta.unit}","${meta.base}"\n`;
       }
     });
 
