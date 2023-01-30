@@ -61,7 +61,7 @@
       "gtm.blacklist": ["customScripts","sp","adm","awct","k","d","j"],
       ...analyticsProps
       }];
-      if (page) location =  $page.url.hostname + $page.url.pathname + $page.url.searchParams;
+      if (page) location = `${page.url.protocol}//${page.url.hostname}${page.url.pathname}`;
 
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.head,
