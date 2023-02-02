@@ -43,7 +43,7 @@ export default async function (table, codes, comp = "K04000001") {
   let data = csvParse(str, autoType);
   if (table.unit === "%" && table.measures === 20100) data = calcPercent(data);
   analyticsEvent({
-    event: "topicLoad",
+    event: "topicSelect",
     topicName: table.label,
     topicCode: table.code
   });

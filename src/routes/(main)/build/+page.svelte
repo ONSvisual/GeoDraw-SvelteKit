@@ -142,8 +142,8 @@
     let par = await getParents(geojson, state.compressed.split(';'));
     coverage = par.coverage;
     parents = par.parents.filter(p => p.areanm !== state.name);
-    topics = topics_all.filter(t => !t.coverage || t.coverage.every(c => coverage.includes(c)));
-    state.comparison = parents[0];
+    topics = topics_all.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
+    state.comparison = coverage[1] ? parents[0] : parents[1];
 
     state.start = true;
     // console.warn(state.compressed);
