@@ -2,13 +2,13 @@
   import {onMount} from 'svelte';
   import pym from 'pym.js';
   import html2canvas from 'html2canvas';
-  import topics from '$lib/topics.json';
+  import topics from '$lib/config/topics.json';
   import Cards from '$lib/layout/Cards.svelte';
   import Card from '$lib/layout/partial/Card.svelte';
-  import BarChart from '$lib/tables/BarChart.svelte';
-  import MapAreas from '$lib/tables/MapAreas.svelte';
-  import ProfileChart from '$lib/tables/ProfileChart.svelte';
-  import BigNumber from '$lib/tables/cards/BigNumber.svelte';
+  import BarChart from '$lib/charts/BarChart.svelte';
+  import AreaMap from '$lib/charts/AreaMap.svelte';
+  import ProfileChart from '$lib/charts/ProfileChart.svelte';
+  import BigNumber from '$lib/charts/BigNumber.svelte';
 
   let pym_child, name, comp, geojson, tables, population;
   let stats = [];
@@ -92,7 +92,7 @@
     {#if geojson}
       <Card title="Area map">
         <div style:min-height="260px" style:width="100%">
-          <MapAreas {geojson} />
+          <AreaMap {geojson} />
         </div>
       </Card>
     {/if}

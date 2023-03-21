@@ -1,9 +1,9 @@
 <script>
-  import '../../app.css';
+  import '$lib/css/app.css';
   import { onMount, setContext } from "svelte";
   import { page } from '$app/stores';
-  import { centroids } from './draw/mapstore.js';
-  import { GetCentroids } from './draw/centroid_utils.js';
+  import { centroids } from '$lib/stores/mapstore.js';
+  import { GetCentroids } from './draw/centroid-utils.js';
   import AnalyticsBanner from '$lib/layout/AnalyticsBanner.svelte';
   import ONSHeader from '$lib/layout/ONSHeader.svelte';
   import ONSFooter from '$lib/layout/ONSFooter.svelte';

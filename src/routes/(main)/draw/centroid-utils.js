@@ -5,16 +5,9 @@ import bboxPoly from '@turf/bbox-polygon';
 import inPoly from '@turf/points-within-polygon';
 import buffer from '@turf/buffer';
 import area from '@turf/area';
-import {dissolve} from '$lib/mapshaper';
-import {roundAll} from './misc_utils';
-const url = 'https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv';
-
-//'/oa21-data-v4.csv'
-
-
-function u(x){
-  return [...new Set(x)]
-}
+import {dissolve} from '$lib/util/mapshaper';
+import {roundAll} from './misc-utils';
+import {points} from '$lib/config/geography';
 
 // Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
 function filterGeo(geojson, area_sqm) {
@@ -33,7 +26,7 @@ function filterGeo(geojson, area_sqm) {
 
 class Centroids {
   async initialize () {
-    let res = await fetch (url);
+    let res = await fetch (points.url);
     let arr = csvParse (await res.text (), autoType);
 
     let gjson = {type: 'FeatureCollection', features: []};
@@ -152,17 +145,7 @@ class Centroids {
 
     // compress the codes
     let {oa, lsoa, msoa} = this.compress(oa_all);
-
-    // oa = u(oa)
-    // msoa = u(msoa)
-    // lsoa = u(lsoa)
-
-
-    
     const bbox = this.bounds (oa_all);
-
-
-
     var merge = {};
     merge.properties = {
       name,
@@ -234,9 +217,3 @@ export async function GetCentroids (kwargs) {
   await c.initialize (kwargs);
   return c;
 }
-
-//   module.exports = {
-//     GetCentroids
-//   };
-
-// Object.fromEntries(a.$index.map((_, i) => [_, a.$data[i]]))

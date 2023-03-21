@@ -21,23 +21,18 @@
   maplibregl.workerCount = 5;
   maplibregl.maxParallelImageRequests = 20;
 
-  import {createEventDispatcher, onMount} from 'svelte';
-  import {init_draw} from './drawing_utils.js';
+  import {createEventDispatcher, onMount, onDestroy} from 'svelte';
+  import {init_draw} from './drawing-utils';
   import {
     mapsource,
     maplayer,
     mapfunctions,
-    mapobject,
-    mapstyle,
-    minzoom,
-    maxzoom,
-    maxbounds,
-
-  } from './mapstore.js';
+    mapobject
+  } from '$lib/stores/mapstore';
+  import {minzoom, maxzoom, maxbounds, mapstyle} from '$lib/config/geography';
 
   const mapboxgl = maplibregl;
   let webgl_canvas;
-  
 
   export let drawing_tools = false;
 
@@ -104,7 +99,7 @@
       // set the layers
       for (const value of $maplayer) {
         if ($mapobject.getLayer(value.id)) $mapobject.removeLayer(value.id);
-        $mapobject.addLayer(value);
+        $mapobject.addLayer(value, "small settlement names");
       }
     });
 
@@ -118,5 +113,9 @@
 
   /// main
   onMount(init);
+  onDestroy(async () => {
+		if ($mapobject) $mapobject.remove();
+		mapobject.set(null);
+	});
 </script>
 

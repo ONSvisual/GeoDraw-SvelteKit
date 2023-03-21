@@ -1,5 +1,5 @@
 import {csvParse, autoType} from 'd3-dsv';
-import {roundCount} from '../draw/misc_utils';
+import {roundCount} from '../draw/misc-utils';
 import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 function makeUrl(table, codes, comp) {

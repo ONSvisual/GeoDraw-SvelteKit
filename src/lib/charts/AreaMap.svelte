@@ -1,5 +1,6 @@
 <script>
 	import maplibre from 'maplibre-gl';
+  import '$lib/css/maplibre-gl.css';
 	import bbox from '@turf/bbox';
 	import { onMount } from 'svelte';
   import { base } from '$app/paths';
@@ -61,13 +62,6 @@
 	$: data = geojson ? geojson : {'type': 'Polygon', 'coordinates': []};
 	$: w && fitBounds(bounds);
 </script>
-
-<svelte:head>
-	<link
-		rel="stylesheet"
-		href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css"
-	/>
-</svelte:head>
 
 <div id="map" class="center" bind:this={container} bind:clientWidth={w}/>
 

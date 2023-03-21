@@ -1,5 +1,5 @@
 <script>
-  import ONSloader from '../ONSloader.svelte';
+  import ONSloader from '$lib/ui/ONSloader.svelte';
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
 	import {flip} from 'svelte/animate';
@@ -8,13 +8,13 @@
   import Notice from '$lib/ui/Notice.svelte';
   import TopicItem from '$lib/ui/TopicItem.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import topics_all from '$lib/topics.json';
-  import {simplify_geo, geo_blob} from '../draw/drawing_utils.js';
-  import getTable from './gettable.js';
-  import getParents from './getparents.js';
+  import topics_all from '$lib/config/topics.json';
+  import {simplify_geo, geo_blob} from '../draw/drawing-utils';
+  import getTable from './gettable';
+  import getParents from './getparents';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
-  import {centroids} from '../draw/mapstore.js';
+  import {centroids} from '$lib/stores/mapstore';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
   let isLoading = false;
   let pym_parent; // Variabl for pym

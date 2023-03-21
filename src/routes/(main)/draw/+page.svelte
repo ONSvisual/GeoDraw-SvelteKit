@@ -1,18 +1,18 @@
 <script>
-  import ONSloader from '../ONSloader.svelte';
+  import ONSloader from '$lib/ui/ONSloader.svelte';
   import {goto} from '$app/navigation';
   import {base} from '$app/paths';
   import tooltip from '$lib/ui/tooltip';
   import Select, {getPlace} from '$lib/ui/Select.svelte';
   import Slider from '$lib/ui/Slider.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import {download, clip} from '$lib/util/functions.js';
+  import {download, clip} from '$lib/util/functions';
   import bbox from '@turf/bbox';
-  import AreaMap from './AreaMap.svelte';
-  import '$lib/draw/css/mapbox-gl.css';
+  import Map from './Map.svelte';
+  import '$lib/css/maplibre-gl.css';
   import {onMount} from 'svelte';
-  import {update, simplify_geo, geo_blob} from './drawing_utils.js';
-  import {roundCount} from './misc_utils.js';
+  import {update, simplify_geo, geo_blob} from './drawing-utils';
+  import {roundCount} from './misc-utils';
   import {
     mapsource,
     maplayer,
@@ -22,11 +22,9 @@
     add_mode,
     radiusInKm,
     selected,
-    server,
-    centroids,
-    minzoom,
-    maxzoom,
-  } from './mapstore.js';
+    centroids
+  } from '$lib/stores/mapstore';
+  import {boundaries} from '$lib/config/geography';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 
@@ -88,8 +86,8 @@
       area: {
         type: 'vector',
         maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
-        minzoom: 8, // IMPORTANT: This is the minimum zoom aailable
-        tiles: [`${server}/{z}/{x}/{y}.pbf`],
+        minzoom: 8, // IMPORTANT: This is the minimum zoom available
+        tiles: [boundaries.url],
       },
 
       points: {
@@ -102,9 +100,7 @@
       {
         id: 'bounds',
         source: 'area',
-        'source-layer': 'oa',
-        // tileSize: 256,
-
+        'source-layer': boundaries.key,
         type: 'fill',
         paint: {
           'fill-color': 'transparent',
@@ -122,7 +118,6 @@
           'circle-color': 'coral'
       }}
     ];
-
 
     $mapfunctions = [
     ];
@@ -520,7 +515,7 @@ The save data and continue function
   </nav>
 {/if}
 <div id="map">
-  <AreaMap drawing_tools={true} />
+  <Map drawing_tools={true} />
 </div>
 <aside class="info-box" style:top="{showTray || state.showSave ? 200 : 158}px">
   <div class="search">

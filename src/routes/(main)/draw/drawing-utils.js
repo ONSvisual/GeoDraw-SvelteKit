@@ -7,15 +7,15 @@ import {
   add_mode,
   draw_enabled,
   centroids,
-} from './mapstore.js';
-import {roundAll, extent} from './misc_utils.js';
+} from '$lib/stores/mapstore';
+import {roundAll, extent} from './misc-utils';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
 import circle from '@turf/circle';
 import turf_simplify from '@turf/simplify';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
-import {dissolve} from '$lib/mapshaper';
+import {dissolve} from '$lib/util/mapshaper';
 import bbox from '@turf/bbox';
 
 const mzm = 10;

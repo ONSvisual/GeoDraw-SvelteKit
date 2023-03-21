@@ -14,13 +14,11 @@ const config = {
 			fallback: '404.html'
 		}),
 		prerender: {
-			enabled: production,
 			handleHttpError: 'warn'
 		},
 		paths: {
 			base: production && ons_path ? '/visualisations/customprofiles' : ''
-		},
-		trailingSlash: 'always'
+		}
 	}
 };
 

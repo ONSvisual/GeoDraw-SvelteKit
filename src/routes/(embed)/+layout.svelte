@@ -1,5 +1,5 @@
 <script>
-  import "./ons.css";
+  import "$lib/css/ons.css";
 </script>
 
 <slot/>
