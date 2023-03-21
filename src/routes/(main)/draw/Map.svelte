@@ -113,9 +113,5 @@
 
   /// main
   onMount(init);
-  onDestroy(async () => {
-		if ($mapobject) $mapobject.remove();
-		mapobject.set(null);
-	});
 </script>
 

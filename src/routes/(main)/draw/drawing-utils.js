@@ -8,6 +8,7 @@ import {
   draw_enabled,
   centroids,
 } from '$lib/stores/mapstore';
+import {boundaries} from '$lib/config/geography';
 import {roundAll, extent} from './misc-utils';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
@@ -243,7 +244,7 @@ function draw_point (e) {
   // update using select tool
   let feature = e.features[0];
   if (feature) {
-    let code = feature.properties.areacd;
+    let code = feature.properties[boundaries.id_key];
     let current = get (selected);
     let oas = current[current.length - 1].oa;
     if (oas.has (code)) {

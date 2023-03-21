@@ -7,7 +7,14 @@ import buffer from '@turf/buffer';
 import area from '@turf/area';
 import {dissolve} from '$lib/util/mapshaper';
 import {roundAll} from './misc-utils';
-import {points} from '$lib/config/geography';
+import {points, boundaries} from '$lib/config/geography';
+
+const key = points.key;
+const code = `${points.key}${String(points.year).slice(2)}cd`;
+const parents = points.parents.map(key => ({
+  key,
+  code: `${key}${String(points.year).slice(0, 2)}cd`
+}));
 
 // Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
 function filterGeo(geojson, area_sqm) {
@@ -31,34 +38,30 @@ class Centroids {
 
     let gjson = {type: 'FeatureCollection', features: []};
     let lkp = {};
-    let lsoa_ct = {};
-    let msoa_ct = {};
+    let parent_ct = {};
+    parents.forEach(p => parent_ct[p.key] = {});
+
     arr.forEach (d => {
-      lkp[d.oa21cd] = d;
+      lkp[d[code]] = d;
       gjson.features.push ({
         type: 'Feature',
-        properties: {areacd: d.oa21cd},
+        properties: {areacd: d[code]},
         geometry: {type: 'Point', coordinates: [d.lng, d.lat]},
       });
 
-      if (!lsoa_ct[d.lsoa21cd]) {
-        lsoa_ct[d.lsoa21cd] = 1;
-      } else {
-        lsoa_ct[d.lsoa21cd] += 1;
-      }
-
-      if (!msoa_ct[d.msoa21cd]) {
-        msoa_ct[d.msoa21cd] = 1;
-      } else {
-        msoa_ct[d.msoa21cd] += 1;
-      }
+      parents.forEach(p => {
+        if (!parent_ct[p.key][d[p.code]]) {
+          parent_ct[p.key][d[p.code]] = 1;
+        } else {
+          parent_ct[p.key][d[p.code]] += 1;
+        }
+      });
     });
 
     this.sizes = arr.map (d => d.r);
     this.geojson = gjson;
     this.lookup = lkp;
-    this.lsoa_count = lsoa_ct;
-    this.msoa_count = msoa_ct;
+    parents.forEach(p => this[`${p.key}_count`] = parent_ct[p.key]);
   }
 
   // geojson () {
@@ -66,11 +69,11 @@ class Centroids {
   // }
 
   parent (oa) {
-    // Return LSOA parents for OAs
+    // Return immediate parents for OAs
     if (typeof oa === 'string') {
-      return this.lookup[oa].lsoa21cd;
+      return this.lookup[oa][parents[0].code];
     } else {
-      return oa.map (cd => this.lookup[cd].lsoa21cd);
+      return oa.map (cd => this.lookup[cd][parents[0].code]);
     }
   }
 
@@ -102,37 +105,38 @@ class Centroids {
     bounds = bboxPoly (bounds);
 
     let oas = inPoly (this.geojson, bounds);
-    oas = inPoly (oas, geo).features.map (oa => oa.properties.areacd);
+    oas = inPoly (oas, geo).features.map (oa => oa.properties[boundaries.id_key]);
 
     return {bbox: bounds, oa: new Set (oas)};
   }
 
   compress (oa_all) {
-    const lsoa_all = oa_all.map (oa => this.lookup[oa].lsoa21cd);
-    const msoa_all = oa_all.map (oa => this.lookup[oa].msoa21cd);
-    let oa = [];
-    let lsoa = [];
-    let msoa = [];
+    let all = {};
+    let compressed = {};
+    all[key] = oa_all;
+    compressed[key] = [];
+    parents.forEach(p => {
+      all[p.key] = oa_all.map(oa => this.lookup[oa][p.code]);
+      compressed[p.key] = [];
+    });
+    const keys = Object.keys(all).reverse();
     for (let i = 0; i < oa_all.length; i++) {
-      if (!msoa.includes (msoa_all[i]) && !lsoa.includes (lsoa_all[i])) {
-        if (
-          msoa_all.filter (msoa => msoa_all[i] == msoa).length ==
-          this.msoa_count[msoa_all[i]]
-        ) {
-          msoa.push (msoa_all[i]);
-        } else if (
-          lsoa_all.filter (lsoa => lsoa_all[i] == lsoa).length ==
-          this.lsoa_count[lsoa_all[i]]
-        ) {
-          lsoa.push (lsoa_all[i]);
-        }
-        else {
-          oa.push(oa_all[i])
+      if (parents.every(p => !compressed[p.key].includes(all[p.key][i]))) {
+        for (let j = 0; j < keys.length; j ++) {
+          let thiskey = keys[j];
+          if (j === keys.length - 1) {
+            compressed[thiskey].push(all[thiskey][i])
+          } else if (
+            all[thiskey].filter(cd => all[thiskey][i] === cd).length ===
+            this[`${thiskey}_count`][all[thiskey][i]]
+          ) {
+            compressed[thiskey].push(all[thiskey][i]);
+            break;
+          }
         }
       }
     }
-    // console.warn('ssss', {oa,lsoa,msoa,oa_all});
-    return {oa, lsoa, msoa};
+    return compressed;
   }
 
   async simplify (
@@ -141,18 +145,16 @@ class Centroids {
     mapobject
     // options = {simplify_geo: false},
   ) {
-    const oa_all = Array.from (selected.oa);
+    const oa_all = Array.from (selected[key]);
 
     // compress the codes
-    let {oa, lsoa, msoa} = this.compress(oa_all);
-    const bbox = this.bounds (oa_all);
+    const compressed = this.compress(oa_all);
+    const bbox = this.bounds(oa_all);
     var merge = {};
     merge.properties = {
       name,
       // bbox,
-      oa,
-      lsoa,
-      msoa,
+      ...compressed,
       oa_all,
       original: oa_all.length,
     };
@@ -164,7 +166,7 @@ class Centroids {
     merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
       var geometry = mapobject
         .queryRenderedFeatures ({layers: ['bounds']})
-        .filter (e => selected.oa.has (e.properties.areacd));
+        .filter (e => selected[key].has(e.properties[boundaries.id_key]));
 
       let geojson = {
         type: 'FeatureCollection',
@@ -185,7 +187,6 @@ class Centroids {
       
       let area_sqm = area(dissolved);
       filterGeo(dissolved, area_sqm);
-
       resolve(dissolved);
     }));
 
