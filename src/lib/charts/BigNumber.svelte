@@ -9,7 +9,7 @@
   export let rounded = "";
 </script>
 
-<div class="num-big">{prefix}{format(value)}{suffix}</div>
+<div class="num-big">{prefix ? prefix : ""}{format(value)}{suffix}</div>
 {#if unit}
 <div class="num-suffix">{unit}</div>
 {/if}

@@ -3,10 +3,9 @@ import {roundCount} from '../draw/misc-utils';
 import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 function makeUrl(table, codes, comp) {
-  let url = `https://www.nomisweb.co.uk/api/v01/dataset/${table.tableCode}.data.csv?date=latest&geography=MAKE|MyCustomArea|${codes},${comp}&${table.cellCode}=${makeCells(table.categories)}&measures=${table.measures}&select=geography_name,${table.cellCode}_name,obs_value`;
+  let url = `https://www.nomisweb.co.uk/api/v01/dataset/${table.tableCode}.data.csv?date=latest&geography=MAKE|MyCustomArea|${codes.join(";")},${comp}&${table.cellCode}=${makeCells(table.categories)}&measures=${table.measures}&select=geography_name,${table.cellCode}_name,obs_value`;
   if (table.queryExt) url += table.queryExt;
   return url;
-
 }
 
 function makeCells(categories) {
@@ -35,11 +34,11 @@ function calcPercent(data) {
   return dataNew;
 }
 
-export default async function (table, codes, comp = "K04000001") {
-  let url = makeUrl(table, codes, comp);
-  // console.log("url", url);
-  let res = await fetch(url);
-  let str = (await res.text()).replace("GEOGRAPHY_NAME", "areanm").replace("OBS_VALUE", "value").replace(`${table.cellCode}_name`.toUpperCase(), "category");
+export default async function (table, state, comp = "K04000001") {
+  const codes = table.onlyOA ? state.codes : state.compressed;
+  const url = makeUrl(table, codes, comp);
+  const res = await fetch(url);
+  const str = (await res.text()).replace("GEOGRAPHY_NAME", "areanm").replace("OBS_VALUE", "value").replace(`${table.cellCode}_name`.toUpperCase(), "category");
   let data = csvParse(str, autoType);
   if (table.unit === "%" && table.measures === 20100) data = calcPercent(data);
   analyticsEvent({

@@ -98,16 +98,17 @@
     {/if}
     {#each tables || [] as tab}
       <Card title={topicsLookup[tab.code].label}>
-        {#if ["population", "households", "population_density", "median_age"].includes(tab.code)}
+        {#if topicsLookup[tab.code]?.chart === "number"}
         <BigNumber
           value={tab.data[0]}
           unit={topicsLookup[tab.code].unit}
+          prefix={topicsLookup[tab.code].prefix}
           description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}`}
           rounded={tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
           tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit} (nearest 100 for ${comp})` :
           null}
         />
-        {:else if tab.code === "resident_age"}
+        {:else if topicsLookup[tab.code]?.chart === "profile"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {:else}
         <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />

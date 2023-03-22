@@ -6,6 +6,7 @@
     "tableCode": "NM_2028_1",
     "cellCode": "c_sex",
     "measures": 20100,
+    "chart": "number",
     "unit": "people",
     "base": "all people",
     "categories": [
@@ -22,6 +23,7 @@
     "tableCode": "NM_2059_1",
     "cellCode": "c2021_hh_1",
     "measures": 20100,
+    "chart": "number",
     "unit": "households",
     "base": "all households",
     "categories": [
@@ -39,6 +41,7 @@
     "tableCode": "NM_2020_1",
     "cellCode": "c2021_age_19",
     "measures": 20100,
+    "chart": "profile",
     "unit": "%",
     "base": "all people",
     "categories": [

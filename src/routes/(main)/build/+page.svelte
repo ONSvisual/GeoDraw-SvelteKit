@@ -12,6 +12,7 @@
   import {simplify_geo, geo_blob} from '../draw/drawing-utils';
   import getTable from './gettable';
   import getParents from './getparents';
+  import {points} from '$lib/config/geography'
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import {centroids} from '$lib/stores/mapstore';
@@ -90,15 +91,12 @@
           )}/${code}.json`
         );
         let data = await res.json();
-        let comp = $centroids.compress(data.properties.codes);
+        let compressed = $centroids.compress(data.properties.codes);
         const info = {
-          compressed: [...comp.msoa, ...comp.lsoa, ...comp.oa].join(';'),
+          compressed,
           geojson: data,
           properties: {
             oa_all: data.properties.codes,
-            oa: comp.oa,
-            lsoa: comp.lsoa,
-            msoa: comp.msoa,
             name: data.properties.hclnm
               ? data.properties.hclnm
               : data.properties.areanm
@@ -135,11 +133,10 @@
     let props = store.properties;
     // console.log('props', props);
 
-    state.compressed =
-      store.compressed ||
-      [...props.msoa, ...props.lsoa, ...props.oa].flat().join(';');
+    state.codes = props.oa_all;
+    state.compressed = props.compressed;
     
-    let par = await getParents(geojson, state.compressed.split(';'));
+    let par = await getParents(geojson, state.compressed);
     coverage = par.coverage;
     parents = par.parents.filter(p => p.areanm !== state.name);
     topics = topics_all.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
@@ -164,7 +161,8 @@
       if (cache[comp][data[i].code]) {
         table = cache[comp][data[i].code];
       } else {
-        table = await getTable(data[i], state.compressed, comp);
+        console.log(state);
+        table = await getTable(data[i], state, comp);
         cache[comp][data[i].code] = table;
       }
       tables.push({code: data[i].code, data: table});

@@ -13,7 +13,7 @@ const key = points.key;
 const code = `${points.key}${String(points.year).slice(2)}cd`;
 const parents = points.parents.map(key => ({
   key,
-  code: `${key}${String(points.year).slice(0, 2)}cd`
+  code: `${key}${String(points.year).slice(2)}cd`
 }));
 
 // Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
@@ -112,25 +112,23 @@ class Centroids {
 
   compress (oa_all) {
     let all = {};
-    let compressed = {};
+    let compressed = [];
     all[key] = oa_all;
-    compressed[key] = [];
     parents.forEach(p => {
       all[p.key] = oa_all.map(oa => this.lookup[oa][p.code]);
-      compressed[p.key] = [];
-    });
+    }); 
     const keys = Object.keys(all).reverse();
     for (let i = 0; i < oa_all.length; i++) {
-      if (parents.every(p => !compressed[p.key].includes(all[p.key][i]))) {
+      if (parents.every(p => !compressed.includes(all[p.key][i]))) {
         for (let j = 0; j < keys.length; j ++) {
           let thiskey = keys[j];
           if (j === keys.length - 1) {
-            compressed[thiskey].push(all[thiskey][i])
+            compressed.push(all[thiskey][i]);
           } else if (
             all[thiskey].filter(cd => all[thiskey][i] === cd).length ===
             this[`${thiskey}_count`][all[thiskey][i]]
           ) {
-            compressed[thiskey].push(all[thiskey][i]);
+            compressed.push(all[thiskey][i]);
             break;
           }
         }
@@ -154,7 +152,7 @@ class Centroids {
     merge.properties = {
       name,
       // bbox,
-      ...compressed,
+      compressed,
       oa_all,
       original: oa_all.length,
     };
