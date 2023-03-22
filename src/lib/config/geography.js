@@ -1,11 +1,12 @@
 import { base } from "$app/paths";
 
 // data constants
+export const cdnbase = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1";
 export const places = `${base}/data/places-list.csv`;
 export const mapstyle = `${base}/data/style.json`
 export const points = {
   key: "oa",
-  url: "https://cdn.ons.gov.uk/maptiles/cp-geos/v1/oa21-data.csv",
+  url: `${cdnbase}/oa21-data.csv`,
   parents: ["lsoa", "msoa"],
   year: 2021
 };

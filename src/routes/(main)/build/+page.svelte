@@ -12,7 +12,6 @@
   import {simplify_geo, geo_blob} from '../draw/drawing-utils';
   import getTable from './gettable';
   import getParents from './getparents';
-  import {points} from '$lib/config/geography'
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import {centroids} from '$lib/stores/mapstore';
@@ -85,7 +84,7 @@
       let code = hash.slice(1);
       try {
         let res = await fetch(
-          `https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(
+          `${cdnbase}/${code.slice(
             0,
             3
           )}/${code}.json`

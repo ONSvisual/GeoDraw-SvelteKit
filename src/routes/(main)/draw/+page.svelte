@@ -24,7 +24,7 @@
     selected,
     centroids
   } from '$lib/stores/mapstore';
-  import {boundaries} from '$lib/config/geography';
+  import {boundaries, cdnbase} from '$lib/config/geography';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 
@@ -157,7 +157,7 @@
       } else if (hash.length == 10) {
         let code = hash.slice(1);
         try {
-          fetch(`https://cdn.ons.gov.uk/maptiles/cp-geos/v1/${code.slice(0, 3)}/${code}.json`)
+          fetch(`${cdnbase}/${code.slice(0, 3)}/${code}.json`)
           .then(res => res.json())
           .then(data => {
             newselect();

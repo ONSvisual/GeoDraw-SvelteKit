@@ -1,5 +1,6 @@
 <script context="module">
   import { base } from "$app/paths";
+  import { cdnbase } from "$lib/config/geography";
   import { csvParse, autoType } from "d3-dsv";
   import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
   import Pbf from "pbf";
@@ -8,7 +9,6 @@
   import inPolygon from "@turf/boolean-point-in-polygon";
 
 	// Config for places data
-  const baseurl = "https://cdn.ons.gov.uk/maptiles/cp-geos/v1";
   const geotypes = [
     {keys: ["E00", "W00"], label: "Output area"},
     {keys: ["E01", "W01"], label: "LSOA"},
@@ -54,7 +54,7 @@
 	export async function getPlace(code) {
     let geo;
     try {
-      let geo_raw = await fetch(`${baseurl}/${code.slice(0,3)}/${code}.json`);
+      let geo_raw = await fetch(`${cdnbase}/${code.slice(0,3)}/${code}.json`);
       geo = await geo_raw.json();
     }
     catch(err) {
