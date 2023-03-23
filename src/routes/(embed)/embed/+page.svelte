@@ -8,6 +8,7 @@
   import BarChart from '$lib/charts/BarChart.svelte';
   import AreaMap from '$lib/charts/AreaMap.svelte';
   import ProfileChart from '$lib/charts/ProfileChart.svelte';
+  import LineChart from '$lib/charts/LineChart.svelte';
   import BigNumber from '$lib/charts/BigNumber.svelte';
 
   let pym_child, name, comp, geojson, tables, population;
@@ -110,6 +111,8 @@
         />
         {:else if topicsLookup[tab.code]?.chart === "profile"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        {:else if topicsLookup[tab.code]?.chart === "line"}
+        <LineChart data={expandTable(tab, name, comp)} zKey="areanm" xDomain={topicsLookup[tab.code].categories.map(c => c.label)}/>
         {:else}
         <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {/if}

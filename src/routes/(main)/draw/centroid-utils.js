@@ -90,6 +90,7 @@ class Centroids {
       })
     };
     let bounds = bbox (points);
+    console.log(points.geometries, bounds)
     bounds = [bounds[0] - 0.02, bounds[1] - 0.02, bounds[2] + 0.02, bounds[3] + 0.02];
     // console.log("bounds", bounds);
     return bounds;
@@ -143,7 +144,7 @@ class Centroids {
     mapobject
     // options = {simplify_geo: false},
   ) {
-    const oa_all = Array.from (selected[key]);
+    const oa_all = Array.from (selected.oa);
 
     // compress the codes
     const compressed = this.compress(oa_all);
@@ -164,7 +165,7 @@ class Centroids {
     merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
       var geometry = mapobject
         .queryRenderedFeatures ({layers: ['bounds']})
-        .filter (e => selected[key].has(e.properties[boundaries.id_key]));
+        .filter (e => selected.oa.has(e.properties[boundaries.id_key]));
 
       let geojson = {
         type: 'FeatureCollection',

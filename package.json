@@ -31,6 +31,7 @@
 		"carbon-components-svelte": "^0.62.3",
 		"d3-dsv": "^3.0.1",
 		"d3-format": "^3.1.0",
+		"d3-scale": "^4.0.2",
 		"flatbush": "^4.0.0",
 		"html2canvas": "^1.4.1",
 		"iconv-lite": "^0.6.3",
