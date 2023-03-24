@@ -168,7 +168,7 @@
     "chart": "line",
     "prefix": "£",
     "unit": "million",
-    "base": "",
+    "base": "GVA",
     "geo": "lsoa11",
     "flatData": true,
     "categories": [

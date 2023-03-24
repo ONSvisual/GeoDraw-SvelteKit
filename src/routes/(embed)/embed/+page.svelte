@@ -112,7 +112,7 @@
         {:else if topicsLookup[tab.code]?.chart === "profile"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {:else if topicsLookup[tab.code]?.chart === "line"}
-        <LineChart data={expandTable(tab, name, comp)} zKey="areanm" xDomain={topicsLookup[tab.code].categories.map(c => c.label)}/>
+        <LineChart data={expandTable(tab, name, comp)} zKey="areanm" xDomain={topicsLookup[tab.code].categories.map(c => c.label)} base="% change in {topicsLookup[tab.code].base} since {topicsLookup[tab.code].categories[0].label}" />
         {:else}
         <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {/if}

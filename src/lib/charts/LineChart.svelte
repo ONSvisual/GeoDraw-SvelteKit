@@ -9,6 +9,7 @@
   export let lineWidth = 2;
   export let xDomain = [1981, 1991, 2001, 2011];
   export let xVal = xDomain[xDomain.length - 1];
+  export let base = "";
   export let formatTick = (tick) => `${tick - 1 > 0 ? '+' : ''}${Math.round((tick - 1) * 100)}`;
 
   let _data, yDomain, zDomain, xScale, yScale;
@@ -91,80 +92,91 @@
 </div>
 {/if}
 
+{#if base}
+<small>{base}</small>
+{/if}
+
 <style>
-.bold {
-  font-weight: bold;
-}
-.brackets::before {
-  content: "(";
-}
-.brackets::after {
-  content: ")";
-}
-.line-group, .x-scale {
-  display: block;
-  position: relative;
-  width: 100%;
-}
-.line-group {
-  margin-top: 24px;
-}
-.baseline {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  border-top: 1.5px solid #555;
-}
-.x-scale {
-  position: relative;
-  font-size: 0.9rem;
-}
-.x-scale > div {
-  position: absolute;
-  top: 0;
-  line-height: normal;
-  padding-top: 2px;
-}
-.marker-vis {
-  transform: translate(0,calc(3px - 0.5rem)) !important;
-}
-ul.legend-block {
-  list-style-type: none;
-  padding: 0;
-  margin: 0 0 5px 0;
-  min-height: 1rem;
-}
-ul.legend-block > li {
-  display: inline-block;
-  margin: 0 10px 0 0;
-      padding: 0;
-}
-.legend-vis {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  transform: translate(0,3px);
-}
-svg {
-  width: 100%;
-  height: 100%;
-      overflow: visible;
-}
-path {
-  fill: none;
-}
-.point {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #27A0CC;
-  border-radius: 50%;
-  transform: translate(-50%,-50%);
-}
-.point-text {
-  position: absolute;
-  line-height: 1;
-  background-color: rgba(245,245,246,0.7);
-  transform: translate(-100%,calc(-100% - 7px));
-}
+  .bold {
+    font-weight: bold;
+  }
+  .brackets::before {
+    content: "(";
+  }
+  .brackets::after {
+    content: ")";
+  }
+  .line-group, .x-scale {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+  .line-group {
+    margin-top: 24px;
+  }
+  .baseline {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border-top: 1.5px solid #555;
+  }
+  .x-scale {
+    position: relative;
+    font-size: 0.9rem;
+  }
+  .x-scale > div {
+    position: absolute;
+    top: 0;
+    line-height: normal;
+    padding-top: 2px;
+  }
+  .marker-vis {
+    transform: translate(0,calc(3px - 0.5rem)) !important;
+  }
+  ul.legend-block {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 5px 0;
+    min-height: 1rem;
+  }
+  ul.legend-block > li {
+    display: inline-block;
+    margin: 0 10px 0 0;
+        padding: 0;
+  }
+  .legend-vis {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    transform: translate(0,3px);
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+        overflow: visible;
+  }
+  path {
+    fill: none;
+  }
+  .point {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #27A0CC;
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+  }
+  .point-text {
+    position: absolute;
+    line-height: 1;
+    background-color: rgba(245,245,246,0.7);
+    transform: translate(-100%,calc(-100% - 7px));
+  }
+  small {
+    font-size: 14px;
+    line-height: 1.3;
+    display: block;
+    margin-top: 8px;
+    color: #777;
+  }
 </style>
