@@ -38,7 +38,7 @@
     {topic.desc}
     {#if topic.url}
     <!-- svelte-ignore security-anchor-rel-noreferrer -->
-    <a href="https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/{topic.url}" target="_blank">Read more</a>
+    <a href="https://www.ons.gov.uk{topic.url[0] === '/' ? topic.url : `/census/census2021dictionary/variablesbytopic/${topic.url}`}" target="_blank">Read more</a>
     {/if}
   </p>
 </div>

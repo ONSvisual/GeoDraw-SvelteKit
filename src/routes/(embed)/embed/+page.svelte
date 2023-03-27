@@ -35,7 +35,6 @@
   };
 
   function update() {
-    
     let hash = document.location.hash;
 
     if (hash && hash.includes('name=')) {
@@ -58,6 +57,8 @@
       stats = props.stats;
     }
   }
+
+  const format = (val) => val.toLocaleString('en-GB', {minimumFractionDigits: 0, maximumFractionDigits: 0});
 
   async function makePNG(e) {
     // console.log('pngbtn', e);
@@ -104,9 +105,10 @@
           value={tab.data[0]}
           unit={topicsLookup[tab.code].unit}
           prefix={topicsLookup[tab.code].prefix}
-          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}`}
-          rounded={tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
-          tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit} (nearest 100 for ${comp})` :
+          {format}
+          description={`<mark>${topicsLookup[tab.code].prefix ? topicsLookup[tab.code].prefix : ''}${format(tab.data[1])} ${topicsLookup[tab.code].unit}</mark> in ${comp}`}
+          rounded={["population", "households"].includes(tab.code) && tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
+          ["population", "households"].includes(tab.code) && tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit} (nearest 100 for ${comp})` :
           null}
         />
         {:else if topicsLookup[tab.code]?.chart === "profile"}

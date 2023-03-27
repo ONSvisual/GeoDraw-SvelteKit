@@ -77,5 +77,5 @@ export default async function (table, state, comp, map = null) {
     topicName: table.label,
     topicCode: table.code
   });
-  return ["population", "households", "gva"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
+  return ["population", "households"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
 }

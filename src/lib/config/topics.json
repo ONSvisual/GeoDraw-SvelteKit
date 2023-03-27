@@ -142,8 +142,9 @@
   },
   {
     "code": "gva",
-    "label": "Gross value added",
+    "label": "Gross value added (GVA)",
     "desc": "A measure of the value of goods and services produced in an area.",
+    "url": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedbalancedqmi",
     "tableCode": "NM_2400_1",
     "cellCode": "cell",
     "measures": 20100,
@@ -160,8 +161,9 @@
   },
   {
     "code": "gva_timeseries",
-    "label": "Gross value added, timeseries",
+    "label": "Gross value added (GVA), timeseries",
     "desc": "A measure of the value of goods and services produced in an area.",
+    "url": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedbalancedqmi",
     "tableCode": "NM_2400_1",
     "cellCode": "cell",
     "measures": 20100,
