@@ -151,7 +151,7 @@
     "chart": "number",
     "prefix": "£",
     "unit": "million",
-    "base": "",
+    "base": "all people",
     "geo": "lsoa11",
     "flatData": true,
     "categories": [
@@ -170,7 +170,7 @@
     "chart": "line",
     "prefix": "£",
     "unit": "million",
-    "base": "GVA",
+    "base": "all people",
     "geo": "lsoa11",
     "flatData": true,
     "categories": [

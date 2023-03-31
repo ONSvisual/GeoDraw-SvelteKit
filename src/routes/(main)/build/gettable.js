@@ -1,6 +1,6 @@
 import {base} from '$app/paths';
 import {csvParse, autoType} from 'd3-dsv';
-import {roundCount} from '../draw/misc-utils';
+import {round, roundCount} from '../draw/misc-utils';
 import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
 function makeUrl(table, codes, comp) {
@@ -77,5 +77,7 @@ export default async function (table, state, comp, map = null) {
     topicName: table.label,
     topicCode: table.code
   });
-  return ["population", "households"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
+  return ["population", "households"].includes(table.code) ? data.map(d => roundCount(d.value)) :
+    ["gva", "gva_timeseries"].includes(table.code) ? data.map(d => round(d.value)) :
+    data.map(d => d.value);
 }

@@ -91,7 +91,7 @@ class Centroids {
     };
     let bounds = bbox (points);
     console.log(points.geometries, bounds)
-    bounds = [bounds[0] - 0.02, bounds[1] - 0.02, bounds[2] + 0.02, bounds[3] + 0.02];
+    bounds = [bounds[0] - 0.04, bounds[1] - 0.04, bounds[2] + 0.04, bounds[3] + 0.04];
     // console.log("bounds", bounds);
     return bounds;
   }

@@ -109,12 +109,12 @@
           description={`<mark>${topicsLookup[tab.code].prefix ? topicsLookup[tab.code].prefix : ''}${format(tab.data[1])} ${topicsLookup[tab.code].unit}</mark> in ${comp}`}
           rounded={["population", "households"].includes(tab.code) && tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
           ["population", "households"].includes(tab.code) && tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit} (nearest 100 for ${comp})` :
-          null}
+          "Rounded to the nearest £1 million"}
         />
         {:else if topicsLookup[tab.code]?.chart === "profile"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {:else if topicsLookup[tab.code]?.chart === "line"}
-        <LineChart data={expandTable(tab, name, comp)} zKey="areanm" xDomain={topicsLookup[tab.code].categories.map(c => c.label)} base="% change in {topicsLookup[tab.code].base} since {topicsLookup[tab.code].categories[0].label}" />
+        <LineChart data={expandTable(tab, name, comp)} zKey="areanm" xDomain={topicsLookup[tab.code].categories.map(c => c.label)} base="% change in GVA since {topicsLookup[tab.code].categories[0].label}" />
         {:else}
         <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
         {/if}
@@ -123,6 +123,7 @@
   </Cards>
 
   <span class="footnote">Source: Office for National Statistics - Census 2021</span>
+  <div class="spacer"/>
 {/if}
 
 <style>
@@ -134,5 +135,8 @@
   h3 {
     font-size: 1.3rem;
     font-weight: bold;
+  }
+  .spacer {
+    height: 10px;
   }
 </style>
