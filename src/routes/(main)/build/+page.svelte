@@ -9,10 +9,11 @@
   import TopicItem from '$lib/ui/TopicItem.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import topics_all from '$lib/config/topics.json';
+  import {lsoa_lkp_path, lsoa_pts_path} from '$lib/config/geography';
   import {simplify_geo, geo_blob} from '../draw/drawing-utils';
   import getTable from './gettable';
   import getParents from './getparents';
-  import {download, clip} from '$lib/util/functions';
+  import {download, clip, getLsoa2011} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import {centroids} from '$lib/stores/mapstore';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
@@ -24,6 +25,7 @@
   let parents;
   let coverage = ["E", "W"];
   let topics = [...topics_all]; // Topics might be filtered based on coverage
+  let lsoa11; // HACK!! Lookup between 2021 lsoas -> 2011 lsoas + 2011 lsoas -> 2021 parent areas
 
   let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
   // would this not be better off as a MAP and not a dict?
@@ -141,6 +143,8 @@
     topics = topics_all.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
     state.comparison = coverage[1] ? parents[0] : parents[1];
 
+    lsoa11 = await getLsoa2011(lsoa_lkp_path, lsoa_pts_path);
+
     state.start = true;
     // console.warn(state.compressed);
   }
@@ -153,16 +157,15 @@
   let cache = {};
   async function get_data(data, comp) {
     if (!state.start) return [];
-    if (!cache[comp]) cache[comp] = {};
+    if (!cache[comp.areacd]) cache[comp.areacd] = {};
     let tables = [];
     for (let i = 0; i < data.length; i++) {
       let table;
-      if (cache[comp][data[i].code]) {
-        table = cache[comp][data[i].code];
+      if (cache[comp.areacd][data[i].code]) {
+        table = cache[comp.areacd][data[i].code];
       } else {
-        console.log(state);
-        table = await getTable(data[i], state, comp);
-        cache[comp][data[i].code] = table;
+        table = await getTable(data[i], state, comp, lsoa11);
+        cache[comp.areacd][data[i].code] = table;
       }
       tables.push({code: data[i].code, data: table});
     }
@@ -177,7 +180,7 @@
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
       let codes = data.map((d) => d.code);
-      tables = await get_data(topics.filter((t) => codes.includes(t.code)), comp.areacd);
+      tables = await get_data(topics.filter((t) => codes.includes(t.code)), comp);
 
       embed_hash = `#/?name=${btoa(name)}&comp=${btoa(comp.areanm)}&tabs=${btoa(JSON.stringify(tables))}${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''

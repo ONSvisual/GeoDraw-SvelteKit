@@ -8,6 +8,7 @@
   import BarChart from '$lib/charts/BarChart.svelte';
   import AreaMap from '$lib/charts/AreaMap.svelte';
   import ProfileChart from '$lib/charts/ProfileChart.svelte';
+  import LineChart from '$lib/charts/LineChart.svelte';
   import BigNumber from '$lib/charts/BigNumber.svelte';
 
   let pym_child, name, comp, geojson, tables, population;
@@ -34,7 +35,6 @@
   };
 
   function update() {
-    
     let hash = document.location.hash;
 
     if (hash && hash.includes('name=')) {
@@ -53,14 +53,17 @@
       comp = props.comp ? props.comp : "England and Wales";
       geojson = props.poly;
       population = props.population;
-      tables = props.tabs;
+      tables = props.tabs.map(t => ({
+        ...topicsLookup[t.code],
+        data: expandTable(t, name, comp)
+      }));
       stats = props.stats;
     }
   }
 
-  async function makePNG(e) {
-    // console.log('pngbtn', e);
+  const format = (val) => val.toLocaleString('en-GB', {minimumFractionDigits: 0, maximumFractionDigits: 0});
 
+  async function makePNG(e) {
     let canvas = await html2canvas(document.body);
     const base64 = canvas.toDataURL();
     let a = document.createElement('a');
@@ -97,27 +100,31 @@
       </Card>
     {/if}
     {#each tables || [] as tab}
-      <Card title={topicsLookup[tab.code].label}>
-        {#if topicsLookup[tab.code]?.chart === "number"}
+      <Card title="{tab.label}, <span>{tab.date ? tab.date : '2021'}</span>">
+        {#if tab?.chart === "number"}
         <BigNumber
-          value={tab.data[0]}
-          unit={topicsLookup[tab.code].unit}
-          prefix={topicsLookup[tab.code].prefix}
-          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}`}
-          rounded={tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
-          tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit} (nearest 100 for ${comp})` :
-          null}
+          value={tab.data[0].value}
+          unit={tab.unit}
+          prefix={tab.prefix}
+          {format}
+          description={`<mark>${tab.prefix ? tab.prefix : ''}${format(tab.data[1].value)} ${tab.unit}</mark> in ${comp}`}
+          rounded={["population", "households"].includes(tab.code) && tab.data[0].value > 1000 ? `Rounded to the nearest 100 ${tab.unit}` :
+          ["population", "households"].includes(tab.code) && tab.data[0].value > 100 ? `Rounded to the nearest 10 ${tab.unit} (nearest 100 for ${comp})` :
+          "Rounded to the nearest £1 million"}
         />
-        {:else if topicsLookup[tab.code]?.chart === "profile"}
-        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        {:else if tab?.chart === "profile"}
+        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={tab.data} base="% of {tab.base}" />
+        {:else if tab?.chart === "line"}
+        <LineChart data={tab.data} zKey="areanm" xDomain={tab.categories.map(c => c.label)} base="% change in GVA since {tab.categories[0].label}" />
         {:else}
-        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        <BarChart xKey="value" yKey="category" zKey="areanm" data={tab.data} base="% of {tab.base}" />
         {/if}
       </Card>
     {/each}
   </Cards>
 
-  <span class="footnote">Source: Office for National Statistics - Census 2021</span>
+  <span class="footnote">Source: Office for National Statistics</span>
+  <div class="spacer"/>
 {/if}
 
 <style>
@@ -129,5 +136,8 @@
   h3 {
     font-size: 1.3rem;
     font-weight: bold;
+  }
+  .spacer {
+    height: 10px;
   }
 </style>

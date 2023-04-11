@@ -5,7 +5,7 @@
 	
 	export let theme = "light";
 	export let filled = true;
-	export let census = true;
+	export let census = false;
 
 	let primary = theme == "dark" ? "white" : filled ? "#003c57" : "#222222";
 	let secondary = theme == "dark" || filled ? "#a8bd3a" : "#222222";

@@ -145,7 +145,7 @@
       let res = await fetch(`https://api.postcodes.io/postcodes/${e.detail.areacd}`);
 			let json = await res.json();
 			if (json.result) {
-        let oa = await getOAfromLngLat(json.result.longitude, json.result.latitude);
+        let oa = json.result?.codes?.lsoa;
         if (oa) dispatch('select', await getPlace(oa));
       }
 		} else {

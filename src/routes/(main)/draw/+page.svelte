@@ -50,7 +50,7 @@
     topicsFilter: '',
     infoExpand: true,
   };
-  const zoomstop = 8;
+  const zoomstop = 7;
   let zoom; // prop bound to map zoom level
   let uploader; // DOM element for geojson file upload
   let pselect = '0';
@@ -86,7 +86,7 @@
       area: {
         type: 'vector',
         maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
-        minzoom: 8, // IMPORTANT: This is the minimum zoom available
+        minzoom: 7, // IMPORTANT: This is the minimum zoom available
         tiles: [boundaries.url],
       },
 
