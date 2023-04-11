@@ -13,8 +13,8 @@
 <article class:blank class="{!blank ? 'tile tile__content' : ''}" style:grid-column="span {colspan == 1 ? 1 : colspan > $cols ? $cols : colspan}" style:grid-row="span {rowspan}">
   {#if title}
   <header class="margin-top--1">
-    <h3 class="margin-top--0 margin-right--0 margin-bottom--0 margin-left--0">
-      {title}
+    <h3 class="card-title margin-top--0 margin-right--0 margin-bottom--0 margin-left--0">
+      {@html title}
     </h3>
   </header>
   {/if}
@@ -46,5 +46,8 @@
   .tile, .blank {
     color: black;
     margin: 4px 0 0 !important;
+  }
+  :global(h3.card-title > span) {
+    font-weight: 400;
   }
 </style>

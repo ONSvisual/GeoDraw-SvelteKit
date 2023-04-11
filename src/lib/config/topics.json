@@ -152,6 +152,7 @@
     "prefix": "£",
     "unit": "million",
     "base": "all people",
+    "date": "2020",
     "geo": "lsoa11",
     "flatData": true,
     "categories": [
@@ -161,7 +162,7 @@
   },
   {
     "code": "gva_timeseries",
-    "label": "Gross value added (GVA), timeseries",
+    "label": "Gross value added (GVA) timeseries",
     "desc": "A measure of the value of goods and services produced in an area.",
     "url": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedbalancedqmi",
     "tableCode": "NM_2400_1",
@@ -171,6 +172,7 @@
     "prefix": "£",
     "unit": "million",
     "base": "all people",
+    "date": "1998-2020",
     "geo": "lsoa11",
     "flatData": true,
     "categories": [

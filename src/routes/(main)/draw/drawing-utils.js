@@ -300,7 +300,6 @@ function circle_fast (clear = false, center = radius_center) {
 ////////////////////
 
 export function geo_blob (q) {
-  console.log(q);
   let geojson = q.geojson;
   geojson.properties = {
     name: q.properties.name,

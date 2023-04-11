@@ -164,7 +164,6 @@
       if (cache[comp.areacd][data[i].code]) {
         table = cache[comp.areacd][data[i].code];
       } else {
-        console.log(state);
         table = await getTable(data[i], state, comp, lsoa11);
         cache[comp.areacd][data[i].code] = table;
       }
