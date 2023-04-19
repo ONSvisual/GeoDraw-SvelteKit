@@ -200,7 +200,7 @@
     "desc": "The passports people hold.",
     "url": "internationalmigrationvariablescensus2021/passportsheld",
     "tableCode": "NM_2025_1",
-    "cellCode": "c2021_pass_18",
+    "cellCode": "c2021_pass_27",
     "measures": 20301,
     "unit": "%",
     "base": "all people",

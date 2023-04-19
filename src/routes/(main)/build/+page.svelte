@@ -12,6 +12,7 @@
   import {simplify_geo, geo_blob} from '../draw/drawing-utils';
   import getTable from './gettable';
   import getParents from './getparents';
+  import {cdnbase} from '$lib/config/geography';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';
   import {centroids} from '$lib/stores/mapstore';
@@ -84,18 +85,15 @@
       let code = hash.slice(1);
       try {
         let res = await fetch(
-          `${cdnbase}/${code.slice(
-            0,
-            3
-          )}/${code}.json`
+          `${cdnbase}/${code.slice(0, 3)}/${code}.json`
         );
         let data = await res.json();
         let compressed = $centroids.compress(data.properties.codes);
         const info = {
-          compressed,
           geojson: data,
           properties: {
             oa_all: data.properties.codes,
+            compressed,
             name: data.properties.hclnm
               ? data.properties.hclnm
               : data.properties.areanm
@@ -121,7 +119,7 @@
 
     // console.debug('build-', store);
     if (!store) {
-      // alert('Warning, no area selected! Redirecting to the drawing page.');
+      alert('Warning, no area selected! Redirecting to the drawing page.');
       goto(`${base}/draw/`);
     }
 
