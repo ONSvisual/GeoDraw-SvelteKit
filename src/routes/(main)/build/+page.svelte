@@ -187,6 +187,7 @@
         pym_parent = new pym.Parent('embed', `${base}/embed/${embed_hash}`, {
           name: 'embed',
           id: 'iframe',
+          title: 'Embedded area profile'
         });
         isLoading = false;
       } else {
@@ -207,7 +208,7 @@
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
     return `<div id="custom-profile"></div>
 <script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
-<script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile"});<\/script>`;
+<script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile", title: "Embedded area profile"});<\/script>`;
   }
 
   async function downloadData() {

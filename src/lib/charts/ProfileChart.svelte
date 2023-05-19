@@ -139,6 +139,6 @@
     line-height: 1.3;
     display: block;
     margin-top: 8px;
-    color: #777;
+    color: #707070;
   }
 </style>
