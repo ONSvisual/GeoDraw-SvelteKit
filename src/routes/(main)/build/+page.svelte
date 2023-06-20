@@ -13,6 +13,7 @@
   import getTable from './gettable';
   import getParents from './getparents';
   import {download, clip} from '$lib/util/functions';
+  import {cdnbase} from '$lib/config/geography';
   import {onMount} from 'svelte';
   import {centroids} from '$lib/stores/mapstore';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
@@ -77,12 +78,9 @@
 
     // in case we call for a pre loaded area as a hash string
     let hash = window.location.hash;
-    if (hash === '#undefined') {
-      hash = '';
-      window.location.hash = '';
-    } else if (hash.length == 10) {
+    if (hash.match(/#[EW]\d{8}/)) {
       let code = hash.slice(1);
-      try {
+      // try {
         let res = await fetch(
           `${cdnbase}/${code.slice(
             0,
@@ -90,17 +88,17 @@
           )}/${code}.json`
         );
         let data = await res.json();
-        let compressed = $centroids.compress(data.properties.codes);
+        let compressed = data.properties.c21cds;
         const info = {
-          compressed,
           geojson: data,
           properties: {
-            oa_all: data.properties.codes,
+            oa_all: $centroids.expand(compressed),
+            compressed,
             name: data.properties.hclnm
               ? data.properties.hclnm
               : data.properties.areanm
               ? data.properties.areanm
-              : code,
+              : code
           },
         };
         localStorage.setItem('onsbuild', JSON.stringify(info));
@@ -109,11 +107,11 @@
           areaCode: code,
           areaName: info.properties.name
         });
-      } catch (err) {
-        // console.warn(err);
-        alert(`Requested GSS code ${code} is unavailable or invalid.`);
-      }
-      history.replaceState(null, null, ' ');
+      // } catch (err) {
+      //   // console.warn(err);
+      //   alert(`Requested GSS code ${code} is unavailable or invalid.`);
+      // }
+      history.replaceState(null, '', ' ');
     }
 
     // resume as normal
@@ -127,11 +125,10 @@
 
     geojson = simplify_geo(store.geojson.geometry);
 
-    state.name = store.properties.name;
-
     let props = store.properties;
     // console.log('props', props);
 
+    state.name = props.name;
     state.codes = props.oa_all;
     state.compressed = props.compressed;
     
@@ -160,7 +157,6 @@
       if (cache[comp][data[i].code]) {
         table = cache[comp][data[i].code];
       } else {
-        console.log(state);
         table = await getTable(data[i], state, comp);
         cache[comp][data[i].code] = table;
       }
@@ -177,7 +173,7 @@
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
       let codes = data.map((d) => d.code);
-      tables = await get_data(topics.filter((t) => codes.includes(t.code)), comp.areacd);
+      tables = await get_data(topics.filter((t) => codes.includes(t.code)), comp.c21cds ? comp.c21cds.join(";") : comp.areacd);
 
       embed_hash = `#/?name=${btoa(name)}&comp=${btoa(comp.areanm)}&tabs=${btoa(JSON.stringify(tables))}${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''

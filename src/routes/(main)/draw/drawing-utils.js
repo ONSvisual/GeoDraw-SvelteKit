@@ -9,7 +9,7 @@ import {
   centroids,
 } from '$lib/stores/mapstore';
 import {boundaries} from '$lib/config/geography';
-import {roundAll, extent} from './misc-utils';
+import {roundAll, extent, union, difference} from '$lib/util/functions';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
 import circle from '@turf/circle';
@@ -53,7 +53,9 @@ function cursor () {
 }
 
 export async function init_draw () {
-  get (mapobject).addSource ('drawsrc', {
+  const map = get (mapobject);
+
+  map.addSource ('drawsrc', {
     type: 'geojson',
     data: {
       type: 'Feature',
@@ -64,7 +66,7 @@ export async function init_draw () {
     },
   });
 
-  get (mapobject).addLayer ({
+  map.addLayer ({
     id: 'draw_layer',
     type: 'fill',
     source: 'drawsrc',
@@ -75,7 +77,7 @@ export async function init_draw () {
     },
   });
 
-  get (mapobject).addLayer ({
+  map.addLayer ({
     id: 'draw_outline',
     type: 'line',
     source: 'drawsrc',
@@ -97,8 +99,8 @@ export async function init_draw () {
     userProperties: true,
   });
 
-  get (mapobject).addControl (Draw, 'top-right');
-  get (mapobject).on ('draw.selectionchange', drawPoly);
+  map.addControl (Draw, 'top-right');
+  map.on ('draw.selectionchange', drawPoly);
   Draw.deleteAll ();
   async function drawPoly (e) {
     var data = Draw.getAll ();
@@ -106,15 +108,15 @@ export async function init_draw () {
     update (geo);
     clearpoly ();
   }
-  get (mapobject).on ('zoomend', function () {
-    const de = get (mapobject).getZoom () < mzm;
+  map.on ('zoomend', function () {
+    const de = map.getZoom () < mzm;
     draw_enabled.set (de);
     // cursor()
   });
 
-  get (mapobject).doubleClickZoom.enable ();
+  map.doubleClickZoom.enable ();
   // on move events
-  get (mapobject).on ('mousemove', 'bounds', function move (e) {
+  map.on ('mousemove', 'bounds', function move (e) {
     // console.log (e.lngLat, get (draw_type));
 
     if (get (draw_type) == 'radius') circle_fast (false, e.lngLat);
@@ -150,9 +152,26 @@ export async function init_draw () {
         break;
     }
   }
+  map.on ('click', 'bounds', boundclick); //mouse
+  map.on ('touchstart', 'bounds', boundclick); //touch
 
-  get (mapobject).on ('click', 'bounds', boundclick); //mouse
-  get (mapobject).on ('touchstart', 'bounds', boundclick); //touch
+  let hovered;
+
+  function boundhover (e) {
+    if (hovered) map.removeFeatureState(
+      {source: "area", sourceLayer: boundaries.layer, id: hovered},
+    );
+    if (e.features?.[0] && get(draw_type) === "select") {
+      hovered = e.features[0].properties[boundaries.id_key];
+      map.setFeatureState(
+        {source: "area", sourceLayer: boundaries.layer, id: hovered},
+        {hovered: true}
+      );
+    } else {
+      hovered = null;
+    }
+  }
+  map.on ('mousemove', 'bounds', boundhover); //hover
 }
 
 export function simplify_geo (geometry, max_length = 3000) {
@@ -209,7 +228,8 @@ export function clearpoly () {
 }
 
 export function change_data (layer, data) {
-  get (mapobject).getSource (layer).setData (data);
+  const map = get(mapobject);
+  if (map) map.getSource(layer).setData(data);
 }
 
 ////////////////////
@@ -228,11 +248,11 @@ export async function update (geo) {
 
   if (get (add_mode)) {
     current.push ({
-      oa: new Set ([...last.oa, ...features.oa]),
+      oa: union(last.oa, new Set(features.oa)),
     });
   } else {
     current.push ({
-      oa: new Set ([...last.oa].filter (x => !features.oa.has (x))),
+      oa: difference(last.oa, new Set(features.oa)),
     });
   }
 
@@ -245,12 +265,17 @@ function draw_point (e) {
   let feature = e.features[0];
   if (feature) {
     let code = feature.properties[boundaries.id_key];
+    let parentcd = feature.properties[boundaries.pt_key];
     let current = get (selected);
     let oas = current[current.length - 1].oa;
-    if (oas.has (code)) {
-      oas = new Set (Array.from (oas).filter (oa => oa !== code));
+    if (oas.has(code) && parentcd) {
+      oas = difference(oas, new Set(get(centroids).expand([parentcd])));
+    } else if (oas.has(code)) {
+      oas = difference(oas, new Set([code]));
+    } else if (parentcd) {
+      oas = union(oas, new Set(get(centroids).expand([parentcd])));
     } else {
-      oas = new Set ([...Array.from (oas), code]);
+      oas = new Set ([...oas, code]);
     }
     current.push ({oa: oas});
     updatelocal (current);

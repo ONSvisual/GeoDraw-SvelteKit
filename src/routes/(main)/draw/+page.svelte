@@ -12,7 +12,7 @@
   import '$lib/css/maplibre-gl.css';
   import {onMount} from 'svelte';
   import {update, simplify_geo, geo_blob} from './drawing-utils';
-  import {roundCount} from './misc-utils';
+  import {roundCount} from '$lib/util/functions';
   import {
     mapsource,
     maplayer,
@@ -50,7 +50,7 @@
     topicsFilter: '',
     infoExpand: true,
   };
-  const zoomstop = 8;
+  const zoomstop = 6;
   let zoom; // prop bound to map zoom level
   let uploader; // DOM element for geojson file upload
   let pselect = '0';
@@ -71,9 +71,8 @@
     isLoading = true;
       /* 
     A section to clear the local storage if past the last update date
-    When updating this, use the american format of mm/dd/yy
     */
-    if (new Date(localStorage.getItem('lastdate')) < new Date('18/18/2022')) {
+    if (new Date(localStorage.getItem('lastdate')) < new Date('2022-18-18')) {
       localStorage.clear();
     }
     localStorage.setItem('lastdate', +new Date());
@@ -82,12 +81,16 @@
     // console.clear();
 
     // map setup and vars
+    const promoteId = {};
+    promoteId[boundaries.layer] = boundaries.id_key;
+
     $mapsource = {
       area: {
         type: 'vector',
         maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
-        minzoom: 8, // IMPORTANT: This is the minimum zoom available
+        minzoom: 6, // IMPORTANT: This is the minimum zoom available
         tiles: [boundaries.url],
+        promoteId
       },
 
       points: {
@@ -100,19 +103,28 @@
       {
         id: 'bounds',
         source: 'area',
-        'source-layer': boundaries.key,
+        'source-layer': boundaries.layer,
         type: 'fill',
         paint: {
           'fill-color': 'transparent',
-          'fill-opacity': 1,
-          'fill-outline-color': 'steelblue',
+          'fill-opacity': 1
+        },
+      },
+      {
+        id: 'bounds-line',
+        source: 'area',
+        'source-layer': boundaries.layer,
+        type: 'line',
+        paint: {
+          'line-color': 'steelblue',
+          'line-width': ['case', ['==', ['feature-state', 'hovered'], true], 2, 0.3]
         },
       },
       {
         id: 'cpt',
         source: 'points',
         type: 'circle',
-        minzoom: 9,
+        minzoom: 10,
         paint: {
           'circle-radius': 1,
           'circle-color': 'coral'
@@ -167,7 +179,7 @@
             $selected = [
               ...$selected,
               {
-                oa: new Set(data.properties.codes)
+                oa: new Set($centroids.expand(data.properties.codes))
               },
             ];
 
@@ -525,12 +537,10 @@ The save data and continue function
 
         if (e.detail.type == 'place') {
           let bbox = e.detail.bbox;
-          let oa = new Set(e.detail.codes);
+          let oa = new Set($centroids.expand(e.detail.codes));
           $selected = [
             $selected,
-            {
-              oa: oa
-            },
+            { oa },
           ];
           $mapobject.fitBounds(bbox, {padding: 20});
           state.name = e.detail.areanm;
@@ -548,9 +558,7 @@ The save data and continue function
             var oa = new Set(features.map((f) => f.properties.oa));
             $selected = [
               $selected,
-              {
-                oa: oa
-              },
+              { oa },
             ];
           });
         }

@@ -45,7 +45,7 @@
 	$: noOptionsMessage = isWaiting ? "Loading..." : mode == "search" && filterText.length < 3 ? "Enter 3 or more characters for suggestions" : `No results match ${filterText}`;
 	$: itemFilter = (Array.isArray(value) && value.length >= maxSelected) || mode == "search" && filterText.length < 3
 	? (label, filterText, option) => false
-	: (label, filterText, option) => `${label}`.split("<")[0].toLowerCase().slice(0, filterText.length) == filterText.toLowerCase();
+	: (label, filterText, option) => true;
 	
 	let el;
 	let isFocused;
