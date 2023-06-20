@@ -12,6 +12,7 @@
   import {simplify_geo, geo_blob} from '../draw/drawing-utils';
   import getTable from './gettable';
   import getParents from './getparents';
+  import {cdnbase} from '$lib/config/geography';
   import {download, clip} from '$lib/util/functions';
   import {cdnbase} from '$lib/config/geography';
   import {onMount} from 'svelte';
@@ -82,14 +83,12 @@
       let code = hash.slice(1);
       // try {
         let res = await fetch(
-          `${cdnbase}/${code.slice(
-            0,
-            3
-          )}/${code}.json`
+          `${cdnbase}/${code.slice(0, 3)}/${code}.json`
         );
         let data = await res.json();
         let compressed = data.properties.c21cds;
         const info = {
+          compressed,
           geojson: data,
           properties: {
             oa_all: $centroids.expand(compressed),
@@ -119,7 +118,7 @@
 
     // console.debug('build-', store);
     if (!store) {
-      // alert('Warning, no area selected! Redirecting to the drawing page.');
+      alert('Warning, no area selected! Redirecting to the drawing page.');
       goto(`${base}/draw/`);
     }
 
@@ -185,6 +184,7 @@
         pym_parent = new pym.Parent('embed', `${base}/embed/${embed_hash}`, {
           name: 'embed',
           id: 'iframe',
+          title: 'Embedded area profile'
         });
         isLoading = false;
       } else {
@@ -205,7 +205,7 @@
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
     return `<div id="custom-profile"></div>
 <script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
-<script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile"});<\/script>`;
+<script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile", title: "Embedded area profile"});<\/script>`;
   }
 
   async function downloadData() {
