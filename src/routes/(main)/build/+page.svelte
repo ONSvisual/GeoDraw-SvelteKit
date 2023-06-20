@@ -14,7 +14,6 @@
   import getParents from './getparents';
   import {cdnbase} from '$lib/config/geography';
   import {download, clip} from '$lib/util/functions';
-  import {cdnbase} from '$lib/config/geography';
   import {onMount} from 'svelte';
   import {centroids} from '$lib/stores/mapstore';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
@@ -88,7 +87,6 @@
         let data = await res.json();
         let compressed = data.properties.c21cds;
         const info = {
-          compressed,
           geojson: data,
           properties: {
             oa_all: $centroids.expand(compressed),
