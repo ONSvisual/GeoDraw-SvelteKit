@@ -5,7 +5,7 @@ import intersects from "@turf/boolean-intersects";
 import buffer from "@turf/buffer";
 import { base } from "$app/paths";
 
-const topojson = `${base}/data/lad-cty-rgn.json`;
+const topojson = `${base}/data/topo.json`;
 
 export default async function(poly, codes) {
   // Check if area is in England and/or Wales
@@ -23,9 +23,10 @@ export default async function(poly, codes) {
   let geo = [];
   if (eng) {
     geo.push(feature(topo, "rgn"));
+    geo.push(feature(topo, "cauth"));
     geo.push(feature(topo, "cty"));
   }
-  geo.push(feature(topo, "lad"))
+  geo.push(feature(topo, "ltla"))
 
   // Test features against loaded polygon
   let buffered = buffer(poly, 0.5, {units: 'kilometers'});

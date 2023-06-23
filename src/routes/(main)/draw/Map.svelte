@@ -38,7 +38,6 @@
 
   /// MAP creation
   async function init() {;
-
     $mapobject = new mapboxgl.Map({
       container: 'mapcontainer',
       style: mapstyle,
@@ -47,7 +46,7 @@
       maxBounds: maxbounds,
       //   pitch: 10, // 30,
       center: [-1, 52.2],
-      zoom: 7,
+      zoom: 5,
       hash: false, // set options in hash string
     });
 
@@ -81,6 +80,10 @@
 
     $mapobject.on('load', SetLayers);
   }
+
+  // onDestroy(() => {
+  //   if ($mapobject) $mapobject.remove();
+  // });
 
   /// Set all Mapbox Parameters ///
   export async function SetLayers() {

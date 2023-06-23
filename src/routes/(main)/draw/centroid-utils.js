@@ -6,7 +6,7 @@ import inPoly from '@turf/points-within-polygon';
 import buffer from '@turf/buffer';
 import area from '@turf/area';
 import {dissolve} from '$lib/util/mapshaper';
-import {roundAll} from './misc-utils';
+import {roundAll} from '$lib/util/functions';
 import {points, boundaries} from '$lib/config/geography';
 
 const key = points.key;
@@ -39,6 +39,7 @@ class Centroids {
     let gjson = {type: 'FeatureCollection', features: []};
     let lkp = {};
     let parent_ct = {};
+    let child_lookup = {};
     parents.forEach(p => parent_ct[p.key] = {});
 
     arr.forEach (d => {
@@ -52,8 +53,10 @@ class Centroids {
       parents.forEach(p => {
         if (!parent_ct[p.key][d[p.code]]) {
           parent_ct[p.key][d[p.code]] = 1;
+          child_lookup[d[p.code]] = [d[code]];
         } else {
           parent_ct[p.key][d[p.code]] += 1;
+          child_lookup[d[p.code]].push(d[code]);
         }
       });
     });
@@ -61,6 +64,7 @@ class Centroids {
     this.sizes = arr.map (d => d.r);
     this.geojson = gjson;
     this.lookup = lkp;
+    this.child_lookup = child_lookup;
     parents.forEach(p => this[`${p.key}_count`] = parent_ct[p.key]);
   }
 
@@ -75,6 +79,12 @@ class Centroids {
     } else {
       return oa.map (cd => this.lookup[cd][parents[0].code]);
     }
+  }
+
+  expand (codes) {
+    return Array.isArray(codes) ?
+      codes.map(c => this.child_lookup[c] ? this.child_lookup[c] : c).flat() :
+      this.child_lookup[codes] ? this.child_lookup[codes] : [];
   }
 
   bounds (oas) {

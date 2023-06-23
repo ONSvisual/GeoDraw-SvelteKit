@@ -17,11 +17,16 @@
     {keys: ["W04"], label: "Community"},
     {keys: ["E05", "W05"], label: "Ward"},
     {keys: ["E06", "W06"], label: "Unitary authority"},
-    {keys: ["E07", "E08"], label: "Local authority district"},
+    {keys: ["E07"], label: "Non-metropolitan borough"},
+    {keys: ["E08"], label: "Metropolitan borough"},
     {keys: ["E09"], label: "London borough"},
     {keys: ["E10"], label: "County"},
     {keys: ["E11"], label: "Metropolitan county"},
+    {keys: ["E47"], label: "Combined authority"},
+    {keys: ["E12"], label: "Region"},
     {keys: ["E14", "W07"], label: "Parliamentary constituency"},
+    {keys: ["W09"], label: "Senedd constituency"},
+    {keys: ["W10"], label: "Senedd electoral region"},
     {keys: ["E30", "K01", "W22"], label: "2011 Travel to work area"},
     {keys: ["E34", "K05", "W37", "E63", "K08", "W45"], label: "Built-up area"},
     {keys: ["E35", "K06", "W38"], label: "Built-up area, sub-division"}
@@ -44,7 +49,7 @@
     data.forEach(d => lookup[d.areacd] = d);
 		data.forEach(d => {
       let geotype = geotypes_lookup[d.areacd.slice(0,3)];
-      d.group = d.parent ? `${geotype} in ${lookup[d.parent].areanm}` : geotype;
+      d.group = d.parentcd ? `${geotype} in ${lookup[d.parentcd].areanm}` : geotype;
     });
 		data.sort((a, b) => a.areanm.localeCompare(b.areanm));
 		return data;
@@ -68,7 +73,7 @@
       areacd: geo.properties.areacd,
       geometry: geo.geometry,
       bbox: geo.properties.bounds,
-      codes: geo.properties.codes
+      codes: geo.properties.c21cds
     };
 
     analyticsEvent({
@@ -83,7 +88,7 @@
 
   export async function getOAfromLngLat(lng, lat) {
     const tile = tb.pointToTile(lng, lat, 12);
-    const url = `https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v2/boundaries/${tile[2]}/${tile[0]}/${tile[1]}.pbf`;
+    const url = `https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v3/boundaries/${tile[2]}/${tile[0]}/${tile[1]}.pbf`;
     try {
       const geojson = await getTileAsGeoJSON(url, tile);
       const pt = { type: "Point", coordinates: [lng, lat] };
@@ -123,6 +128,11 @@
 	// Data and state for select box
 	let items;
 	let filterText;
+
+  const startsWithFilter = (str, filter) => str.toLowerCase().startsWith(filter.toLowerCase());
+	const filterSort = (a, b) => startsWithFilter(a.areanm, filterText) && startsWithFilter(b.areanm, filterText) ? 0 :
+		!startsWithFilter(a.areanm, filterText) && startsWithFilter(b.areanm, filterText) ? 1 :
+		startsWithFilter(a.areanm, filterText) && !startsWithFilter(b.areanm, filterText) ? -1 : 0;
 	
   // Function for select box
 	async function getOptions(filterText) {
@@ -136,7 +146,8 @@
         postcode: true
       })) : [];
 		} else if (filterText.length > 2) {
-			return items.filter(p => p.areanm.toLowerCase().slice(0, filterText.length) == filterText.toLowerCase());
+			return items.filter(p => p.areanm.match(new RegExp(`\\b${filterText}`, 'i')))
+        .sort(filterSort);
 		}
 		return [];
 	}

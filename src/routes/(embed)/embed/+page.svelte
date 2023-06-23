@@ -118,6 +118,7 @@
   </Cards>
 
   <span class="footnote">Source: Office for National Statistics - Census 2021</span>
+  <div class="spacer"/>
 {/if}
 
 <style>
@@ -129,5 +130,8 @@
   h3 {
     font-size: 1.3rem;
     font-weight: bold;
+  }
+  div.spacer {
+    height: 10px;
   }
 </style>
