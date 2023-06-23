@@ -49,7 +49,7 @@
     data.forEach(d => lookup[d.areacd] = d);
 		data.forEach(d => {
       let geotype = geotypes_lookup[d.areacd.slice(0,3)];
-      d.group = d.parent ? `${geotype} in ${lookup[d.parent].areanm}` : geotype;
+      d.group = d.parentcd ? `${geotype} in ${lookup[d.parentcd].areanm}` : geotype;
     });
 		data.sort((a, b) => a.areanm.localeCompare(b.areanm));
 		return data;

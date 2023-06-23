@@ -340,8 +340,10 @@
         Due to technical constraints, not all Census 2021 topics can be included in this tool.
       </p>
       <p>
-        Data for a wider range of topics can be <a href="https://www.nomisweb.co.uk/sources/census_2021" target="_blank" rel="noreferrer">downloaded from Nomis</a>.
-        <span style:font-size="0.8em" style:margin-left="2px"><Icon type="launch" /></span>
+        
+        Data for a wider range of topics can be found on <a href="https://www.nomisweb.co.uk/sources/census_2021" target="_blank" rel="noreferrer">Nomis</a>
+        <span style:font-size="0.8em" style:margin="0 2px"><Icon type="launch" /></span>.
+        Multi-variate data can be found via the <a href="https://www.ons.gov.uk/datasets/create" target="_blank">Create a custom dataset</a> service.
       </p>
     </div>
   </aside>
