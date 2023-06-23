@@ -6,6 +6,7 @@
 		"debug": "vite dev --debug",
 		"build": "vite build",
 		"build-ons": "set APP_PATH=ons && vite build && node ./scripts/js-fix",
+		"build-ons-unix": "APP_PATH=ons vite build && node ./scripts/js-fix",
 		"buildgit": "vite build && cp -r build docs",
 		"start": "vite preview",
 		"deploy": "netlify build && netlify deploy -p",
