@@ -100,7 +100,7 @@ class Centroids {
       })
     };
     let bounds = bbox (points);
-    bounds = [bounds[0] - 0.02, bounds[1] - 0.02, bounds[2] + 0.02, bounds[3] + 0.02];
+    bounds = [bounds[0] - 0.01, bounds[1] - 0.01, bounds[2] + 0.01, bounds[3] + 0.01];
     // console.log("bounds", bounds);
     return bounds;
   }
@@ -187,10 +187,10 @@ class Centroids {
       };
 
       let len = geojson.features.length;
-      if (len > 1 && len < 50) geojson = buffer(geojson, 10, {units: 'meters'});
+      if (len > 1 && len < 75) geojson = buffer(geojson, 10, {units: 'meters'});
       let dissolved = dissolve (geojson);
 
-      if (len > 1 && len < 50) dissolved = buffer(dissolved, -10, {units: 'meters'});
+      if (len > 1 && len < 75) dissolved = buffer(dissolved, -10, {units: 'meters'});
       dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
       
       let area_sqm = area(dissolved);

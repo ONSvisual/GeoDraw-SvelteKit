@@ -183,7 +183,7 @@
               },
             ];
 
-            $mapobject.fitBounds(data.properties.bounds, {padding: 20});
+            $mapobject.fitBounds(data.properties.bounds, {padding: 40});
 
             state.name = data.properties.hclnm ? data.properties.hclnm :
               data.properties.areanm ? data.properties.areanm :
@@ -214,7 +214,7 @@
         var bbox = $centroids.bounds([...q.oa_all]);
 
         $mapobject.fitBounds(bbox, {
-          padding: 20,
+          padding: 40,
           linear: true,
         });
 
@@ -234,7 +234,7 @@
         var bbox = $centroids.bounds([...q.oa]);
 
         $mapobject.fitBounds(bbox, {
-          padding: 20,
+          padding: 40,
           linear: true,
         });
 
@@ -281,12 +281,12 @@
               oa: new Set(oa)
             },
           ];
-          $mapobject.fitBounds(bb, {padding: 20});
+          $mapobject.fitBounds(bb, {padding: 40});
         } else if (b.geometry) {
           if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
           let bb = bbox(b);
           update(b.geometry);
-          $mapobject.fitBounds(bb, {padding: 20});
+          $mapobject.fitBounds(bb, {padding: 40});
         } else {
           b = null;
           alert('Invalid geography file. Must be geojson format.');
@@ -542,7 +542,7 @@ The save data and continue function
             $selected,
             { oa },
           ];
-          $mapobject.fitBounds(bbox, {padding: 20});
+          $mapobject.fitBounds(bbox, {padding: 40});
           state.name = e.detail.areanm;
         } else if (e.detail.type == 'postcode') {
 
@@ -590,7 +590,7 @@ The save data and continue function
           on:click={() => {
             let q = $selected[$selected.length - 1];
             let bbox = $centroids.bounds([...q.oa]);
-            $mapobject.fitBounds(bbox, {padding: 20});
+            $mapobject.fitBounds(bbox, {padding: 40});
           }}>click here</button
         > to return to the area you have drawn.
       {:else if !zoom || zoom < zoomstop}
