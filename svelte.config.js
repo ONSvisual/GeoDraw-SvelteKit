@@ -17,7 +17,8 @@ const config = {
 			handleHttpError: 'warn'
 		},
 		paths: {
-			base: production && ons_path ? '/visualisations/customprofiles' : ''
+			base: production && ons_path ? '/visualisations/customprofiles' : '',
+			relative: false
 		}
 	}
 };
