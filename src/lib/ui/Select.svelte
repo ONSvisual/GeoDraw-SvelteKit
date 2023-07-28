@@ -48,7 +48,16 @@
     let lookup = {};
     data.forEach(d => lookup[d.areacd] = d);
 		data.forEach(d => {
-      let geotype = geotypes_lookup[d.areacd.slice(0,3)];
+      let geocd = d.areacd.slice(0,3);
+      let geotype = geotypes_lookup[geocd];
+      // Fix for 2025 parliamentary constituencies
+      if (["E14", "W07"].includes(geocd)) {
+        if (
+          (geocd === "E14" && +d.areacd.slice(3) > 1062) ||
+          (geocd === "W07" && +d.areacd.slice(3) > 80)
+        ) geotype = `2025 ${geotype}`;
+        else geotype = `2010 ${geotype}`;
+      }
       d.group = d.parentcd ? `${geotype} in ${lookup[d.parentcd].areanm}` : geotype;
     });
 		data.sort((a, b) => a.areanm.localeCompare(b.areanm));
