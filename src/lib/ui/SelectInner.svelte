@@ -123,6 +123,7 @@
 		--itemIsActiveBG: #206095;
 		--itemHoverBG: #3875d7;
 		--itemHoverColor: white;
+		--itemPadding: 0 12px;
 		--clearSelectColor: white;
 		--clearSelectFocusColor: white;
 		--clearSelectHoverColor: white;
@@ -201,6 +202,6 @@
 		display: none;
 	}
   :global(.selectbox .listContainer) {
-    margin-right: -42px;
+    margin-right: -110px;
   }
 </style>
