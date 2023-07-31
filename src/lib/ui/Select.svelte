@@ -55,8 +55,8 @@
         if (
           (geocd === "E14" && +d.areacd.slice(3) > 1062) ||
           (geocd === "W07" && +d.areacd.slice(3) > 80)
-        ) geotype = `2025 ${geotype}`;
-        else geotype = `2010 ${geotype}`;
+        ) geotype = `Future ${geotype.toLowerCase()}`;
+        else geotype = `Current ${geotype.toLowerCase()}`;
       }
       d.group = d.parentcd ? `${geotype} in ${lookup[d.parentcd].areanm}` : geotype;
     });
