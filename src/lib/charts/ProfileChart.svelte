@@ -108,7 +108,9 @@
 		padding-top: 2px;
 	}
 	.bar {
-		background-color: #27A0CC;
+		background-color: #27A0CC !important;
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
 	}
 	.marker {
 		border-bottom: 2.5px solid black;

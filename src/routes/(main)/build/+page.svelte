@@ -355,6 +355,11 @@
       The data and boundaries displayed in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources.
     </Notice>
     <div class="embed-actions">
+      <button class="btn-link"
+        disabled={!state.topics}
+        on:click={() => document.getElementById('iframe').contentWindow.print()}>
+        Print profile
+      </button> |
       <button class="btn-link" on:click={() => {
         pym_parent.sendMessage('makePNG', null);
         let opts = state.name ? {areaName: state.name} : {};

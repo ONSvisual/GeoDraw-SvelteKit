@@ -107,7 +107,9 @@
 		top: 0;
 	}
 	.bar {
-		background-color: #27A0CC;
+		background-color: #27A0CC !important;
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
 	}
 	.marker {
 		border-left-color: black;
