@@ -41,41 +41,46 @@
 	$: data_grouped = groupData(data, yKey);
 </script>
 
-{#if zDomain[1]}
-<ul class="legend-block">
-	{#each zDomain as group, i}
-	<li class:ew={i != 0}>
-		<div class="legend-vis {i == 0 ? 'bar' : 'marker'}" style:height="1rem" style:width="{i == 0 ? '1rem' : markerWidth + 'px'}"></div>
-		<span class="{i == 0 ? 'bold' : 'brackets'}">{group}</span>
-	</li>
-	{/each}
-</ul>
-{/if}
+<div class="bar-chart" aria-hidden="true">
+	{#if zDomain[1]}
+	<ul class="legend-block">
+		{#each zDomain as group, i}
+		<li class:ew={i != 0}>
+			<div class="legend-vis {i == 0 ? 'bar' : 'marker'}" style:height="1rem" style:width="{i == 0 ? '1rem' : markerWidth + 'px'}"></div>
+			<span class="{i == 0 ? 'bold' : 'brackets'}">{group}</span>
+		</li>
+		{/each}
+	</ul>
+	{/if}
 
-{#each data_grouped as group}
+	{#each data_grouped as group}
 	<div class="label-group">
-		{group.label}
-    <span class="nowrap">
-      {#each group.values as d, i}
-      <span class="label {i == 0 ? 'bold' : 'sml brackets'}">{formatTick(d[xKey])}{suffix}</span>
-      {/each}
-    </span>
+			{group.label}
+		<span class="nowrap">
+		{#each group.values as d, i}
+		<span class="label {i == 0 ? 'bold' : 'sml brackets'}">{formatTick(d[xKey])}{suffix}</span>
+		{/each}
+		</span>
+		</div>
+		<div class="bar-group" style:height="{barHeight}px">
+		{#each group.values as d, i}
+			{#if i == 0}
+			<div class="bar" style:left="0" style:width="{xScale(d[xKey])}%"/>
+			{:else}
+			<div class="marker" style:left="calc({xScale(d[xKey])}% - {markerWidth / 2}px)" style:border-left-width="{markerWidth}px"/>
+			{/if}
+		{/each}
 	</div>
-	<div class="bar-group" style:height="{barHeight}px">
-	{#each group.values as d, i}
-		{#if i == 0}
-		<div class="bar" style:left="0" style:width="{xScale(d[xKey])}%"/>
-		{:else}
-		<div class="marker" style:left="calc({xScale(d[xKey])}% - {markerWidth / 2}px)" style:border-left-width="{markerWidth}px"/>
-		{/if}
 	{/each}
-	</div>
-{/each}
+</div>
 {#if base}
 <small>{base}</small>
 {/if}
 
 <style>
+	.bar-chart {
+		display: block;
+	}
 	.label-group {
 		margin: 4px 0 1px 0;
     padding: 0;
@@ -84,6 +89,7 @@
 	}
 	.bold {
 		font-weight: bold;
+		color: #1b708f;
 	}
 	.sml {
 		margin-left: 3px;
