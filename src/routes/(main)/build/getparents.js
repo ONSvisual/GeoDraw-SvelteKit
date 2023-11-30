@@ -29,14 +29,14 @@ export default async function(poly, codes) {
   geo.push(feature(topo, "ltla"))
 
   // Test features against loaded polygon
-  let buffered = buffer(poly, 0.5, {units: 'kilometers'});
+  let buffered = buffer(poly, 1, {units: 'kilometers'});
   let bounds = bbox(buffered);
   let boundsPoly = bboxPoly(bounds);
   geo.forEach(g => {
     let filtered = g.features.filter(f => intersects(f, boundsPoly));
     if (filtered[1]) filtered.sort((a, b) => a.properties.areanm.localeCompare(b.properties.areanm));
     filtered.forEach(f => {
-      if (intersects(f, buffered)) parents.push(f.properties);
+      if (intersects(f, buffered)) parents.push({...f.properties, geometry: f.geometry});
     });
   });
   return {parents, coverage};

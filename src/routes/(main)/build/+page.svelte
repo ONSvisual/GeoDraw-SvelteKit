@@ -22,6 +22,7 @@
   let embed_hash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
+  let includecomp = false;
   let parents;
   let coverage = ["E", "W"];
   let topics = [...topics_all]; // Topics might be filtered based on coverage
@@ -72,7 +73,7 @@
   let store;
   let geojson;
 
-  async function getAreaData(code) {
+  async function getAreaData(code, options = {}) {
     const res = await fetch(
       `${cdnbase}/${code.slice(0, 3)}/${code}.json`
     );
@@ -81,7 +82,7 @@
     return {
       geojson: data,
       properties: {
-        oa_all: $centroids.expand(compressed),
+        oa_all: !options?.comparison ? $centroids.expand(compressed) : null,
         compressed,
         name: data.properties.hclnm
           ? data.properties.hclnm
@@ -102,7 +103,6 @@
       try {
         const info = await getAreaData(code);
         localStorage.setItem('onsbuild', JSON.stringify(info));
-        console.log(info)
         analyticsEvent({
           event: "hashSelect",
           areaCode: code,
@@ -142,8 +142,6 @@
     // console.warn(state.compressed);
   }
 
-  $: console.log(state.comparison);
-
   onMount(init);
 
   ////////////////////////////////////////////////////////////////
@@ -168,7 +166,7 @@
     return tables;
   }
 
-  async function update_profile(start, name, comp, data, includemap) {
+  async function update_profile(start, name, comp, data, includemap, includecomp) {
     if (start) {
       var ls = JSON.parse(localStorage.getItem('onsbuild'));
       ls.properties.name = name;
@@ -179,6 +177,8 @@
 
       embed_hash = `#/?name=${btoa(name)}&comp=${btoa(comp.areanm)}&tabs=${btoa(JSON.stringify(tables))}${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
+      }${
+        includemap && includecomp && comp.geometry ? `&comppoly=${btoa(JSON.stringify(simplify_geo(comp.geometry)))}` : ''
       }`;
 
       // alert(population)
@@ -202,7 +202,7 @@
     return mode === "capitalise" ? name[0].toUpperCase() + name.slice(1) : name;
   }
 
-  $: update_profile(state.start, state.name, state.comparison, state.topics, includemap);
+  $: update_profile(state.start, state.name, state.comparison, state.topics, includemap, includecomp);
 
   function makeEmbed(embed_hash) {
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
@@ -313,6 +313,13 @@
       <option value={parent}>{parent.areanm}</option>
       {/each}
     </select>
+
+    {#if includemap && state?.comparison?.geometry}
+    <label>
+      <input type="checkbox" bind:checked={includecomp} />
+      Show on map
+    </label>
+    {/if}
     {/if}
 
     <h2>Select topics</h2>

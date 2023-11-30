@@ -87,7 +87,6 @@ class Centroids {
   }
 
   expand (codes) {
-    console.log(codes);
     return Array.isArray(codes) ?
       codes.map(c => this.child_lookup[c] ? this.child_lookup[c] : c).flat() :
       this.child_lookup[codes] ? this.child_lookup[codes] : [];

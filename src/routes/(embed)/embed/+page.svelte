@@ -10,7 +10,7 @@
   import ProfileChart from '$lib/charts/ProfileChart.svelte';
   import BigNumber from '$lib/charts/BigNumber.svelte';
 
-  let pym_child, name, comp, geojson, tables, population;
+  let pym_child, name, comp, geojson, comp_geojson, tables, population;
   let stats = [];
 
   let topicsLookup = (() => {
@@ -44,7 +44,7 @@
       for (let pair of searchParams.entries()) {
         if (['name', 'comp'].includes(pair[0])) {
           props[pair[0]] = atob(pair[1]);
-        } else if (['tabs', 'poly', 'population', 'stats'].includes(pair[0])) {
+        } else if (['tabs', 'poly', 'comppoly', 'population', 'stats'].includes(pair[0])) {
           props[pair[0]] = JSON.parse(atob(pair[1]));
         }
       }
@@ -52,6 +52,7 @@
       name = props.name ? props.name : "Selected area";
       comp = props.comp ? props.comp : "England and Wales";
       geojson = props.poly;
+      comp_geojson = props.comppoly;
       population = props.population;
       tables = props.tabs;
       stats = props.stats;
@@ -91,9 +92,7 @@
   <Cards>
     {#if geojson}
       <Card title="Area map">
-        <div style:min-height="260px" style:width="100%">
-          <AreaMap {geojson} />
-        </div>
+        <AreaMap {name} {comp} {geojson} {comp_geojson} />
       </Card>
     {/if}
     {#each tables || [] as tab}
