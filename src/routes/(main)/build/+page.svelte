@@ -201,7 +201,7 @@
   function makeEmbed(embed_hash) {
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
     return `<div id="custom-profile"></div>
-<script src="http://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
+<script src="https://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
 <script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile", title: "Embedded area profile"});<\/script>`;
   }
 
