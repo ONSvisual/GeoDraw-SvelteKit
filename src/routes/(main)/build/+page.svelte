@@ -66,12 +66,31 @@
     if (regex) topics_end = topics_end.filter((t) => regex.test(t.label));
     return [...topics_start, ...topics_end];
   }
-
   $: regex =
     state.topicsFilter.length > 1 ? new RegExp(state.topicsFilter, 'i') : null;
 
   let store;
   let geojson;
+
+  async function getAreaData(code) {
+    const res = await fetch(
+      `${cdnbase}/${code.slice(0, 3)}/${code}.json`
+    );
+    const data = await res.json();
+    const compressed = data.properties.c21cds;
+    return {
+      geojson: data,
+      properties: {
+        oa_all: $centroids.expand(compressed),
+        compressed,
+        name: data.properties.hclnm
+          ? data.properties.hclnm
+          : data.properties.areanm
+          ? data.properties.areanm
+          : code
+      },
+    };
+  }
 
   async function init() {
     isLoading = true;
@@ -81,24 +100,9 @@
     if (hash.match(/#[EW]\d{8}/)) {
       let code = hash.slice(1);
       try {
-        let res = await fetch(
-          `${cdnbase}/${code.slice(0, 3)}/${code}.json`
-        );
-        let data = await res.json();
-        let compressed = data.properties.c21cds;
-        const info = {
-          geojson: data,
-          properties: {
-            oa_all: $centroids.expand(compressed),
-            compressed,
-            name: data.properties.hclnm
-              ? data.properties.hclnm
-              : data.properties.areanm
-              ? data.properties.areanm
-              : code
-          },
-        };
+        const info = await getAreaData(code);
         localStorage.setItem('onsbuild', JSON.stringify(info));
+        console.log(info)
         analyticsEvent({
           event: "hashSelect",
           areaCode: code,
@@ -137,6 +141,8 @@
     state.start = true;
     // console.warn(state.compressed);
   }
+
+  $: console.log(state.comparison);
 
   onMount(init);
 
