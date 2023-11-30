@@ -1,5 +1,7 @@
 <script>
+	import TableHidden from "./TableHidden.svelte";
   import tooltip from "$lib/ui/tooltip";
+  import { stackData } from "$lib/util/functions";
 
 	export let data;
 	export let xKey = "category";
@@ -11,26 +13,7 @@
 	export let minmax = ["0 years", "85+"];
   export let base = null;
   export let base_ext = ", 5 year age bands";
-	
-	function stackData(data, key) {
-		let data_indexed = {};
-		
-		for (const d of data) {
-			if (!data_indexed[d[key]]) {
-				data_indexed[d[key]] = {
-					label: d[key],
-					values: []
-				};
-			}
-			data_indexed[d[key]].values.push(d);
-		}
-		
-		let data_stacked = [];
-		for (const key in data_indexed) {
-			data_stacked.push(data_indexed[key]);
-		}
-		return data_stacked;
-	}
+  export let suffix = "%";
 	
 	$: xDomain = data.map(d => d[xKey]).filter((v, i, a) => a.indexOf(v) === i);
 	$: yDomain = [0, Math.max(...data.map(d => d[yKey]))];
@@ -39,37 +22,43 @@
 	$: yScale = (value) => Math.abs(value / yDomain[1]) * 100;
 	
 	$: data_stacked = stackData(data, zKey);
+
+	$: console.log(data, data_stacked);
 </script>
 
-<ul class="legend-block">
-	{#if zDomain[1]}
-	{#each zDomain as group, i}
-	<li>
-		<div class="legend-vis {i == 0 ? 'bar' : 'marker-vis'}" style:border-bottom-width="{i == 0 ? 0 : markerWidth}px"></div>
-		<span class="{i == 0 ? 'bold' : 'brackets'}">{group}</span>
-	</li>
-	{/each}
-	{/if}
-</ul>
+<TableHidden {data} yKey={xKey} {zKey} {suffix}/>
 
-<div class="bar-group" style:height="{height}px">
-	{#each data_stacked as stack, i}
-	{#if i == 0}
-	{#each stack.values as d, j}
-	<div use:tooltip title="{d[xKey]}: {formatTick(d[yKey])}% ({formatTick(data_stacked[i + 1].values[j][yKey])}%)" class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
-	{/each}
-	
-	{:else}
-	{#each stack.values as d, j}
-	<div class="marker" style:bottom="calc({yScale(d[yKey])}% - {markerWidth / 2}px)" style:height="0px" style:left="{(j / xDomain.length) * 100}%" style:width="calc({(1 / xDomain.length) * 100}% - 2px)" style:border-bottom-width="{markerWidth}px"/>
-	{/each}
-	{/if}
-	{/each}
-</div>
+<div class="profile-chart" aria-hidden="true">
+	<ul class="legend-block">
+		{#if zDomain[1]}
+		{#each zDomain as group, i}
+		<li>
+			<div class="legend-vis {i == 0 ? 'bar' : 'marker-vis'}" style:border-bottom-width="{i == 0 ? 0 : markerWidth}px"></div>
+			<span class="{i == 0 ? 'bold' : 'brackets'}">{group}</span>
+		</li>
+		{/each}
+		{/if}
+	</ul>
 
-<div class="x-scale" style:height="1rem">
-	<div style:left="0">{minmax[0]}</div>
-	<div style:right="0">{minmax[1]}</div>
+	<div class="bar-group" style:height="{height}px">
+		{#each data_stacked as stack, i}
+		{#if i == 0}
+		{#each stack.values as d, j}
+		<div use:tooltip title="{d[xKey]}: {formatTick(d[yKey])}{suffix} ({formatTick(data_stacked[i + 1].values[j][yKey])}{suffix})" class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
+		{/each}
+		
+		{:else}
+		{#each stack.values as d, j}
+		<div class="marker" style:bottom="calc({yScale(d[yKey])}% - {markerWidth / 2}px)" style:height="0px" style:left="{(j / xDomain.length) * 100}%" style:width="calc({(1 / xDomain.length) * 100}% - 2px)" style:border-bottom-width="{markerWidth}px"/>
+		{/each}
+		{/if}
+		{/each}
+	</div>
+
+	<div class="x-scale" style:height="1rem">
+		<div style:left="0">{minmax[0]}</div>
+		<div style:right="0">{minmax[1]}</div>
+	</div>
 </div>
 
 {#if base}
@@ -77,6 +66,9 @@
 {/if}
 
 <style>
+	.profile-chart {
+		display: block;
+	}
 	.bold {
 		font-weight: bold;
 		color: #1b708f;

@@ -1,22 +1,27 @@
 <script>
+    import { groupData } from "$lib/util/functions";
+
     export let data;
     export let suffix = "%";
+    export let yKey = "category";
     export let zKey = "areanm";
 
+    $: grouped_data = groupData(data, yKey);
+    $: console.log("grouped", grouped_data);
 </script>
 
-{#if data}
+{#if grouped_data}
 <table class="visuallyhidden">
     <thead>
         <tr>
             <th>Category</th>
-            {#each data[0].values as val}
+            {#each grouped_data[0].values as val}
             <td>{val[zKey]}</td>
             {/each}
         </tr>
     </thead>
     <tbody>
-        {#each data as row}
+        {#each grouped_data as row}
         <tr>
             <td>{row.label}</td>
             {#each row.values as col}

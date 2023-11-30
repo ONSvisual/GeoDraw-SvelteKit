@@ -89,5 +89,44 @@ export function difference(setA, setB) {
   return _difference;
 }
 
-// export json2blob = functio
-// var file = new Blob([text], {type: type});
+export function groupData(data, key) {
+  let data_indexed = {};
+  let keys = [];
+  for (const d of data) {
+    if (!data_indexed[d[key]]) {
+      data_indexed[d[key]] = {
+        label: d[key],
+        values: []
+      };
+      keys.push(d[key]);
+    }
+    data_indexed[d[key]].values.push(d);
+  }
+  
+  let data_grouped = [];
+  keys.forEach(key => {
+    data_grouped.push(data_indexed[key]);
+  });
+  
+  return data_grouped;
+}
+
+export function stackData(data, key) {
+  let data_indexed = {};
+  
+  for (const d of data) {
+    if (!data_indexed[d[key]]) {
+      data_indexed[d[key]] = {
+        label: d[key],
+        values: []
+      };
+    }
+    data_indexed[d[key]].values.push(d);
+  }
+  
+  let data_stacked = [];
+  for (const key in data_indexed) {
+    data_stacked.push(data_indexed[key]);
+  }
+  return data_stacked;
+}

@@ -1,5 +1,6 @@
 <script>
 	import TableHidden from "./TableHidden.svelte";
+	import { groupData } from "$lib/util/functions";
 
 	export let data;
 	export let xKey = "value";
@@ -12,29 +13,6 @@
   export let base = null;
 	export let barHeight = 25;
 	export let markerWidth = 3;
-	
-	function groupData(data, key) {
-		let data_indexed = {};
-    let keys = [];
-		for (const d of data) {
-			if (!data_indexed[d[key]]) {
-				data_indexed[d[key]] = {
-					label: d[key],
-					values: []
-				};
-        keys.push(d[key]);
-			}
-			data_indexed[d[key]].values.push(d);
-		}
-		
-		let data_grouped = [];
-		keys.forEach(key => {
-			data_grouped.push(data_indexed[key]);
-		});
-    
-		return data_grouped;
-	}
-	
 
 	$: xMax = Math.max(...data.map(d => d[xKey]));
 	$: zDomain = data.map(d => d[zKey]).filter((v, i, a) => a.indexOf(v) === i);
@@ -43,7 +21,7 @@
 	$: data_grouped = groupData(data, yKey);
 </script>
 
-<TableHidden data={data_grouped} {zKey} {suffix}/>
+<TableHidden {data} {yKey} {zKey} {suffix}/>
 
 <div class="bar-chart" aria-hidden="true">
 	{#if zDomain[1]}
