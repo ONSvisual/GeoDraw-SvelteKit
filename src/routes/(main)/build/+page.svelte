@@ -106,8 +106,8 @@
         });
       } catch (err) {
         console.warn(`Requested GSS code ${code} is unavailable or invalid.`);
+        history.replaceState(null, '', ' ');
       }
-      history.replaceState(null, '', ' ');
     }
 
     // resume as normal
