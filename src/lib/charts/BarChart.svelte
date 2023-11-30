@@ -1,4 +1,6 @@
 <script>
+	import TableHidden from "./TableHidden.svelte";
+
 	export let data;
 	export let xKey = "value";
 	export let yKey = "category";
@@ -40,6 +42,8 @@
 	$: xScale = (value) => (value / xMax) * 100;
 	$: data_grouped = groupData(data, yKey);
 </script>
+
+<TableHidden data={data_grouped} {zKey} {suffix}/>
 
 <div class="bar-chart" aria-hidden="true">
 	{#if zDomain[1]}
