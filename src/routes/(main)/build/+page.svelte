@@ -80,7 +80,7 @@
     let hash = window.location.hash;
     if (hash.match(/#[EW]\d{8}/)) {
       let code = hash.slice(1);
-      // try {
+      try {
         let res = await fetch(
           `${cdnbase}/${code.slice(0, 3)}/${code}.json`
         );
@@ -104,10 +104,9 @@
           areaCode: code,
           areaName: info.properties.name
         });
-      // } catch (err) {
-      //   // console.warn(err);
-      //   alert(`Requested GSS code ${code} is unavailable or invalid.`);
-      // }
+      } catch (err) {
+        console.warn(`Requested GSS code ${code} is unavailable or invalid.`);
+      }
       history.replaceState(null, '', ' ');
     }
 
@@ -268,7 +267,7 @@
         class="text"
         on:click={async () => {
           let blob = geo_blob(store);
-          download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
+          download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.geojson`);
           state.showSave = false;
           let opts = state.name ? {areaName: state.name} : {};
           analyticsEvent({event: "fileDownload", fileExtension: "json", ...opts});

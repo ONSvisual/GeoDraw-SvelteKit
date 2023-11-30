@@ -30,6 +30,7 @@
 		"autoprefixer": "^10.2.5",
 		"buffer": "^6.0.3",
 		"carbon-components-svelte": "^0.62.3",
+		"compress-csv-to-json": "^0.0.2",
 		"d3-dsv": "^3.0.1",
 		"d3-format": "^3.1.0",
 		"flatbush": "^4.0.0",

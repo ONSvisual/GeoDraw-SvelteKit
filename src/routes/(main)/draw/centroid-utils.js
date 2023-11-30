@@ -1,10 +1,9 @@
-// import pako from 'pako'
-import {csvParse, autoType} from 'd3-dsv';
 import bbox from '@turf/bbox';
 import bboxPoly from '@turf/bbox-polygon';
 import inPoly from '@turf/points-within-polygon';
 import buffer from '@turf/buffer';
 import area from '@turf/area';
+import {decompressData} from "compress-csv-to-json";
 import {dissolve} from '$lib/util/mapshaper';
 import {roundAll} from '$lib/util/functions';
 import {points, boundaries} from '$lib/config/geography';
@@ -34,12 +33,21 @@ function filterGeo(geojson, area_sqm) {
 class Centroids {
   async initialize () {
     let res = await fetch (points.url);
-    let arr = csvParse (await res.text (), autoType);
+    let arr = decompressData (await res.json (), (columnData, rowNumber) => ({
+      oa21cd: columnData[0][rowNumber],
+      lsoa21cd: columnData[1][rowNumber],
+      msoa21cd: columnData[2][rowNumber],
+      ltla21cd: columnData[3][rowNumber],
+      rgn21cd: columnData[4][rowNumber],
+      lng: columnData[5][rowNumber],
+      lat: columnData[6][rowNumber],
+      population: columnData[7][rowNumber]
+    }));
 
     let gjson = {type: 'FeatureCollection', features: []};
     let lkp = {};
     let parent_ct = {};
-    let child_lookup = {};
+    let child_lookup = {"E92000001": []};
     parents.forEach(p => parent_ct[p.key] = {});
 
     arr.forEach (d => {
@@ -59,6 +67,7 @@ class Centroids {
           child_lookup[d[p.code]].push(d[code]);
         }
       });
+      if (d[code][0] === "E") child_lookup["E92000001"].push(d[code]);
     });
 
     this.sizes = arr.map (d => d.r);
@@ -67,10 +76,6 @@ class Centroids {
     this.child_lookup = child_lookup;
     parents.forEach(p => this[`${p.key}_count`] = parent_ct[p.key]);
   }
-
-  // geojson () {
-  //   return this.geojson;
-  // }
 
   parent (oa) {
     // Return immediate parents for OAs
@@ -82,6 +87,7 @@ class Centroids {
   }
 
   expand (codes) {
+    console.log(codes);
     return Array.isArray(codes) ?
       codes.map(c => this.child_lookup[c] ? this.child_lookup[c] : c).flat() :
       this.child_lookup[codes] ? this.child_lookup[codes] : [];

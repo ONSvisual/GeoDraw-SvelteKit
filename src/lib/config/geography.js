@@ -6,8 +6,8 @@ export const places = `${base}/data/places-list.csv`;
 export const mapstyle = `${base}/data/style.json`
 export const points = {
   key: "oa",
-  url: `${base}/data/oa21-data.csv`,
-  parents: ["lsoa", "msoa", "ltla"],
+  url: `${base}/data/oa21-data.json`,
+  parents: ["lsoa", "msoa", "ltla", "rgn"],
   year: 2021
 };
 export const boundaries = {

@@ -169,36 +169,34 @@
       } else if (hash.length == 10) {
         let code = hash.slice(1);
         try {
-          fetch(`${cdnbase}/${code.slice(0, 3)}/${code}.json`)
-          .then(res => res.json())
-          .then(data => {
-            newselect();
-            selected.set([{oa: new Set()}]);
-            localStorage.clear();
-            
-            $selected = [
-              ...$selected,
-              {
-                oa: new Set($centroids.expand(data.properties.codes))
-              },
-            ];
+          const res = await fetch(`${cdnbase}/${code.slice(0, 3)}/${code}.json`);
+          const data = await res.json();
+          newselect();
+          selected.set([{oa: new Set()}]);
+          localStorage.clear();
+          
+          $selected = [
+            ...$selected,
+            {
+              oa: new Set($centroids.expand(data.properties.c21cds))
+            },
+          ];
 
-            $mapobject.fitBounds(data.properties.bounds, {padding: 40});
+          $mapobject.fitBounds(data.properties.bounds, {padding: 40});
 
-            state.name = data.properties.hclnm ? data.properties.hclnm :
-              data.properties.areanm ? data.properties.areanm :
-              data.properties.areacd;
-            setDrawData();
+          state.name = data.properties.hclnm ? data.properties.hclnm :
+            data.properties.areanm ? data.properties.areanm :
+            data.properties.areacd;
+          setDrawData();
 
-            analyticsEvent({
-              event: "hashSelect",
-              areaCode: data.properties.areacd,
-              areaName: state.name
-            });
+          analyticsEvent({
+            event: "hashSelect",
+            areaCode: data.properties.areacd,
+            areaName: state.name
           });
         }
         catch {
-          alert(`Requested GSS code ${code} is unavailable or invalid.`);
+          console.warn(`Requested GSS code ${code} is unavailable or invalid.`);
         }
 
         history.replaceState(null, null, ' ');
@@ -464,7 +462,7 @@ The save data and continue function
         on:click={async () => {
           let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
           let blob = geo_blob(data);
-          download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.json`);
+          download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.geojson`);
           state.showSave = false;
           let opts = state.name ? {areaName: state.name} : {};
           analyticsEvent({event: "fileDownload", fileExtension: "json", ...opts});

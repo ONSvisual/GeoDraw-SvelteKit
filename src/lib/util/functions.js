@@ -8,6 +8,7 @@ export function download(blob, filename) {
 	document.body.appendChild(a);
 
 	a.click();
+  console.log("download", filename, blob, a)
 	document.body.removeChild(a);
 }
 

@@ -325,15 +325,14 @@ function circle_fast (clear = false, center = radius_center) {
 ////////////////////
 
 export function geo_blob (q) {
-  console.log(q);
-  let geojson = q.geojson;
+  const geojson = q.geojson;
   geojson.properties = {
     name: q.properties.name,
     bbox: bbox (geojson),
     codes: q.properties.oa_all,
     codes_compressed: q.properties.compressed,
   };
-  return new Blob ([JSON.stringify (geojson)], {
+  return new Blob ([JSON.stringify(geojson)], {
     type: 'application/json',
   });
 }
