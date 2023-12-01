@@ -456,7 +456,7 @@ The save data and continue function
   <nav class="tray">
     <div />
     <div class="save-buttons">
-      <input type="text" bind:value={state.name} placeholder="Type your area name" />
+      <input type="text" class="input-text" bind:value={state.name} placeholder="Type your area name" />
       <button
         class="text"
         on:click={async () => {
@@ -490,7 +490,7 @@ The save data and continue function
       <div class="slider">
         <span>Radius</span>
         <Slider bind:value={$radiusInKm} />
-        <input type="text" bind:value={$radiusInKm} />km
+        <input type="text" class="input-text" bind:value={$radiusInKm} />km
       </div>
     {/if}
     <div class="select-mode">

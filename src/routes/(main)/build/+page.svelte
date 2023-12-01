@@ -320,7 +320,7 @@
   <nav class="tray">
     <div />
     <div class="save-buttons">
-      <input type="text" bind:value={state.name} placeholder="Type your area name" />
+      <input type="text" class="input-text" bind:value={state.name} placeholder="Type your area name" />
       <button
         class="text"
         on:click={async () => {
@@ -351,7 +351,7 @@
 <div class="container">
   <aside class="topics-box">
     <h2>Name your area</h2>
-    <input type="text" bind:value={state.name} placeholder="Type your area name" />
+    <input type="text" class="input-text" bind:value={state.name} placeholder="Type your area name" />
 
     <label>
       <input type="checkbox" bind:checked={includemap}/>
@@ -386,6 +386,7 @@
     <h2>Select topics</h2>
     <input
       type="text"
+      class="input-text"
       placeholder="Type to filter"
       bind:value={state.topicsFilter}
     />

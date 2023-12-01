@@ -68,7 +68,7 @@
     background-color: white;
   }
   .topic-item > label:focus-within {
-    outline: 2px solid orange;
+    outline: 4px solid #fbc900;
     flex-grow: 1;
   }
   .topic-info {
@@ -94,7 +94,7 @@
     background: none !important;
   }
   .topic-toggle:focus {
-    outline: 2px solid orange;
+    outline: 4px solid #fbc900;
   }
   p {
     margin: 0;

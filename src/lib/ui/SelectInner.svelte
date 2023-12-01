@@ -149,7 +149,7 @@
 		box-shadow: none !important;
 	}
 	:global(.selectbox.focused > .selectContainer) {
-		outline: 4px solid orange;
+		outline: 4px solid #fbc900;
 	}
 	:global(.selectbox.selected > .selectContainer) {
 		background-color: #206095 !important;
@@ -193,7 +193,7 @@
 		height: 24px;
 	}
 	:global(.selectbox .clearSelect:focus) {
-		outline: 4px solid orange;
+		outline: 4px solid #fbc900;
 	}
 	:global(.selectbox .indicator) {
 		width: 20px;

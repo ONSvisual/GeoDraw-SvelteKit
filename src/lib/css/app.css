@@ -180,7 +180,7 @@ nav button:hover, nav label:hover, aside.info-box button:hover, aside.topics-box
   color: #333A45;
 }
 nav button:focus, nav label:focus-within, aside.info-box button:focus, aside.topics-box .search > button:focus {
-  outline: 3px solid orange;
+  outline: 3px solid #fbc900;
   outline-offset: -3px;
 }
 nav button.active, nav label.active {
@@ -291,9 +291,12 @@ nav.tray label, nav.tray button {
   width: 50px;
   margin: 0 4px 0 8px;
 }
-input[type=text]:focus, select:focus {
-  outline: 3px solid orange;
+input.input-text {
   border-color: black;
+}
+input.input-text:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px black, 0 0 0 4px #fbc900;
 }
 .select-mode {
   display: inline-flex;
