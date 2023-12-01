@@ -133,11 +133,11 @@
     state.codes = props.oa_all;
     state.compressed = props.compressed;
     
-    let par = await getParents(geojson, state.compressed);
+    let par = await getParents(state.compressed);
     coverage = par.coverage;
-    parents = par.parents.filter(p => p.areanm !== state.name);
+    parents = par.parents;
     topics = topics_all.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
-    state.comparison = coverage[1] ? parents[0] : parents[1];
+    state.comparison = parents[0];
 
     state.start = true;
     // console.warn(state.compressed);
