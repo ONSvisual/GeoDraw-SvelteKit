@@ -8,6 +8,7 @@
   import Notice from '$lib/ui/Notice.svelte';
   import TopicItem from '$lib/ui/TopicItem.svelte';
   import Icon from '$lib/ui/Icon.svelte';
+  import Select from '$lib/ui/Select.svelte';
   import topics_all from '$lib/config/topics.json';
   import {simplify_geo, geo_blob} from '../draw/drawing-utils';
   import getTable from './gettable';
@@ -162,7 +163,7 @@
       }
       tables.push({code: data[i].code, data: table});
     }
-    // console.log(tables);
+    // console.log("tables", tables);
     return tables;
   }
 
@@ -173,12 +174,15 @@
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
       let codes = data.map((d) => d.code);
-      tables = await get_data(topics.filter((t) => codes.includes(t.code)), comp.c21cds ? comp.c21cds.join(";") : comp.areacd);
+      let compcds = comp?.codes ? comp.codes.join(";") : comp?.areacd || '';
+      tables = await get_data(topics.filter((t) => codes.includes(t.code)), compcds);
 
-      embed_hash = `#/?name=${btoa(name)}&comp=${btoa(comp.areanm)}&tabs=${btoa(JSON.stringify(tables))}${
+      embed_hash = `#/?name=${btoa(name)}${
+        comp ? `&comp=${btoa(comp.areanm)}` : ''
+      }&tabs=${btoa(JSON.stringify(tables))}${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
       }${
-        includemap && includecomp && comp.geometry ? `&comppoly=${btoa(JSON.stringify(simplify_geo(comp.geometry)))}` : ''
+        includemap && includecomp && comp?.geometry ? `&comppoly=${btoa(JSON.stringify(simplify_geo(comp.geometry)))}` : ''
       }`;
 
       // alert(population)
@@ -238,6 +242,8 @@
     let opts = state.name ? {areaName: state.name} : {};
     analyticsEvent({event: "fileDownload", fileExtension: "csv", ...opts});
   }
+
+  $: console.log(state.comparison)
 </script>
 
 <ONSloader {isLoading} />
@@ -247,7 +253,7 @@
       class="text"
       on:click={() => goto(`${base}/draw/`)}
     >
-      <Icon type="chevron" rotation={180} /><span>Edit area</span>
+      <Icon type="chevron" rotation={180} /><span>Edit custom area</span>
     </button>
   </div>
   <div class="nav-right">
@@ -298,7 +304,7 @@
 {/if}
 <div class="container">
   <aside class="topics-box">
-    <h2>Name your area</h2>
+    <h2>Name your custom area</h2>
     <input type="text" bind:value={state.name} placeholder="Type your area name" />
 
     <label>
@@ -306,13 +312,14 @@
       Include map
     </label>
     
-    {#if state.comparison && parents}
-    <h2>Select comparison</h2>
-    <select bind:value={state.comparison}>
+    {#if parents}
+    <h2>Select comparison area</h2>
+    <!-- <select bind:value={state.comparison}>
       {#each parents as parent}
       <option value={parent}>{parent.areanm}</option>
       {/each}
-    </select>
+    </select> -->
+    <Select value={state.comparison} autoClear={false} isClearable on:select={(e) => state.comparison = e.detail} on:clear={() => state.comparison = null}/>
 
     {#if includemap && state?.comparison?.geometry}
     <label>

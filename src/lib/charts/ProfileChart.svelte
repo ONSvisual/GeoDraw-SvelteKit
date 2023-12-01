@@ -44,7 +44,11 @@
 		{#each data_stacked as stack, i}
 		{#if i == 0}
 		{#each stack.values as d, j}
-		<div use:tooltip title="{d[xKey]}: {formatTick(d[yKey])}{suffix} ({formatTick(data_stacked[i + 1].values[j][yKey])}{suffix})" class="bar" style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
+		<div
+			use:tooltip
+			title="{d[xKey]}: {formatTick(d[yKey])}{suffix}{zDomain[1] ? ` (${formatTick(data_stacked[i + 1].values[j][yKey])}${suffix})` : ''}"
+			class="bar"
+			style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
 		{/each}
 		
 		{:else}

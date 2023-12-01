@@ -14,9 +14,9 @@ export default async function(poly, codes) {
   let wal = coverage.includes("W");
 
   // Add countries
-  let parents = [{areacd: "K04000001", areanm: "England and Wales"}];
-  if (eng) parents.push({areacd: "E92000001", areanm: "England"});
-  if (wal) parents.push({areacd: "W92000004", areanm: "Wales"});
+  let parents = [{areacd: "K04000001", areanm: "England and Wales", group: ""}];
+  if (eng) parents.push({areacd: "E92000001", areanm: "England", group: "Country"});
+  if (wal) parents.push({areacd: "W92000004", areanm: "Wales", group: "Country"});
 
   // Load topojson and convert to geojson
   let topo = await(await fetch(topojson)).json();

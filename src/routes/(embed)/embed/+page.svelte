@@ -49,8 +49,8 @@
         }
       }
 
-      name = props.name ? props.name : "Selected area";
-      comp = props.comp ? props.comp : "England and Wales";
+      name = props.name || "Selected area";
+      comp = props.comp || "";
       geojson = props.poly;
       comp_geojson = props.comppoly;
       population = props.population;
@@ -102,9 +102,9 @@
           value={tab.data[0]}
           unit={topicsLookup[tab.code].unit}
           prefix={topicsLookup[tab.code].prefix}
-          description={`<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}`}
+          description={comp ? `<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}` : ''}
           rounded={tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
-          tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit} (nearest 100 for ${comp})` :
+          tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit}` :
           null}
         />
         {:else if topicsLookup[tab.code]?.chart === "profile"}

@@ -14,6 +14,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
 import circle from '@turf/circle';
 import turf_simplify from '@turf/simplify';
+import buffer from '@turf/buffer';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/util/mapshaper';
@@ -180,8 +181,10 @@ export function simplify_geo (geometry, max_length = 3000) {
   let length = max_length;
   let precision = 5;
 
+  const _geometry = buffer(geometry, 0).geometry; // Fix invalid geometries
+
   while (length >= max_length && precision >= 2) {
-    simple = turf_simplify (geometry, {
+    simple = turf_simplify (_geometry, {
       highQuality: true,
       tolerance: Math.pow (10, -precision),
     });

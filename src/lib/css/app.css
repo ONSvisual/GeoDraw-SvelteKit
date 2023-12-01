@@ -88,7 +88,7 @@ article.profile {
   position: relative;
   float: left;
   margin-left: 24px;
-  width: calc(100% - 342px);
+  width: calc(100% - 372px);
   max-width: 980px;
 }
 
@@ -96,7 +96,7 @@ aside.topics-box {
   position: relative;
   float: left;
   margin: 0 0 0 24px;
-  width: 270px;
+  width: 300px;
 }
 aside.topics-box input[type=text], aside.topics-box select {
   width: 100%;

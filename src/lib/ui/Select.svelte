@@ -24,6 +24,7 @@
     {keys: ["E11"], label: "Metropolitan county"},
     {keys: ["E47"], label: "Combined authority"},
     {keys: ["E12"], label: "Region"},
+    {keys: ["E92", "W92"], label: "Country"},
     {keys: ["E14", "W07"], label: "Parliamentary constituency"},
     {keys: ["W09"], label: "Senedd constituency"},
     {keys: ["W10"], label: "Senedd electoral region"},
@@ -65,7 +66,7 @@
 	}
 
 	// Get boundary, bbox and output area lookup
-	export async function getPlace(code) {
+	export async function getPlace(code, group = "") {
     let geo;
     try {
       let geo_raw = await fetch(`${cdnbase}/${code.slice(0,3)}/${code}.json`);
@@ -80,6 +81,7 @@
       type: 'place',
       areanm: geo.properties.areanm ? geo.properties.areanm : geo.properties.areacd,
       areacd: geo.properties.areacd,
+      group,
       geometry: geo.geometry,
       bbox: geo.properties.bounds,
       codes: geo.properties.c21cds
@@ -135,6 +137,7 @@
   export let placeholder = "Find an area or postcode";
   export let listMaxHeight = 250;
   export let mode = "search";
+  export let isClearable = false;
 	
 	// Data and state for select box
 	let items;
@@ -168,10 +171,10 @@
 			let json = await res.json();
 			if (json.result) {
         let oa = await getOAfromLngLat(json.result.longitude, json.result.latitude);
-        if (oa) dispatch('select', await getPlace(oa));
+        if (oa) dispatch('select', await getPlace(oa, "Output area"));
       }
 		} else {
-      dispatch('select', await getPlace(e.detail.areacd));
+      dispatch('select', await getPlace(e.detail.areacd, e.detail.group));
 		}
 	}
   
@@ -179,5 +182,5 @@
 </script>
 
 {#if items}
-<Select id="select" {mode} idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} {listMaxHeight} bind:value bind:filterText loadOptions={getOptions} on:select={doSelect} {autoClear}/>
+<Select id="select" {mode} idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} {listMaxHeight} bind:value bind:filterText loadOptions={getOptions} on:select={doSelect} on:clear {isClearable} {autoClear}/>
 {/if}
