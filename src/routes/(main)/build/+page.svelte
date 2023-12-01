@@ -288,8 +288,6 @@
       reader.readAsText(file);
     }
   }
-
-  $: console.log(state.comparison)
 </script>
 
 <ONSloader {isLoading} />

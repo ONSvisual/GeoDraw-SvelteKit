@@ -25,6 +25,7 @@
     {keys: ["E47"], label: "Combined authority"},
     {keys: ["E12"], label: "Region"},
     {keys: ["E92", "W92"], label: "Country"},
+    {keys: ["K04"], label: ""},
     {keys: ["E14", "W07"], label: "Parliamentary constituency"},
     {keys: ["W09"], label: "Senedd constituency"},
     {keys: ["W10"], label: "Senedd electoral region"},
