@@ -130,9 +130,11 @@
 
   const dispatch = createEventDispatcher();
 
+  export let value;
   export let autoClear = true;
   export let placeholder = "Find an area or postcode";
   export let listMaxHeight = 250;
+  export let mode = "search";
 	
 	// Data and state for select box
 	let items;
@@ -177,5 +179,5 @@
 </script>
 
 {#if items}
-<Select id="select" mode="search" idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} {listMaxHeight} bind:filterText loadOptions={getOptions} on:select={doSelect} {autoClear}/>
+<Select id="select" {mode} idKey="areacd" labelKey="areanm" groupKey="group" {items} {placeholder} {listMaxHeight} bind:value bind:filterText loadOptions={getOptions} on:select={doSelect} {autoClear}/>
 {/if}
