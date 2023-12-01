@@ -308,7 +308,7 @@
     <input type="text" bind:value={state.name} placeholder="Type your area name" />
 
     <label>
-      <input type="checkbox" bind:checked={includemap} />
+      <input type="checkbox" bind:checked={includemap}/>
       Include map
     </label>
     
@@ -321,12 +321,10 @@
     </select> -->
     <Select value={state.comparison} autoClear={false} isClearable on:select={(e) => state.comparison = e.detail} on:clear={() => state.comparison = null}/>
 
-    {#if includemap && state?.comparison?.geometry}
-    <label>
-      <input type="checkbox" bind:checked={includecomp} />
+    <label class:label-disabled={!includemap || !state.comparison} style:margin-top="8px">
+      <input type="checkbox" bind:checked={includecomp} disabled={!includemap || !state.comparison} />
       Show on map
     </label>
-    {/if}
     {/if}
 
     <h2>Select topics</h2>

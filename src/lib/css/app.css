@@ -340,3 +340,6 @@ input[type=text]:focus, select:focus {
   color: #555;
   margin-bottom: 3px;
 }
+label.label-disabled {
+  color: #777;
+}
