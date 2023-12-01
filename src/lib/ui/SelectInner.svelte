@@ -166,6 +166,9 @@
     font-weight: normal;
 		opacity: 0.85;
 	}
+	:global(.selectbox .selectedItem > .selection) {
+		max-width: 210px !important;
+	}
 	:global(.selectbox .item > .group) {
 		font-size: smaller;
 		opacity: 0.7;
