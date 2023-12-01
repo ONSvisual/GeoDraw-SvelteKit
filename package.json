@@ -8,6 +8,7 @@
 		"build-ons": "set APP_PATH=ons && vite build && node ./scripts/js-fix",
 		"build-ons-unix": "APP_PATH=ons vite build && node ./scripts/js-fix",
 		"buildgit": "vite build && cp -r build docs",
+		"compress-oa-data": "node ./scripts/compress-oa-data",
 		"start": "vite preview",
 		"deploy": "netlify build && netlify deploy -p",
 		"push": "git add -A; git commit -m 'npm update';git push"
@@ -30,7 +31,7 @@
 		"autoprefixer": "^10.2.5",
 		"buffer": "^6.0.3",
 		"carbon-components-svelte": "^0.62.3",
-		"compress-csv-to-json": "^0.0.2",
+		"compress-csv-to-json": "^0.0.3",
 		"d3-dsv": "^3.0.1",
 		"d3-format": "^3.1.0",
 		"flatbush": "^4.0.0",
