@@ -253,7 +253,7 @@
       class="text"
       on:click={() => goto(`${base}/draw/`)}
     >
-      <Icon type="chevron" rotation={180} /><span>Edit custom area</span>
+      <Icon type="chevron" rotation={180} /><span>Edit area</span>
     </button>
   </div>
   <div class="nav-right">
@@ -304,7 +304,7 @@
 {/if}
 <div class="container">
   <aside class="topics-box">
-    <h2>Name your custom area</h2>
+    <h2>Name your area</h2>
     <input type="text" bind:value={state.name} placeholder="Type your area name" />
 
     <label>
