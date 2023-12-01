@@ -27,6 +27,7 @@
   let parents;
   let coverage = ["E", "W"];
   let topics = [...topics_all]; // Topics might be filtered based on coverage
+  let uploader; // DOM element for geojson file upload
 
   let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
   // would this not be better off as a MAP and not a dict?
@@ -243,6 +244,51 @@
     analyticsEvent({event: "fileDownload", fileExtension: "csv", ...opts});
   }
 
+  function load_geo() {
+    let file = uploader.files[0] ? uploader.files[0] : null;
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          // Read + simplify the boundary
+          let b = JSON.parse(e.target.result);
+
+          if (b.type == 'FeatureCollection') {
+            b = b.features[0];
+          } else if (b.type == 'Geometry') {
+            b = {type: 'Feature', geometry: b};
+          }
+          if (!b.properties) b.properties = {};
+
+          if (!b?.properties?.codes_compressed && b?.geometry) {
+            if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
+            const oas = $centroids.contains(b);
+            b.properties.codes_compressed = $centroids.compress([...oas.oa]);
+          }
+
+          if (b) {
+            const props = b.properties;
+            state.comparison = {
+              areanm: props.areanm ? props.areanm : props.name ? props.name : "Custom area",
+              areacd: props.areacd ? props.areacd : props.code ? props.code : "",
+              group: "Uploaded area",
+              geometry: b.geometry,
+              codes: b.properties.codes_compressed
+            }
+            analyticsEvent({event: "geoUpload", areaName: state.comparison.areanm});
+          } else {
+            alert("Please upload a valid GeoJSON file.");
+          }
+        } catch {
+          alert("Error. Please make sure you uploaded a valid GeoJSON file.")
+        }
+      };
+      reader.readAsText(file);
+    }
+  }
+
   $: console.log(state.comparison)
 </script>
 
@@ -314,12 +360,22 @@
     
     {#if parents}
     <h2>Select comparison area</h2>
-    <!-- <select bind:value={state.comparison}>
-      {#each parents as parent}
-      <option value={parent}>{parent.areanm}</option>
-      {/each}
-    </select> -->
-    <Select value={state.comparison} autoClear={false} isClearable on:select={(e) => state.comparison = e.detail} on:clear={() => state.comparison = null}/>
+    <div class="search">
+      <Select value={state.comparison} autoClear={false} isClearable on:select={(e) => state.comparison = e.detail} on:clear={() => state.comparison = null}/>
+      <button
+        title="Upload a saved area"
+        use:tooltip
+        on:click={() => uploader.click()}>
+        <Icon type="upload" />
+      </button>
+      <input
+        type="file"
+        accept=".geojson,.json"
+        style:display="none"
+        bind:this={uploader}
+        on:input={load_geo}
+      />
+    </div>
 
     <label class:label-disabled={!includemap || !state.comparison} style:margin-top="8px">
       <input type="checkbox" bind:checked={includecomp} disabled={!includemap || !state.comparison} />

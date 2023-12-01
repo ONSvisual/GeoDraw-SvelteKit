@@ -133,7 +133,7 @@ nav label input {
   position: absolute;
   opacity: 0;
 }
-nav button, nav label, aside.info-box button {
+nav button, nav label, aside.info-box button, aside.topics-box .search > button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -175,11 +175,11 @@ nav.tray label.active {
 .nav-right > button {
   border-left: 1px solid rgba(255,255,255,0.3);
 }
-nav button:hover, nav label:hover, aside.info-box button:hover {
+nav button:hover, nav label:hover, aside.info-box button:hover, aside.topics-box .search > button:hover {
   background-color: #F5F5F5CC !important;
   color: #333A45;
 }
-nav button:focus, nav label:focus-within, aside.info-box button:focus {
+nav button:focus, nav label:focus-within, aside.info-box button:focus, aside.topics-box .search > button:focus {
   outline: 3px solid orange;
   outline-offset: -3px;
 }
@@ -226,10 +226,10 @@ aside.info-box {
   width: 300px;
   background-color: rgba(255,255,255,0.9);
 }
-aside.info-box button {
+aside.info-box button, aside.topics-box .search > button {
   border-left: 1px solid white;
 }
-aside.info-box > .search {
+aside.info-box > .search, aside.topics-box > .search {
   display: flex;
   flex-direction: row;
 }

@@ -196,7 +196,7 @@
           });
         }
         catch {
-          console.warn(`Requested GSS code ${code} is unavailable or invalid.`);
+          alert(`Requested GSS code ${code} is unavailable or invalid.`);
         }
 
         history.replaceState(null, null, ' ');
@@ -573,7 +573,7 @@ The save data and continue function
     <input
       type="file"
       accept=".geojson,.json"
-      style="display:none"
+      style:display="none"
       bind:this={uploader}
       on:input={load_geo}
     />
