@@ -174,12 +174,18 @@
           newselect();
           selected.set([{oa: new Set()}]);
           localStorage.clear();
+
+          let oa;
+          
+          if (!data.properties.c21cds.map(c => c.slice(1, 3)).includes("00")) {
+            oa = new Set($centroids.expand(data.properties.c21cds));
+          } else {
+            oa = $centroids.contains(data.geometry).oa;
+          }
           
           $selected = [
             ...$selected,
-            {
-              oa: new Set($centroids.expand(data.properties.c21cds))
-            },
+            { oa },
           ];
 
           $mapobject.fitBounds(data.properties.bounds, {padding: 40});
@@ -268,7 +274,7 @@
           b = {type: 'Feature', geometry: b};
         }
 
-        if (b.properties && b.properties.codes) {
+        if (b.properties && b.properties.codes && !b.properties.codes.map(c => c.slice(1, 3)).includes("00")) {
           let bb = b.properties.bbox
             ? b.properties.bbox
             : bbox(b);
@@ -535,7 +541,13 @@ The save data and continue function
 
         if (e.detail.type == 'place') {
           let bbox = e.detail.bbox;
-          let oa = new Set($centroids.expand(e.detail.codes));
+
+          let oa;
+          if (!e.detail.codes.map(c => c.slice(1, 3)).includes("00")) {
+            oa = new Set($centroids.expand(e.detail.codes));
+          } else {
+            oa = $centroids.contains(e.detail.geometry).oa;
+          }
           $selected = [
             $selected,
             { oa },

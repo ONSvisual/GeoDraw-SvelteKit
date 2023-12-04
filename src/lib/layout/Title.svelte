@@ -1,6 +1,6 @@
 <script>
-  export let title = "Build a custom area profile";
-  export let badge = "Beta";
+  export let title = "Build a subnational profile";
+  export let badge = "Alpha";
 </script>
 
 <div class="title-block">

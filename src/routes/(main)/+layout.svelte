@@ -22,16 +22,16 @@
   // Settings for page analytics. Values must be shared with <AnalyticsBanner> component
   const analyticsId = "GTM-MBCBVQS";
   const analyticsProps = {
-    "contentTitle": "Build a custom area profile",
+    "contentTitle": "Build a subnational profile",
     "releaseDate": "20230117",
     "contentType": "exploratory",
-    "outputSeries": "buildacustomareaprofile"
+    "outputSeries": "buildasubnationalprofile"
   };
 </script>
 
 <svelte:head>
-  <title>Build a custom area profile - Census 2021, ONS</title>
-  <meta property="og:title" content="Build a custom area profile - Census 2021, ONS" />
+  <title>Build a subnational profile - ONS</title>
+  <meta property="og:title" content="Build a subnational profile - Census 2021, ONS" />
   <meta property="og:type" content="website" />
 	<meta property="og:url" content="https://www.ons.gov.uk/visualisations/customprofiles/draw/" />
 	<meta property="og:image" content="https://www.ons.gov.uk/visualisations/customprofiles/img/og.png" />

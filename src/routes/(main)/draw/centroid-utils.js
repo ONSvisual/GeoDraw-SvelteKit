@@ -34,14 +34,13 @@ class Centroids {
   async initialize () {
     let res = await fetch (points.url);
     let arr = decompressData (await res.json (), (columnData, rowNumber) => ({
-      oa21cd: columnData[0][rowNumber],
-      lsoa21cd: columnData[1][rowNumber],
-      msoa21cd: columnData[2][rowNumber],
-      ltla21cd: columnData[3][rowNumber],
-      rgn21cd: columnData[4][rowNumber],
-      lng: columnData[5][rowNumber],
-      lat: columnData[6][rowNumber],
-      population: columnData[7][rowNumber]
+      lsoa21cd: columnData[0][rowNumber],
+      msoa21cd: columnData[1][rowNumber],
+      ltla21cd: columnData[2][rowNumber],
+      rgn21cd: columnData[3][rowNumber],
+      lng: columnData[4][rowNumber],
+      lat: columnData[5][rowNumber],
+      population: columnData[6][rowNumber]
     }));
 
     let gjson = {type: 'FeatureCollection', features: []};
@@ -158,7 +157,7 @@ class Centroids {
     mapobject
     // options = {simplify_geo: false},
   ) {
-    const oa_all = Array.from (selected[key]);
+    const oa_all = Array.from (selected.oa);
 
     // compress the codes
     const compressed = this.compress(oa_all);
@@ -179,7 +178,7 @@ class Centroids {
     merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
       var geometry = mapobject
         .queryRenderedFeatures ({layers: ['bounds']})
-        .filter (e => selected[key].has(e.properties[boundaries.id_key]));
+        .filter (e => selected.oa.has(e.properties[boundaries.id_key]));
 
       let geojson = {
         type: 'FeatureCollection',

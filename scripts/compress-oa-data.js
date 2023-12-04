@@ -7,7 +7,7 @@ const parse = (path) => csvParse(
     autoType
 );
 const input = (yr) => `./raw_data/lsoa${yr}-data.csv`;
-const output = (yr) => `./static/data/lsoa${yr}-data.json`;
+const output = (yr) => `./static/data/lsoa${yr}-lookup.json`;
 
 const data11 = parse(input("11"));
 const data21 = parse(input("21"));

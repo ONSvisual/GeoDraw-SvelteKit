@@ -5,15 +5,15 @@ export const cdnbase = "https://ons-dp-prod-cdn.s3.eu-west-2.amazonaws.com/mapti
 export const places = `${base}/data/places-list.csv`;
 export const mapstyle = `${base}/data/style.json`
 export const points = {
-  key: "oa",
-  url: `${base}/data/oa21-data.json`,
-  parents: ["lsoa", "msoa", "ltla", "rgn"],
+  key: "lsoa",
+  url: `${base}/data/lsoa21-lookup.json`,
+  parents: ["msoa", "ltla", "rgn"],
   year: 2021
 };
 export const boundaries = {
-  key: "oa",
+  key: "lsoa",
   layer: "boundaries",
-  url: "https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v3/boundaries/{z}/{x}/{y}.pbf",
+  url: "https://cdn.ons.gov.uk/maptiles/administrative/2021/lsoa/v3/boundaries/{z}/{x}/{y}.pbf",
   id_key: "areacd",
   pt_key: "parentcd"
 };
