@@ -133,7 +133,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let value;
+  export let value = null;
   export let autoClear = true;
   export let placeholder = "Find an area or postcode";
   export let listMaxHeight = 250;

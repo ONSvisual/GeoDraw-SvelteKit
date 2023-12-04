@@ -3,7 +3,7 @@ import { csvParse, autoType } from "d3-dsv";
 import { compressData } from "compress-csv-to-json";
 
 const input = "./raw_data/oa21-data.csv";
-const output = "./static/data/oa21-data.json";
+const output = "./static/data/oa21-lookup.json";
 
 const raw = fs.readFileSync(input, {encoding: 'utf8', flag: 'r'});
 const data = csvParse(raw.replace(/\uFEFF/, ''), autoType);

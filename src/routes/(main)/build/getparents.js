@@ -19,7 +19,5 @@ export default async function(codes) {
     codes: geo.properties.c21cds
   }
 
-  console.log(data);
-
   return {parents: [data], coverage};
 }
