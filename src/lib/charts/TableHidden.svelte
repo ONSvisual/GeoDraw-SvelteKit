@@ -7,7 +7,6 @@
     export let zKey = "areanm";
 
     $: grouped_data = groupData(data, yKey);
-    $: console.log("grouped", grouped_data);
 </script>
 
 {#if grouped_data}

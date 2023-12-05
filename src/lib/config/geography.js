@@ -17,6 +17,8 @@ export const boundaries = {
   id_key: "areacd",
   pt_key: "parentcd"
 };
+export const lookup11 = `${base}/data/lsoa11-lookup.json`;
+export const lookup21_11 = `${base}/data/lsoa21-lsoa11-lookup.json`;
 
 // map constants
 export const minzoom = 4;

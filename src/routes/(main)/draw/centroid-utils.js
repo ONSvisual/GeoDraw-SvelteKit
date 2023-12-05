@@ -6,13 +6,17 @@ import area from '@turf/area';
 import {decompressData} from "compress-csv-to-json";
 import {dissolve} from '$lib/util/mapshaper';
 import {roundAll} from '$lib/util/functions';
-import {points, boundaries} from '$lib/config/geography';
+import {points, boundaries, lookup11, lookup21_11} from '$lib/config/geography';
 
 const key = points.key;
 const code = `${points.key}${String(points.year).slice(2)}cd`;
 const parents = points.parents.map(key => ({
   key,
   code: `${key}${String(points.year).slice(2)}cd`
+}));
+const parents11 = points.parents.map(key => ({
+  key,
+  code: `${key}11cd`
 }));
 
 // Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
@@ -32,8 +36,7 @@ function filterGeo(geojson, area_sqm) {
 
 class Centroids {
   async initialize () {
-    let res = await fetch (points.url);
-    let arr = decompressData (await res.json (), (columnData, rowNumber) => ({
+    let arr = decompressData (await (await fetch (points.url)).json (), (columnData, rowNumber) => ({
       lsoa21cd: columnData[0][rowNumber],
       msoa21cd: columnData[1][rowNumber],
       ltla21cd: columnData[2][rowNumber],
@@ -69,11 +72,39 @@ class Centroids {
       if (d[code][0] === "E") child_lookup["E92000001"].push(d[code]);
     });
 
-    this.sizes = arr.map (d => d.r);
+    // this.sizes = arr.map (d => d.r);
     this.geojson = gjson;
     this.lookup = lkp;
     this.child_lookup = child_lookup;
-    parents.forEach(p => this[`${p.key}_count`] = parent_ct[p.key]);
+    parents11.forEach(p => this[`${p.key}_count`] = parent_ct[p.key]);
+
+    let lkp11 = {};
+    let parent11_ct = {};
+    parents11.forEach(p => parent11_ct[p.key] = {});
+
+    let arr11 = decompressData (await (await fetch(lookup11)).json (), (columnData, rowNumber) => ({
+      lsoa11cd: columnData[0][rowNumber],
+      msoa11cd: columnData[1][rowNumber],
+      ltla11cd: columnData[2][rowNumber],
+      rgn11cd: columnData[3][rowNumber]
+    }));
+
+    arr11.forEach (d => {
+      const cd = d.lsoa11cd;
+      lkp11[cd] = d;
+
+      parents11.forEach(p => {
+        if (!parent11_ct[p.key][d[p.code]]) {
+          parent11_ct[p.key][d[p.code]] = 1;
+        } else {
+          parent11_ct[p.key][d[p.code]] += 1;
+        }
+      });
+    });
+
+    this.lookup11 = lkp11;
+    this.lookup21_11 = await (await fetch (lookup21_11)).json();
+    parents11.forEach(p => this[`${p.key}11_count`] = parent11_ct[p.key]);
   }
 
   parent (oa) {
@@ -124,13 +155,13 @@ class Centroids {
     return {bbox: bounds, oa: new Set (oas)};
   }
 
-  compress (oa_all) {
+  compress (oa_all, yr = 21) {
     let all = {};
     let compressed = [];
     all[key] = oa_all;
     parents.forEach(p => {
-      all[p.key] = oa_all.map(oa => this.lookup[oa][p.code]);
-    }); 
+      all[p.key] = oa_all.map(oa => this[`lookup${yr === 21 ? '' : yr}`][oa][`${p.key}${yr}cd`]);
+    });
     const keys = Object.keys(all).reverse();
     for (let i = 0; i < oa_all.length; i++) {
       if (parents.every(p => !compressed.includes(all[p.key][i]))) {
@@ -140,7 +171,7 @@ class Centroids {
             compressed.push(all[thiskey][i]);
           } else if (
             all[thiskey].filter(cd => all[thiskey][i] === cd).length ===
-            this[`${thiskey}_count`][all[thiskey][i]]
+            this[`${thiskey}${yr === 21 ? '' : yr}_count`][all[thiskey][i]]
           ) {
             compressed.push(all[thiskey][i]);
             break;
@@ -149,6 +180,15 @@ class Centroids {
       }
     }
     return compressed;
+  }
+
+  convert (oa_all) {
+    return oa_all.map(oa => this.lookup21_11[oa] || [oa]).flat();
+  }
+
+  comp2comp (oa_comp) {
+    if (oa_comp.every(oa => this.lookup[oa] || this.child_lookup[oa])) return oa_comp;
+    return this.compress(this.convert(this.expand(oa_comp)), 11);
   }
 
   async simplify (

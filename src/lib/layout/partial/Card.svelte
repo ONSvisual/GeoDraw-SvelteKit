@@ -14,7 +14,7 @@
   {#if title}
   <header class="margin-top--1">
     <h3 class="margin-top--0 margin-right--0 margin-bottom--0 margin-left--0">
-      {title}
+      {@html title}
     </h3>
   </header>
   {/if}
@@ -38,6 +38,9 @@
   h3 {
     font-size: 1.3rem;
     font-weight: bold;
+  }
+  h3 :global(span) {
+    font-weight: normal;
   }
   .blank {
     padding: 0;

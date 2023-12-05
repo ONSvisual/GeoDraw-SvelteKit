@@ -132,7 +132,9 @@
 
     state.name = props.name;
     state.codes = props.oa_all;
+    state.codes11 = $centroids.convert(state.codes);
     state.compressed = props.compressed;
+    state.compressed11 = $centroids.compress(state.codes11, "11");
     
     let par = await getParents(state.compressed);
     coverage = par.coverage;
@@ -150,7 +152,8 @@
   // Processing functions
   ////////////////////////////////////////////////////////////////
   let cache = {};
-  async function get_data(data, comp) {
+  async function get_data(data) {
+    const comp = state?.comparison ? state.comparison.codes.join(";") : "_";
     if (!state.start) return [];
     if (!cache[comp]) cache[comp] = {};
     let tables = [];
@@ -159,7 +162,7 @@
       if (cache[comp][data[i].code]) {
         table = cache[comp][data[i].code];
       } else {
-        table = await getTable(data[i], state, comp);
+        table = await getTable(data[i], state);
         cache[comp][data[i].code] = table;
       }
       tables.push({code: data[i].code, data: table});
@@ -175,8 +178,7 @@
       localStorage.setItem('onsbuild', JSON.stringify(ls));
 
       let codes = data.map((d) => d.code);
-      let compcds = comp?.codes ? comp.codes.join(";") : comp?.areacd || '';
-      tables = await get_data(topics.filter((t) => codes.includes(t.code)), compcds);
+      tables = await get_data(topics.filter((t) => codes.includes(t.code)));
 
       embed_hash = `#/?name=${btoa(name)}${
         comp ? `&comp=${btoa(comp.areanm)}` : ''
@@ -269,7 +271,7 @@
               b.properties.codes_compressed.map(c => c.slice(1, 3)).includes("00")
             )
           ) {
-            if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
+            if (JSON.stringify(b.geometry).length > 20000) b.geometry = simplify_geo(b.geometry, 20000);
             const oas = $centroids.contains(b);
             b.properties.codes_compressed = $centroids.compress([...oas.oa]);
           }
@@ -281,7 +283,8 @@
               areacd: props.areacd ? props.areacd : props.code ? props.code : "",
               group: "Uploaded area",
               geometry: b.geometry,
-              codes: b.properties.codes_compressed
+              codes: b.properties.codes_compressed,
+              codes11: $centroids.comp2comp(b.properties.codes_compressed)
             }
             analyticsEvent({event: "geoUpload", areaName: state.comparison.areanm});
           } else {
@@ -370,6 +373,7 @@
         if (e.detail.codes.map(c => c.slice(1, 3)).includes("00")) {
           comp.codes = Array.from($centroids.contains(e.detail.geometry).oa);
         }
+        comp.codes11 = $centroids.comp2comp(comp.codes);
         state.comparison = comp;
       }} on:clear={() => state.comparison = null}/>
       <button

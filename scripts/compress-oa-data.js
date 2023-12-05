@@ -15,8 +15,7 @@ const data21 = parse(input("21"));
 const compressed11 = compressData(
     data11,
     [
-        {key: 'lsoa11cd', colType: 'interned_string'},
-        {key: 'lsoa21cd', colType: 'interned_string'},
+        {key: 'lsoa11cd', colType: 'string'},
         {key: 'msoa11cd', colType: 'interned_string'},
         {key: 'ltla11cd', colType: 'interned_string'},
         {key: 'rgn11cd', colType: 'interned_string'},

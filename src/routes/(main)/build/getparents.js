@@ -1,4 +1,6 @@
+import { get } from 'svelte/store'
 import { cdnbase } from "$lib/config/geography";
+import { centroids } from '$lib/stores/mapstore';
 
 export default async function(codes) {
   // Check if area is in England and/or Wales
@@ -16,7 +18,8 @@ export default async function(codes) {
     group: eng && wal ? "" : "Country",
     geometry: geo.geometry,
     bbox: geo.properties.bounds,
-    codes: geo.properties.c21cds
+    codes: geo.properties.c21cds,
+    codes11: get(centroids).comp2comp(geo.properties.c21cds)
   }
 
   return {parents: [data], coverage};

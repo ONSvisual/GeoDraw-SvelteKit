@@ -2,19 +2,22 @@
   {
     "code": "population",
     "label": "Population",
-    "desc": "The number of people on Census Day, 21 March 2021.",
-    "tableCode": "NM_2028_1",
-    "cellCode": "c_sex",
+    "desc": "Mid-year estimate of the total number of people.",
+    "tableCode": ["NM_2010_1", "NM_2002_1"],
+    "cellCode": "c_age",
     "measures": 20100,
+    "date": 2020,
+    "geoDate": 2011,
     "chart": "number",
     "unit": "people",
     "base": "all people",
     "categories": [
       {
         "label": "Population",
-        "cells": [0]
+        "cells": [200]
       }
-    ]
+    ],
+    "queryExt": "&gender=0"
   },
   {
     "code": "households",
@@ -23,6 +26,7 @@
     "tableCode": "NM_2059_1",
     "cellCode": "c2021_hh_1",
     "measures": 20100,
+    "date": 2021,
     "chart": "number",
     "unit": "households",
     "base": "all households",
@@ -34,13 +38,31 @@
     ]
   },
   {
+    "code": "births",
+    "label": "Live births",
+    "desc": "The number of babies born in a year, excluding stillbirths.",
+    "tableCode": "NM_206_1",
+    "measures": 20100,
+    "date": 2021,
+    "geoDate": 2011,
+    "chart": "number",
+    "unit": "births",
+    "base": "all live births",
+    "categories": [
+      {
+        "label": "Live births"
+      }
+    ]
+  },
+  {
     "code": "resident_age",
     "label": "Age profile",
-    "desc": "The age of a person on Census Day, 21 March 2021.",
+    "desc": "Five year age bands based on mid-year population estimates.",
     "url": "demographyvariablescensus2021/age",
-    "tableCode": "NM_2020_1",
-    "cellCode": "c2021_age_19",
+    "tableCode": ["NM_2010_1", "NM_2002_1"],
+    "cellCode": "c_age",
     "measures": 20100,
+    "date": 2020,
     "chart": "profile",
     "unit": "%",
     "base": "all people",
@@ -51,94 +73,98 @@
       },
       {
         "label": "Aged 5 to 9",
-        "cells": [2]
-      },
-      {
-        "label": "Aged 10 to 14",
         "cells": [3]
       },
       {
-        "label": "Aged 15 to 19",
+        "label": "Aged 10 to 14",
         "cells": [4]
       },
       {
-        "label": "Aged 20 to 24",
+        "label": "Aged 15 to 19",
         "cells": [5]
       },
       {
-        "label": "Aged 25 to 29",
+        "label": "Aged 20 to 24",
         "cells": [6]
       },
       {
-        "label": "Aged 30 to 34",
+        "label": "Aged 25 to 29",
         "cells": [7]
       },
       {
-        "label": "Aged 35 to 39",
+        "label": "Aged 30 to 34",
         "cells": [8]
       },
       {
-        "label": "Aged 40 to 44",
+        "label": "Aged 35 to 39",
         "cells": [9]
       },
       {
-        "label": "Aged 45 to 49",
+        "label": "Aged 40 to 44",
         "cells": [10]
       },
       {
-        "label": "Aged 50 to 54",
+        "label": "Aged 45 to 49",
         "cells": [11]
       },
       {
-        "label": "Aged 55 to 59",
+        "label": "Aged 50 to 54",
         "cells": [12]
       },
       {
-        "label": "Aged 60 to 64",
+        "label": "Aged 55 to 59",
         "cells": [13]
       },
       {
-        "label": "Aged 65 to 69",
+        "label": "Aged 60 to 64",
         "cells": [14]
       },
       {
-        "label": "Aged 70 to 74",
+        "label": "Aged 65 to 69",
         "cells": [15]
       },
       {
-        "label": "Aged 75 to 79",
+        "label": "Aged 70 to 74",
         "cells": [16]
       },
       {
-        "label": "Aged 80 to 84",
+        "label": "Aged 75 to 79",
         "cells": [17]
       },
       {
-        "label": "Aged 85 and over",
+        "label": "Aged 80 to 84",
         "cells": [18]
+      },
+      {
+        "label": "Aged 85 and over",
+        "cells": [210]
       }
-    ]
+    ],
+    "queryExt": "&gender=0"
   },
   {
     "code": "sex",
     "label": "Sex",
-    "desc": "The sex recorded by the person completing the census.",
+    "desc": "Mid-year estimate of the proportion of females and males.",
     "url": "demographyvariablescensus2021/sex",
-    "tableCode": "NM_2028_1",
-    "cellCode": "c_sex",
-    "measures": 20301,
+    "tableCode": ["NM_2010_1", "NM_2002_1"],
+    "cellCode": "gender",
+    "measures": 20100,
+    "date": 2020,
+    "geoDate": 2011,
     "unit": "%",
     "base": "all people",
     "categories": [
       {
         "label": "Female",
-        "cells": [1]
+        "cells": [2]
       },
       {
         "label": "Male",
-        "cells": [2]
+        "cells": [1]
       }
-    ]
+    ],
+    "queryExt": "&c_age=200"
   },
   {
     "code": "legal_partnership_status",
@@ -148,6 +174,7 @@
     "tableCode": "NM_2022_1",
     "cellCode": "c2021_lpstat_12",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -181,6 +208,7 @@
     "tableCode": "NM_2024_1",
     "cellCode": "c2021_cob_12",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -202,6 +230,7 @@
     "tableCode": "NM_2025_1",
     "cellCode": "c2021_pass_27",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -227,6 +256,7 @@
     "tableCode": "NM_2036_1",
     "cellCode": "c2021_resuk_6",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -260,6 +290,7 @@
     "tableCode": "NM_2037_1",
     "cellCode": "c2021_hhsize_10",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -289,6 +320,7 @@
     "tableCode": "NM_2023_1",
     "cellCode": "c2021_hhcomp_15",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -314,6 +346,7 @@
     "tableCode": "NM_2031_1",
     "cellCode": "c2021_dep_6",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -347,6 +380,7 @@
     "tableCode": "NM_2041_1",
     "cellCode": "c2021_eth_20",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -380,6 +414,7 @@
     "tableCode": "NM_2046_1",
     "cellCode": "c2021_natiduk_17",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -407,6 +442,7 @@
     "tableCode": "NM_2049_1",
     "cellCode": "c2021_religion_10",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -458,6 +494,7 @@
     "tableCode": "NM_2055_1",
     "cellCode": "c2021_health_6",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -493,6 +530,7 @@
     "tableCode": "NM_2056_1",
     "cellCode": "c2021_disability_5",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -516,6 +554,7 @@
     "tableCode": "NM_2057_1",
     "cellCode": "c2021_carer_7",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged five years and over",
     "categories": [
@@ -545,6 +584,7 @@
     "tableCode": "NM_2048_1",
     "cellCode": "c2021_engprf_6",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged three years and over",
     "categories": [
@@ -578,6 +618,7 @@
     "tableCode": "NM_2050_1",
     "cellCode": "c2021_wlang_9",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged three years and over",
     "coverage": ["W"],
@@ -604,6 +645,7 @@
     "tableCode": "NM_2051_1",
     "cellCode": "c2021_wlangs_3",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged three years and over",
     "coverage": ["W"],
@@ -626,6 +668,7 @@
     "tableCode": "NM_2062_1",
     "cellCode": "c2021_acctype_9",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -651,6 +694,7 @@
     "tableCode": "NM_2063_1",
     "cellCode": "c2021_cars_5",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -680,6 +724,7 @@
     "tableCode": "NM_2064_1",
     "cellCode": "c2021_heating_13",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -701,6 +746,7 @@
     "tableCode": "NM_2068_1",
     "cellCode": "c2021_bedrooms_5",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -730,6 +776,7 @@
     "tableCode": "NM_2070_1",
     "cellCode": "c2021_occrat_bedrooms_6",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -763,6 +810,7 @@
     "tableCode": "NM_2072_1",
     "cellCode": "c2021_tenure_9",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -792,6 +840,7 @@
     "tableCode": "NM_2074_1",
     "cellCode": "c2021_2addr_4",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -819,6 +868,7 @@
     "tableCode": "NM_2075_1",
     "cellCode": "c2021_ttwdist_11",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -854,6 +904,7 @@
     "tableCode": "NM_2078_1",
     "cellCode": "c2021_ttwmeth_12",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -913,6 +964,7 @@
     "tableCode": "NM_2083_1",
     "cellCode": "c2021_eastat_20",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -940,6 +992,7 @@
     "tableCode": "NM_2082_1",
     "cellCode": "c2021_worked_4",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over not in employment",
     "categories": [
@@ -967,6 +1020,7 @@
     "tableCode": "NM_2080_1",
     "cellCode": "c2021_occ_10",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -1018,6 +1072,7 @@
     "tableCode": "NM_2079_1",
     "cellCode": "c2021_nssec_10",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -1069,6 +1124,7 @@
     "tableCode": "NM_2076_1",
     "cellCode": "c2021_hours_5",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -1098,6 +1154,7 @@
     "tableCode": "NM_2084_1",
     "cellCode": "c2021_hiqual_8",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -1131,6 +1188,7 @@
     "tableCode": "NM_2085_1",
     "cellCode": "c2021_student_3",
     "measures": 20301,
+    "date": 2021,
     "unit": "%",
     "base": "people aged five years and over",
     "categories": [

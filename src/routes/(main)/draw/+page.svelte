@@ -287,7 +287,7 @@
           ];
           $mapobject.fitBounds(bb, {padding: 40});
         } else if (b.geometry) {
-          if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
+          if (JSON.stringify(b.geometry).length > 20000) b.geometry = simplify_geo(b.geometry, 20000);
           let bb = bbox(b);
           update(b.geometry);
           $mapobject.fitBounds(bb, {padding: 40});

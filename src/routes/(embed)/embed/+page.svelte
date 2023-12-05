@@ -24,12 +24,12 @@
     let data = [];
     let i = 0;
     let names = table.data.length === def.categories.length ? [areaName] : [areaName, compName];
-    names.forEach(name => {
-      def.categories.forEach(cat => {
+    for (const name of names) {
+      for (const cat of def.categories) {
         data.push({areanm: name, category: cat.label, value: table.data[i]})
         i ++;
-      });
-    });
+      }
+    }
     return data;
   };
 
@@ -54,7 +54,10 @@
       geojson = props.poly;
       comp_geojson = props.comppoly;
       population = props.population;
-      tables = props.tabs;
+      tables = props.tabs.map(t => ({
+        ...topicsLookup[t.code],
+        data: expandTable(t, name, comp)
+      }));
       stats = props.stats;
     }
   }
@@ -96,21 +99,21 @@
       </Card>
     {/if}
     {#each tables || [] as tab}
-      <Card title={topicsLookup[tab.code].label}>
-        {#if topicsLookup[tab.code]?.chart === "number"}
+      <Card title="{tab.label}, <span>{tab.date ? tab.date : '2021'}</span>">
+        {#if tab?.chart === "number"}
         <BigNumber
-          value={tab.data[0]}
-          unit={topicsLookup[tab.code].unit}
-          prefix={topicsLookup[tab.code].prefix}
-          description={comp ? `<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}` : ''}
-          rounded={tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
-          tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit}` :
+          value={tab.data[0].value}
+          unit={tab.unit}
+          prefix={tab.prefix}
+          description={comp ? `<mark>${tab.data[1].value.toLocaleString('en-GB')}</mark> ${tab.unit} in ${comp}` : ''}
+          rounded={tab.data[0].value > 1000 ? `Rounded to the nearest 100 ${tab.unit}` :
+          tab.data[0].value > 100 ? `Rounded to the nearest 10 ${tab.unit}` :
           null}
         />
-        {:else if topicsLookup[tab.code]?.chart === "profile"}
-        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        {:else if tab?.chart === "profile"}
+        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={tab.data} base="% of {tab.base}" />
         {:else}
-        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        <BarChart xKey="value" yKey="category" zKey="areanm" data={tab.data} base="% of {tab.base}" />
         {/if}
       </Card>
     {/each}
