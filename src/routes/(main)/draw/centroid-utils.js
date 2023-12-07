@@ -50,27 +50,31 @@ class Centroids {
     let lkp = {};
     let parent_ct = {};
     let child_lookup = {"E92000001": []};
+    let region_lookup = {};+
     parents.forEach(p => parent_ct[p.key] = {});
 
-    arr.forEach (d => {
+    for (const d of arr) {
       lkp[d[code]] = d;
+      region_lookup[d[code]] = d.rgn21cd;
+
       gjson.features.push ({
         type: 'Feature',
         properties: {areacd: d[code]},
         geometry: {type: 'Point', coordinates: [d.lng, d.lat]},
       });
 
-      parents.forEach(p => {
+      for (const p of parents) {
         if (!parent_ct[p.key][d[p.code]]) {
           parent_ct[p.key][d[p.code]] = 1;
           child_lookup[d[p.code]] = [d[code]];
+          region_lookup[d[p.code]] = d.rgn21cd;
         } else {
           parent_ct[p.key][d[p.code]] += 1;
           child_lookup[d[p.code]].push(d[code]);
         }
-      });
+      }
       if (d[code][0] === "E") child_lookup["E92000001"].push(d[code]);
-    });
+    }
 
     // this.sizes = arr.map (d => d.r);
     this.geojson = gjson;
@@ -80,6 +84,7 @@ class Centroids {
 
     let lkp11 = {};
     let parent11_ct = {};
+    let child11_lookup = {"E92000001": []};
     parents11.forEach(p => parent11_ct[p.key] = {});
 
     let arr11 = decompressData (await (await fetch(lookup11)).json (), (columnData, rowNumber) => ({
@@ -92,19 +97,25 @@ class Centroids {
     arr11.forEach (d => {
       const cd = d.lsoa11cd;
       lkp11[cd] = d;
+      region_lookup[cd] = d.rgn11cd;
 
       parents11.forEach(p => {
         if (!parent11_ct[p.key][d[p.code]]) {
           parent11_ct[p.key][d[p.code]] = 1;
+          child11_lookup[d[p.code]] = [cd];
+          region_lookup[d[p.code]] = d.rgn11cd;
         } else {
           parent11_ct[p.key][d[p.code]] += 1;
+          child11_lookup[d[p.code]].push(cd);
         }
       });
     });
 
     this.lookup11 = lkp11;
     this.lookup21_11 = await (await fetch (lookup21_11)).json();
+    this.child11_lookup = child11_lookup;
     parents11.forEach(p => this[`${p.key}11_count`] = parent11_ct[p.key]);
+    this.region_lookup = region_lookup;
   }
 
   parent (oa) {
@@ -116,10 +127,11 @@ class Centroids {
     }
   }
 
-  expand (codes) {
+  expand (codes, yr = 21) {
+    const lookup = this[`child${yr === 21 ? "" : yr}_lookup`];
     return Array.isArray(codes) ?
-      codes.map(c => this.child_lookup[c] ? this.child_lookup[c] : c).flat() :
-      this.child_lookup[codes] ? this.child_lookup[codes] : [];
+      codes.map(c => lookup[c] || c).flat() :
+      lookup[codes] || [];
   }
 
   bounds (oas) {
@@ -179,6 +191,7 @@ class Centroids {
         }
       }
     }
+    // console.log("compressed", compressed);
     return compressed;
   }
 
@@ -187,7 +200,7 @@ class Centroids {
   }
 
   comp2comp (oa_comp) {
-    if (oa_comp.every(oa => this.lookup[oa] || this.child_lookup[oa])) return oa_comp;
+    if (oa_comp.every(oa => this.lookup11[oa] || this.child11_lookup[oa])) return oa_comp;
     return this.compress(this.convert(this.expand(oa_comp)), 11);
   }
 
@@ -261,6 +274,10 @@ class Centroids {
 
   population (oa) {
     return this.lookup[oa].population;
+  }
+
+  region (oa) {
+    return this.region_lookup[oa];
   }
 }
 

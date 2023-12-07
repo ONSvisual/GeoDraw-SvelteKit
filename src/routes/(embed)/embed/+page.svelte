@@ -8,6 +8,7 @@
   import BarChart from '$lib/charts/BarChart.svelte';
   import AreaMap from '$lib/charts/AreaMap.svelte';
   import ProfileChart from '$lib/charts/ProfileChart.svelte';
+  import LineChart from '$lib/charts/LineChart.svelte';
   import BigNumber from '$lib/charts/BigNumber.svelte';
 
   let pym_child, name, comp, geojson, comp_geojson, tables, population;
@@ -105,13 +106,15 @@
           value={tab.data[0].value}
           unit={tab.unit}
           prefix={tab.prefix}
-          description={comp ? `<mark>${tab.data[1].value.toLocaleString('en-GB')}</mark> ${tab.unit} in ${comp}` : ''}
+          description={comp ? `<mark>${tab.prefix || ""}${tab.data[1].value.toLocaleString('en-GB')}</mark> ${tab.unit} in ${comp}` : ''}
           rounded={tab.data[0].value > 1000 ? `Rounded to the nearest 100 ${tab.unit}` :
           tab.data[0].value > 100 ? `Rounded to the nearest 10 ${tab.unit}` :
           null}
         />
         {:else if tab?.chart === "profile"}
         <ProfileChart xKey="category" yKey="value" zKey="areanm" data={tab.data} base="% of {tab.base}" />
+        {:else if tab?.chart === "line"}
+        <LineChart data={tab.data} zKey="areanm" xDomain={tab.categories.map(c => c.label)} base="% change since {tab.categories[0].label}" />
         {:else}
         <BarChart xKey="value" yKey="category" zKey="areanm" data={tab.data} base="% of {tab.base}" />
         {/if}

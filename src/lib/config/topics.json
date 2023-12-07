@@ -20,6 +20,62 @@
     "queryExt": "&gender=0"
   },
   {
+    "code": "population_change",
+    "label": "Population change",
+    "desc": "Mid-year estimate of the total number of people.",
+    "tableCode": ["NM_2010_1", "NM_2002_1"],
+    "cellCode": "date",
+    "measures": 20100,
+    "date": "2011-2020",
+    "geoDate": 2011,
+    "chart": "line",
+    "unit": "people",
+    "base": "all people",
+    "categories": [
+      {
+        "label": "2011",
+        "cells": [2011]
+      },
+      {
+        "label": "2012",
+        "cells": [2012]
+      },
+      {
+        "label": "2013",
+        "cells": [2013]
+      },
+      {
+        "label": "2014",
+        "cells": [2014]
+      },
+      {
+        "label": "2015",
+        "cells": [2015]
+      },
+      {
+        "label": "2016",
+        "cells": [2016]
+      },
+      {
+        "label": "2017",
+        "cells": [2017]
+      },
+      {
+        "label": "2018",
+        "cells": [2018]
+      },
+      {
+        "label": "2019",
+        "cells": [2019]
+      },
+      {
+        "label": "2020",
+        "cells": [2020]
+      }
+    ],
+    "queryExt": "&gender=0&c_age=200"
+  },
+  {
     "code": "households",
     "label": "Number of households",
     "desc": "The number of households on Census Day, 21 March 2021.",
@@ -165,6 +221,67 @@
       }
     ],
     "queryExt": "&c_age=200"
+  },
+  {
+    "code": "gva",
+    "label": "Gross value added (GVA)",
+    "desc": "A measure of the value of goods and services produced in an area.",
+    "url": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedbalancedqmi",
+    "tableCode": "NM_2400_1",
+    "cellCode": "cell",
+    "measures": 20100,
+    "chart": "number",
+    "prefix": "£",
+    "unit": "million",
+    "base": "all people",
+    "date": 2020,
+    "geoDate": 2011,
+    "flatData": true,
+    "categories": [
+      {"label": "Gross value added", "cells": [0]}
+    ]
+  },
+  {
+    "code": "gva_change",
+    "label": "Gross value added (GVA) change",
+    "desc": "A measure of the value of goods and services produced in an area.",
+    "url": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedbalancedqmi",
+    "tableCode": "NM_2400_1",
+    "cellCode": "date",
+    "measures": 20100,
+    "chart": "line",
+    "prefix": "£",
+    "unit": "million",
+    "base": "all people",
+    "date": "1998-2000",
+    "geoDate": 2011,
+    "flatData": true,
+    "categories": [
+      {"label": "1998", "cells": [1998]},
+      {"label": "1999", "cells": [1999]},
+      {"label": "2000", "cells": [2000]},
+      {"label": "2001", "cells": [2001]},
+      {"label": "2002", "cells": [2002]},
+      {"label": "2003", "cells": [2003]},
+      {"label": "2004", "cells": [2004]},
+      {"label": "2005", "cells": [2005]},
+      {"label": "2006", "cells": [2006]},
+      {"label": "2007", "cells": [2007]},
+      {"label": "2008", "cells": [2008]},
+      {"label": "2009", "cells": [2009]},
+      {"label": "2010", "cells": [2010]},
+      {"label": "2011", "cells": [2011]},
+      {"label": "2012", "cells": [2012]},
+      {"label": "2013", "cells": [2013]},
+      {"label": "2014", "cells": [2014]},
+      {"label": "2015", "cells": [2015]},
+      {"label": "2016", "cells": [2016]},
+      {"label": "2017", "cells": [2017]},
+      {"label": "2018", "cells": [2018]},
+      {"label": "2019", "cells": [2019]},
+      {"label": "2020", "cells": [2020]}
+    ],
+    "queryExt": "&cell=0"
   },
   {
     "code": "legal_partnership_status",

@@ -371,7 +371,7 @@
       <Select value={state.comparison} autoClear={false} isClearable on:select={(e) => {
         const comp = e.detail;
         if (e.detail.codes.map(c => c.slice(1, 3)).includes("00")) {
-          comp.codes = Array.from($centroids.contains(e.detail.geometry).oa);
+          comp.codes = $centroids.compress(Array.from($centroids.contains(e.detail.geometry).oa));
         }
         comp.codes11 = $centroids.comp2comp(comp.codes);
         state.comparison = comp;
