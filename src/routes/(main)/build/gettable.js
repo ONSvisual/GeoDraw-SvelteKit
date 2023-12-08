@@ -57,7 +57,7 @@ function sumData(data1, data2) {
       }
     }
   }
-  return Object.keys(newData).map(key => newData[key]).sort((a, b) => -a.areanm.localeCompare(b.areanm));
+  return Object.keys(newData).map(key => newData[key]).sort((a, b) => b.areanm.localeCompare(a.areanm));
 }
 
 function filterCodes(codes, level = "none") {
