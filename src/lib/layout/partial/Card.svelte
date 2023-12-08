@@ -41,6 +41,8 @@
   }
   h3 :global(span) {
     font-weight: normal;
+    font-size: 0.85em;
+    white-space: nowrap;
   }
   .blank {
     padding: 0;

@@ -99,8 +99,8 @@
         <AreaMap {name} {comp} {geojson} {comp_geojson} />
       </Card>
     {/if}
-    {#each tables || [] as tab}
-      <Card title="{tab.label}, <span>{tab.date ? tab.date : '2021'}</span>">
+    {#each tables || [] as tab (tab.code)}
+      <Card title="{tab.label} <span>{tab.date ? tab.date : '2021'}</span>">
         {#if tab?.chart === "number"}
         <BigNumber
           value={tab.data[0].value}
