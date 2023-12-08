@@ -21,7 +21,7 @@
   },
   {
     "code": "population_change",
-    "label": "Population change",
+    "label": "Population timeseries",
     "desc": "Mid-year estimate of the total number of people.",
     "tableCode": ["NM_2010_1", "NM_2002_1"],
     "cellCode": "date",
@@ -243,7 +243,7 @@
   },
   {
     "code": "gva_change",
-    "label": "Gross value added (GVA) change",
+    "label": "Gross value added (GVA) timeseries",
     "desc": "A measure of the value of goods and services produced in an area.",
     "url": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedbalancedqmi",
     "tableCode": "NM_2400_1",
