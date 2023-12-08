@@ -57,7 +57,7 @@ function sumData(data1, data2) {
       }
     }
   }
-  return Object.keys(newData).map(key => newData[key]).sort((a, b) => b.areanm.localeCompare(a.areanm));
+  return Object.keys(newData).map(key => newData[key]);
 }
 
 function filterCodes(codes, level = "none") {
@@ -122,6 +122,7 @@ export default async function (table, state) {
   const comp = !state.comparison ? [] : table?.geoDate === 2011 ? state.comparison.codes11 : state.comparison.codes;
   let data = table.flatData ? await fetchFlatData(table, codes, comp) : await fetchData(table, codes, comp);
   if (table.unit === "%" && table.measures === 20100) data = calcPercent(data);
+  data = data.sort((a, b) => b.areanm.localeCompare(a.areanm));
   analyticsEvent({
     event: "topicSelect",
     topicName: table.label,
