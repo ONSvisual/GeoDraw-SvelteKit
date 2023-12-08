@@ -52,6 +52,12 @@
             "M" + series.map((d) => `${xScale(d.x)} ${yScale(d.y)}`).join("L")
         );
     }
+    function yPos(y2, y1) {
+        const buffer = 14;
+        if (y2 < y1 - buffer || y2 > y1 + buffer) return y2;
+        else if (y2 < y1) return y1 - buffer;
+        else return y1 + buffer;
+    }
 
     function update(data) {
         _data = transformData(data);
@@ -100,11 +106,23 @@
             {/each}
         </svg>
         <div
+            class="point point-black"
+            style:left="{xScale(xVal)}%"
+            style:top="{yScale(_data[1][yKey(xVal)])}%"
+        />
+        <div
             class="point"
             style:left="{xScale(xVal)}%"
             style:top="{yScale(_data[0][yKey(xVal)])}%"
         />
         {#if xVal != xDomain[0]}
+        <div
+                class="point-text brackets"
+                style:left="{xScale(xVal)}%"
+                style:top="{yPos(yScale(_data[1][yKey(xVal)]), yScale(_data[0][yKey(xVal)]))}%"
+            >
+                {formatTick(_data[1][yKey(xVal)])}%
+            </div>
             <div
                 class="point-text bold"
                 style:left="{xScale(xVal)}%"
@@ -197,17 +215,26 @@
         border-radius: 50%;
         transform: translate(-50%, -50%);
     }
+    .point-black {
+        width: 8px;
+        height: 8px;
+        background-color: black;
+    }
     .point-text {
         position: absolute;
         line-height: 1;
-        background-color: rgba(245, 245, 246, 0.7);
+        background-color: rgba(245, 245, 246, 0.5);
         transform: translate(-100%, calc(-100% - 7px));
+        font-size: 16px;
+    }
+    .point-text.brackets {
+        font-size: 0.85em;
     }
     small {
         font-size: 14px;
         line-height: 1.3;
         display: block;
         margin-top: 8px;
-        color: #777;
+        color: #707070;
     }
 </style>
