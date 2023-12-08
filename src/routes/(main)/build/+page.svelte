@@ -374,6 +374,7 @@
           comp.codes = $centroids.compress(Array.from($centroids.contains(e.detail.geometry).oa));
         }
         comp.codes11 = $centroids.comp2comp(comp.codes);
+        console.log(comp.codes, comp.codes11);
         state.comparison = comp;
       }} on:clear={() => state.comparison = null}/>
       <button

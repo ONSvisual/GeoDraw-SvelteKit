@@ -57,7 +57,7 @@ function sumData(data1, data2) {
       }
     }
   }
-  return Object.keys(newData).map(key => newData[key]);
+  return Object.keys(newData).map(key => newData[key]).sort((a, b) => -a.areanm.localeCompare(b.areanm));
 }
 
 function filterCodes(codes, level = "none") {
@@ -102,7 +102,11 @@ async function fetchFlatData(table, codes, comp) {
   const dat = {};;
   for (const area of [{nm: "MyCustomArea", cds: codes}, {nm: "ComparisonArea", cds: comp}]) {
     for (const cd of area.cds) {
-      const rows = table.categories.map(c => raw_lookup[`${cd}_${c.label}`]);
+      const rows = table.categories.map(c => {
+        const row = raw_lookup[`${cd}_${c.label}`];
+        if (!row) console.log(cd, c, row);
+        return row;
+      });
       for (const d of rows) {
         const key = `${area.nm}_${d.category}`;
         if (!dat[key]) dat[key] = {areanm: area.nm, category: d.category, value: d.value};
@@ -123,5 +127,6 @@ export default async function (table, state) {
     topicName: table.label,
     topicCode: table.code
   });
+  console.log("data", data);
   return ["population", "households", "births"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
 }

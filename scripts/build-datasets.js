@@ -89,7 +89,8 @@ async function makeDatasets() {
 
         const data_lkp = {};
         for (const d of data) {
-            data_lkp[d.areacd] = d;
+            const key = `${d.areacd}_${d.category}`;
+            data_lkp[key] = d;
             for (const parent of ["msoa", "ltla", "rgn", "ctry"]) {
                 const key = `${d[parent]}_${d.category}`;
                 if (!data_lkp[key]) {
