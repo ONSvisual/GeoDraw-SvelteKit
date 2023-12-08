@@ -111,6 +111,57 @@
     ]
   },
   {
+    "code": "births_change",
+    "label": "Live births timeseries",
+    "desc": "The number of babies born in a year, excluding stillbirths.",
+    "tableCode": "NM_206_1",
+    "cellCode": "date",
+    "measures": 20100,
+    "date": "2013-2021",
+    "geoDate": 2011,
+    "chart": "line",
+    "unit": "births",
+    "base": "all live births",
+    "categories": [
+      {
+        "label": "2013",
+        "cells": [2013]
+      },
+      {
+        "label": "2014",
+        "cells": [2014]
+      },
+      {
+        "label": "2015",
+        "cells": [2015]
+      },
+      {
+        "label": "2016",
+        "cells": [2016]
+      },
+      {
+        "label": "2017",
+        "cells": [2017]
+      },
+      {
+        "label": "2018",
+        "cells": [2018]
+      },
+      {
+        "label": "2019",
+        "cells": [2019]
+      },
+      {
+        "label": "2020",
+        "cells": [2020]
+      },
+      {
+        "label": "2021",
+        "cells": [2021]
+      }
+    ]
+  },
+  {
     "code": "resident_age",
     "label": "Age profile",
     "desc": "Five year age bands based on mid-year population estimates.",
