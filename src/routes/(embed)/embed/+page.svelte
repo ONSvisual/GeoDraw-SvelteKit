@@ -122,7 +122,7 @@
     {/each}
   </Cards>
 
-  <span class="footnote">Source: Office for National Statistics - Census 2021</span>
+  <span class="footnote">Source: Office for National Statistics</span>
   <div class="spacer"/>
 {/if}
 

@@ -129,5 +129,5 @@ export default async function (table, state) {
     topicCode: table.code
   });
   console.log("data", data);
-  return ["population", "households", "births"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
+  return ["population", "households", "births", "gva"].includes(table.code) ? data.map(d => roundCount(d.value)) : data.map(d => d.value);
 }
