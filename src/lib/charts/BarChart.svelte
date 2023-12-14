@@ -13,6 +13,7 @@
   export let base = null;
 	export let barHeight = 25;
 	export let markerWidth = 3;
+	export let table = true;
 
 	$: xMax = Math.max(...data.map(d => d[xKey]));
 	$: zDomain = data.map(d => d[zKey]).filter((v, i, a) => a.indexOf(v) === i);
@@ -21,7 +22,9 @@
 	$: data_grouped = groupData(data, yKey);
 </script>
 
+{#if table}
 <TableHidden {data} {yKey} {zKey} {suffix}/>
+{/if}
 
 <div class="bar-chart" aria-hidden="true">
 	{#if zDomain[1]}

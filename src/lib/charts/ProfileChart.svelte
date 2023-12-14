@@ -14,6 +14,7 @@
   export let base = null;
   export let base_ext = ", 5 year age bands";
   export let suffix = "%";
+  export let table = true;
 	
 	$: xDomain = data.map(d => d[xKey]).filter((v, i, a) => a.indexOf(v) === i);
 	$: yDomain = [0, Math.max(...data.map(d => d[yKey]))];
@@ -26,7 +27,9 @@
 	$: console.log(data, data_stacked);
 </script>
 
+{#if table}
 <TableHidden {data} yKey={xKey} {zKey} {suffix}/>
+{/if}
 
 <div class="profile-chart" aria-hidden="true">
 	<ul class="legend-block">

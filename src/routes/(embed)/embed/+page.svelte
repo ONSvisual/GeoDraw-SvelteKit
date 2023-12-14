@@ -12,12 +12,15 @@
 
   let pym_child, name, comp, geojson, comp_geojson, tables, population;
   let stats = [];
+  let hideTables = false;
 
   let topicsLookup = (() => {
     let lookup = {};
     topics.forEach(t => lookup[t.code] = t);
     return lookup;
   })();
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   function expandTable(table, areaName, compName) {
     let def = topicsLookup[table.code];
@@ -34,7 +37,6 @@
   };
 
   function update() {
-    
     let hash = document.location.hash;
 
     if (hash && hash.includes('name=')) {
@@ -60,14 +62,15 @@
   }
 
   async function makePNG(e) {
-    // console.log('pngbtn', e);
-
+    hideTables = true;
+    await sleep(100);
     let canvas = await html2canvas(document.body);
     const base64 = canvas.toDataURL();
     let a = document.createElement('a');
     a.href = base64;
     a.download = name.replace(/\s+/g, '_') + '.png';
     a.click();
+    hideTables = false;
   }
 
   onMount(() => {
@@ -108,9 +111,9 @@
           null}
         />
         {:else if topicsLookup[tab.code]?.chart === "profile"}
-        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" table={!hideTables} />
         {:else}
-        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" />
+        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" table={!hideTables} />
         {/if}
       </Card>
     {/each}
