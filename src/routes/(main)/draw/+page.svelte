@@ -352,11 +352,44 @@ The save data and continue function
   $: updateAddSubtract(state.select);
 
   // $: console.log('selected', $selected);
+
+  function doSelect(e) {
+    newselect();
+
+    if (e.detail.type == 'place') {
+      let bbox = e.detail.bbox;
+      let oa = new Set($centroids.expand(e.detail.codes));
+      $selected = [
+        $selected,
+        { oa },
+      ];
+      $mapobject.fitBounds(bbox, {padding: 40});
+      state.name = e.detail.areanm;
+    } else if (e.detail.type == 'postcode') {
+
+      let center = e.detail.center;
+      $mapobject.flyTo({center: center, zoom: 14});
+      $mapobject.once('idle', () => {
+        let coords = $mapobject.project(center);
+        let features = $mapobject.queryRenderedFeatures(
+          [coords.x, coords.y],
+          {layers: ['bounds']}
+        );
+
+        var oa = new Set(features.map((f) => f.properties.oa));
+        $selected = [
+          $selected,
+          { oa },
+        ];
+      });
+    }
+    setDrawData();
+  }
 </script>
 
 <ONSloader {isLoading} />
 <nav>
-  <div class="nav-left" style="z-index:99;">
+  <div class="nav-left" style:z-index={99}>
     {#each modes as mode}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <label
@@ -513,38 +546,7 @@ The save data and continue function
 <aside class="info-box" style:top="{showTray || state.showSave ? 200 : 158}px">
   <div class="search">
     <Select
-      on:select={(e) => {
-        newselect();
-
-        if (e.detail.type == 'place') {
-          let bbox = e.detail.bbox;
-          let oa = new Set($centroids.expand(e.detail.codes));
-          $selected = [
-            $selected,
-            { oa },
-          ];
-          $mapobject.fitBounds(bbox, {padding: 40});
-          state.name = e.detail.areanm;
-        } else if (e.detail.type == 'postcode') {
-
-          let center = e.detail.center;
-          $mapobject.flyTo({center: center, zoom: 14});
-          $mapobject.once('idle', () => {
-            let coords = $mapobject.project(center);
-            let features = $mapobject.queryRenderedFeatures(
-              [coords.x, coords.y],
-              {layers: ['bounds']}
-            );
-
-            var oa = new Set(features.map((f) => f.properties.oa));
-            $selected = [
-              $selected,
-              { oa },
-            ];
-          });
-        }
-        setDrawData();
-      }}
+      on:select={doSelect}
     />
     <button
       title="Upload a saved area"
@@ -582,25 +584,25 @@ The save data and continue function
         <span style:font-size="0.8em" style:margin-left="2px"><Icon type="launch"/></span>
       {:else if state.mode == 'polygon'}
         <strong>Draw a polygon mode</strong>
-        <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> {state.select=='add'?'+':'–'}
+        <span class="mode-icon"> {state.select=='add'?'+':'–'}
           <Icon type={state.mode} />
         </span>
         <br />
         Click on the map to draw a polygon. Click again on the first or last point
         to close the polygon.
       {:else if state.mode == 'radius'}
-        <strong>Draw a radius mode</strong> <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> {state.select=='add'?'+':'–'}
+        <strong>Draw a radius mode</strong> <span class="mode-icon"> {state.select=='add'?'+':'–'}
           <Icon type={state.mode} />
         </span><br />
         Select a radius in kilometres from the menu, then click on the map to draw
         a circle.
       {:else if state.mode == 'select'}
-        <strong>Click and select mode</strong> <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> 
+        <strong>Click and select mode</strong> <span class="mode-icon"> 
           <Icon type={state.mode} />
         </span><br />
         Click an individual area to add or remove it from your selection.
       {:else}
-        <strong>Pan and zoom mode</strong> <span style='color:gray;margin:auto;width:auto;float:right;vertical-align:sup'> 
+        <strong>Pan and zoom mode</strong> <span class="mode-icon"> 
           <Icon type={state.mode} />
         </span><br />
         Explore the map to find a location of interest, then select a drawing tool

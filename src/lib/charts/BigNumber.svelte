@@ -14,7 +14,7 @@
 <div class="num-suffix">{unit}</div>
 {/if}
 {#if description}
-<div class="num-desc" style="--highlightColor: {highlightColor}">{@html description}</div>
+<div class="num-desc" style:--highlightColor={highlightColor}>{@html description}</div>
 {/if}
 {#if rounded}
 <small>{rounded}</small>

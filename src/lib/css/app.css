@@ -237,6 +237,13 @@ aside.info-box > .message {
   padding: 16px;
   border-bottom: 2px solid #ccc;
 }
+aside.info-box > .message > .mode-icon {
+  color: grey;
+  margin: auto;
+  width: auto;
+  float: right;
+  vertical-align: super;
+}
 aside.info-box > .population {
   display: flex;
   flex-direction: row;
