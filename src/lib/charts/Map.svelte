@@ -22,7 +22,7 @@
   maplibregl.maxParallelImageRequests = 20;
 
   import {createEventDispatcher, onMount, onDestroy} from 'svelte';
-  import {init_draw} from './drawing-utils';
+  import {init_draw} from '$lib/util/drawing-utils';
   import {
     mapsource,
     maplayer,

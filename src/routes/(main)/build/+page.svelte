@@ -10,9 +10,9 @@
   import Icon from '$lib/ui/Icon.svelte';
   import Select from '$lib/ui/Select.svelte';
   import topics_all from '$lib/config/topics.json';
-  import {simplify_geo, geo_blob} from '../draw/drawing-utils';
-  import getTable from './gettable';
-  import getParents from './getparents';
+  import {simplify_geo, geo_blob} from '$lib/util/drawing-utils';
+  import getTable from '$lib/util/get-table';
+  import getParents from '$lib/util/get-parents';
   import {cdnbase} from '$lib/config/geography';
   import {download, clip} from '$lib/util/functions';
   import {onMount} from 'svelte';

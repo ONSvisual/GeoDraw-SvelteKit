@@ -4,7 +4,7 @@ import inPoly from '@turf/points-within-polygon';
 import buffer from '@turf/buffer';
 import area from '@turf/area';
 import {decompressData} from "compress-csv-to-json";
-import {dissolve} from '$lib/util/mapshaper';
+import {dissolve} from '$lib/util/bundled/mapshaper';
 import {roundAll} from '$lib/util/functions';
 import {points, boundaries} from '$lib/config/geography';
 

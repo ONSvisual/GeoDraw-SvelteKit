@@ -3,7 +3,7 @@
   import { onMount, setContext } from "svelte";
   import { page } from '$app/stores';
   import { centroids } from '$lib/stores/mapstore.js';
-  import { GetCentroids } from './draw/centroid-utils.js';
+  import { GetCentroids } from '$lib/util/centroid-utils.js';
   import AnalyticsBanner from '$lib/layout/AnalyticsBanner.svelte';
   import ONSHeader from '$lib/layout/ONSHeader.svelte';
   import ONSFooter from '$lib/layout/ONSFooter.svelte';

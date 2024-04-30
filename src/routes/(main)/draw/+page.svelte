@@ -8,10 +8,10 @@
   import Icon from '$lib/ui/Icon.svelte';
   import {download, clip} from '$lib/util/functions';
   import bbox from '@turf/bbox';
-  import Map from './Map.svelte';
+  import Map from '$lib/charts/Map.svelte';
   import '$lib/css/maplibre-gl.css';
   import {onMount} from 'svelte';
-  import {update, simplify_geo, geo_blob} from './drawing-utils';
+  import {update, simplify_geo, geo_blob} from '$lib/util/drawing-utils';
   import {roundCount} from '$lib/util/functions';
   import {
     mapsource,

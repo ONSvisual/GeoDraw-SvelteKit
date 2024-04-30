@@ -17,7 +17,7 @@ import turf_simplify from '@turf/simplify';
 import buffer from '@turf/buffer';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
-import {dissolve} from '$lib/util/mapshaper';
+import {dissolve} from '$lib/util/bundled/mapshaper';
 import bbox from '@turf/bbox';
 
 const mzm = 10;
