@@ -27,8 +27,7 @@
   import {boundaries, cdnbase} from '$lib/config/geography';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
 
-
-  const modelist = [
+  const modes = [
     {key: 'move', label: 'Pan and zoom'},
     {key: 'select', label: 'Click to select'},
     {key: 'polygon', label: 'Draw a polygon'},
@@ -37,8 +36,6 @@
 
   // variable custom testing
   let isLoading = false;
-  let advanced = true; //new Date()%2;
-  $: modes = advanced ? modelist : modelist.slice(0, 2);
   let state = {
     mode: 'move',
     radius: 5,
@@ -382,31 +379,17 @@ The save data and continue function
   </div>
 
   <div class="nav-right">
-    {#if advanced}
-      <button
-        title="Undo last action"
-        use:tooltip
-        disabled={$selected.length < 2}
-        on:click={() => {
-          $selected = $selected.slice(0, -1);
-          setDrawData();
-        }}
-      >
-        <Icon type="undo" />
-      </button>
-    {:else}
-      <button
-        class="text secondary"
-        style:color="lightgray"
-        style:filter="invert(.2)contrast(2)"
-        on:click={() => {
-          advanced = true;
-        }}
-      >
-        Further Tools
-      </button>
-    {/if}
-
+    <button
+      title="Undo last action"
+      use:tooltip
+      disabled={$selected.length < 2}
+      on:click={() => {
+        $selected = $selected.slice(0, -1);
+        setDrawData();
+      }}
+    >
+      <Icon type="undo" />
+    </button>
     <button
       class="alert"
       title="Clear all areas"

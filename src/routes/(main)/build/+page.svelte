@@ -32,13 +32,6 @@
   let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
   // would this not be better off as a MAP and not a dict?
 
-  // (() => {
-  //   let lookup = {};
-  //   topics.forEach((t) => (lookup[t.code] = t));
-  //   return lookup;
-  // })();
-
-
   let state = {
     mode: 'move',
     radius: 5,
