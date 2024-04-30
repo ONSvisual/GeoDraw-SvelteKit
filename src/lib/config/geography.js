@@ -17,6 +17,11 @@ export const boundaries = {
   id_key: "areacd",
   pt_key: "parentcd"
 };
+export const promoteId = (() => {
+  const pId = {};
+  pId[boundaries.layer] = boundaries.id_key;
+  return pId;
+})();
 
 // map constants
 export const minzoom = 4;

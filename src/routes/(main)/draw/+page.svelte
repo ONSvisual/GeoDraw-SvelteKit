@@ -14,9 +14,6 @@
   import {update, simplify_geo, geo_blob} from '$lib/util/drawing-utils';
   import {roundCount} from '$lib/util/functions';
   import {
-    mapsource,
-    maplayer,
-    mapfunctions,
     mapobject,
     draw_type,
     add_mode,
@@ -76,61 +73,6 @@
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
     // console.clear();
-
-    // map setup and vars
-    const promoteId = {};
-    promoteId[boundaries.layer] = boundaries.id_key;
-
-    $mapsource = {
-      area: {
-        type: 'vector',
-        maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
-        minzoom: 6, // IMPORTANT: This is the minimum zoom available
-        tiles: [boundaries.url],
-        promoteId
-      },
-
-      points: {
-        type: 'geojson',
-        data: $centroids.geojson
-      },
-    };
-
-    $maplayer = [
-      {
-        id: 'bounds',
-        source: 'area',
-        'source-layer': boundaries.layer,
-        type: 'fill',
-        paint: {
-          'fill-color': 'transparent',
-          'fill-opacity': 1
-        },
-      },
-      {
-        id: 'bounds-line',
-        source: 'area',
-        'source-layer': boundaries.layer,
-        type: 'line',
-        paint: {
-          'line-color': 'steelblue',
-          'line-width': ['case', ['==', ['feature-state', 'hovered'], true], 2, 0.3]
-        },
-      },
-      {
-        id: 'cpt',
-        source: 'points',
-        type: 'circle',
-        minzoom: 10,
-        paint: {
-          'circle-radius': 1,
-          'circle-color': 'coral'
-      }}
-    ];
-
-    $mapfunctions = [
-    ];
-    /// end read out areas
 
     function recolour(selected) {
       const items = selected[selected.length - 1];

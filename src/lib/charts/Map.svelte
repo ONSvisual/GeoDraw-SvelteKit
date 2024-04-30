@@ -5,12 +5,11 @@
   maplibregl.workerCount = 5;
   maplibregl.maxParallelImageRequests = 20;
 
-  import {createEventDispatcher, onMount, onDestroy} from 'svelte';
+  import {onMount} from 'svelte';
   import {init_draw} from '$lib/util/drawing-utils';
   import {
     mapsource,
     maplayer,
-    mapfunctions,
     mapobject
   } from '$lib/stores/mapstore';
   import {minzoom, maxzoom, maxbounds, mapstyle} from '$lib/config/geography';
@@ -90,11 +89,6 @@
       }
     });
 
-    mapfunctions.subscribe(async () => {
-      for (const e of $mapfunctions) {
-        $mapobject.on(e.event, e.layer, e.callback);
-      }
-    });
     if (drawing_tools) await init_draw();
   }
 
