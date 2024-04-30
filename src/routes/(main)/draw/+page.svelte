@@ -566,7 +566,7 @@ The save data and continue function
   {#if state.infoExpand}
     <div class="message">
       {#if (!zoom || zoom < zoomstop) && $selected[$selected.length - 1].oa.size > 0}
-        <strong>Zoom in to continue</strong><br />
+        <strong role="status">Zoom in to continue</strong><br />
         You can
         <button
           class="btn-link"
@@ -577,13 +577,13 @@ The save data and continue function
           }}>click here</button
         > to return to the area you have drawn.
       {:else if !zoom || zoom < zoomstop}
-        <strong>How to get started</strong><br />
+        <strong role="status">How to get started</strong><br />
         Zoom in to an area on the map to start drawing, or use the search box above
         to find a ready-made area.
         <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/articles/buildacustomareaprofile/2023-01-17" target="_blank" rel="noreferrer">Read more</a>
         <span style:font-size="0.8em" style:margin-left="2px"><Icon type="launch"/></span>
       {:else if state.mode == 'polygon'}
-        <strong>Draw a polygon mode</strong>
+        <strong role="status">Draw a polygon mode</strong>
         <span class="mode-icon"> {state.select=='add'?'+':'–'}
           <Icon type={state.mode} />
         </span>
@@ -591,18 +591,18 @@ The save data and continue function
         Click on the map to draw a polygon. Click again on the first or last point
         to close the polygon.
       {:else if state.mode == 'radius'}
-        <strong>Draw a radius mode</strong> <span class="mode-icon"> {state.select=='add'?'+':'–'}
+        <strong role="status">Draw a radius mode</strong> <span class="mode-icon"> {state.select=='add'?'+':'–'}
           <Icon type={state.mode} />
         </span><br />
         Select a radius in kilometres from the menu, then click on the map to draw
         a circle.
       {:else if state.mode == 'select'}
-        <strong>Click and select mode</strong> <span class="mode-icon"> 
+        <strong role="status">Click and select mode</strong> <span class="mode-icon"> 
           <Icon type={state.mode} />
         </span><br />
         Click an individual area to add or remove it from your selection.
       {:else}
-        <strong>Pan and zoom mode</strong> <span class="mode-icon"> 
+        <strong role="status">Pan and zoom mode</strong> <span class="mode-icon"> 
           <Icon type={state.mode} />
         </span><br />
         Explore the map to find a location of interest, then select a drawing tool
