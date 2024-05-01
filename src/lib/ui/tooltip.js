@@ -9,7 +9,7 @@ export default function tooltip(element) {
 		title = element.getAttribute('title');
 		element.removeAttribute('title');
 
-    let body = document.body.getBoundingClientRect();
+		let body = document.body.getBoundingClientRect();
 		let pos = element.getBoundingClientRect();
 		let y = pos.bottom;
 		let x = (pos.left + pos.right) / 2;
@@ -29,10 +29,10 @@ export default function tooltip(element) {
 		// NOTE: restore the `title` attribute
 		element.setAttribute('title', title);
 	}
-	
+
 	element.addEventListener('mouseover', mouseOver);
-  	element.addEventListener('mouseout', mouseOut);
-	
+	element.addEventListener('mouseout', mouseOut);
+
 	return {
 		destroy() {
 			if (tooltipComponent) tooltipComponent.$destroy();

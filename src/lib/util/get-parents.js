@@ -1,6 +1,6 @@
 import { cdnbase } from "$lib/config/geography";
 
-export default async function(codes) {
+export default async function (codes) {
   // Check if area is in England and/or Wales
   const coverage = Array.from(new Set(codes.map(c => c[0])));
   const eng = coverage.includes("E");
@@ -19,5 +19,5 @@ export default async function(codes) {
     codes: geo.properties.c21cds
   }
 
-  return {parents: [data], coverage};
+  return { parents: [data], coverage };
 }

@@ -4,9 +4,9 @@
 
 <div class="notice-container">
   <div class="notice-icon">
-    <Icon type="error"/>
+    <Icon type="error" />
   </div>
-  <slot/>
+  <slot />
 </div>
 
 <style>
@@ -14,8 +14,8 @@
     position: relative;
     display: block;
     padding: 12px 12px 12px 44px;
-    background-color: rgb(245,245,246);
-    border-left: 4px solid rgb(112,112,113);
+    background-color: rgb(245, 245, 246);
+    border-left: 4px solid rgb(112, 112, 113);
     margin: 4px 0 12px;
   }
   .notice-icon {

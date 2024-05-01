@@ -1,8 +1,8 @@
 <script>
-	import { getContext } from 'svelte';
+	import { getContext } from "svelte";
 	import ONSLogo from "./ONSLogo.svelte";
 	import CensusLogo from "./CensusLogo.svelte";
-	
+
 	export let theme = "light";
 	export let filled = true;
 	export let census = true;
@@ -15,12 +15,16 @@
 <div class="col-wide middle">
 	<div class="logo-block">
 		<a href="https://www.ons.gov.uk/" class="logo" style:width="270px">
-			<ONSLogo {primary} {secondary}/>
+			<ONSLogo {primary} {secondary} />
 		</a>
 		{#if census}
-		<a href="https://www.ons.gov.uk/census" class="logo" style:width="160px">
-			<CensusLogo color={censusColor}/>
-		</a>
+			<a
+				href="https://www.ons.gov.uk/census"
+				class="logo"
+				style:width="160px"
+			>
+				<CensusLogo color={censusColor} />
+			</a>
 		{/if}
 	</div>
 </div>

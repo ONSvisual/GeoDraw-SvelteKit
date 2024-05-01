@@ -1,9 +1,9 @@
 <script>
-	import maplibre from 'maplibre-gl';
-  import '$lib/css/maplibre-gl.css';
-	import bbox from '@turf/bbox';
-	import { onMount } from 'svelte';
-  import { base } from '$app/paths';
+	import maplibre from "maplibre-gl";
+	import "$lib/css/maplibre-gl.css";
+	import bbox from "@turf/bbox";
+	import { onMount } from "svelte";
+	import { base } from "$app/paths";
 
 	const style = `${base}/data/style.json`;
 
@@ -11,55 +11,55 @@
 	export let geojson = null;
 	export let compGeojson = null;
 	export let config = {
-		boundary: {color: '#1f8ab0', lineWidth: 2.5, fillOpacity: 0.2},
-		comp: {color: 'rgba(0,0,0,0.5)', lineWidth: 1.5, fillOpacity: 0.1}
+		boundary: { color: "#1f8ab0", lineWidth: 2.5, fillOpacity: 0.2 },
+		comp: { color: "rgba(0,0,0,0.5)", lineWidth: 1.5, fillOpacity: 0.1 },
 	};
-	
+
 	let map;
 	let container;
 	let w;
-	
+
 	onMount(() => {
 		map = new maplibre.Map({
 			container,
 			style,
 			bounds,
 			interactive: false,
-    	preserveDrawingBuffer: true
+			preserveDrawingBuffer: true,
 		});
-		
-		map.on('load', () => {
+
+		map.on("load", () => {
 			for (const key of ["boundary", "comp"]) {
-				map.addSource(key, {type: 'geojson', data: data[key]});
+				map.addSource(key, { type: "geojson", data: data[key] });
 				map.addLayer({
-					'id': `${key}-fill`,
-					'type': 'fill',
-					'source': key,
-					'layout': {},
-					'paint': {
-						'fill-color': config[key].color,
-						'fill-opacity': config[key].fillOpacity
-					}
+					id: `${key}-fill`,
+					type: "fill",
+					source: key,
+					layout: {},
+					paint: {
+						"fill-color": config[key].color,
+						"fill-opacity": config[key].fillOpacity,
+					},
 				});
 				map.addLayer({
-					'id': `${key}-line`,
-					'type': 'line',
-					'source': key,
-					'layout': {},
-					'paint': {
-						'line-color': config[key].color,
-						'line-width': config[key].lineWidth
-					}
+					id: `${key}-line`,
+					type: "line",
+					source: key,
+					layout: {},
+					paint: {
+						"line-color": config[key].color,
+						"line-width": config[key].lineWidth,
+					},
 				});
 			}
 		});
 	});
-	
+
 	function fitBounds(bounds) {
-    // console.log("refitting");
+		// console.log("refitting");
 		if (map) {
-		map.resize();
-		map.fitBounds(bounds, {padding: 20, animate: false});
+			map.resize();
+			map.fitBounds(bounds, { padding: 20, animate: false });
 		}
 	}
 
@@ -73,36 +73,46 @@
 	}
 
 	$: data = {
-		boundary: geojson ? geojson : {'type': 'Polygon', 'coordinates': []},
-		comp: compGeojson ? compGeojson : {'type': 'Polygon', 'coordinates': []}
+		boundary: geojson ? geojson : { type: "Polygon", coordinates: [] },
+		comp: compGeojson ? compGeojson : { type: "Polygon", coordinates: [] },
 	};
-	$: bounds = data ? bbox({type: "GeometryCollection", geometries: [data.boundary, data.comp]}) : [[-9, 49], [2, 61]];
+	$: bounds = data
+		? bbox({
+				type: "GeometryCollection",
+				geometries: [data.boundary, data.comp],
+			})
+		: [
+				[-9, 49],
+				[2, 61],
+			];
 	$: w && fitBounds(bounds);
 	$: setData(data);
-	
 </script>
 
 {#if compGeojson}
-<ul class="legend-block">
-	{#each ["boundary", "comp"] as key}
-	<li>
-		<div
-			class="legend-sq"
-			style:color={config[key].color}
-			style:border-color={config[key].color}
-			style:border-width="{Math.ceil(config[key].lineWidth)}px"></div>
-		<span class="legend-text-{key}">{key === "comp" ? comp : name}</span>
-	</li>
-	{/each}
-</ul>
+	<ul class="legend-block">
+		{#each ["boundary", "comp"] as key}
+			<li>
+				<div
+					class="legend-sq"
+					style:color={config[key].color}
+					style:border-color={config[key].color}
+					style:border-width="{Math.ceil(config[key].lineWidth)}px"
+				></div>
+				<span class="legend-text-{key}"
+					>{key === "comp" ? comp : name}</span
+				>
+			</li>
+		{/each}
+	</ul>
 {/if}
-<div id="map" class="center" bind:this={container} bind:clientWidth={w}/>
+<div id="map" class="center" bind:this={container} bind:clientWidth={w} />
 
 <style>
 	#map {
 		margin: 0;
 		padding: 0;
-    	height: 300px;
+		height: 300px;
 	}
 	ul.legend-block {
 		list-style-type: none;
@@ -117,13 +127,13 @@
 	.legend-sq {
 		position: relative;
 		display: inline-block;
-		transform: translate(0,3px);
+		transform: translate(0, 3px);
 		width: 1rem;
 		height: 1rem;
 		border: 1px solid grey;
 	}
 	.legend-sq::before {
-		content: ' ';
+		content: " ";
 		position: absolute;
 		top: 0;
 		left: 0;

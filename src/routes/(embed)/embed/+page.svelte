@@ -4,7 +4,7 @@
   import html2canvas from "html2canvas";
   import topics from "$lib/config/topics.json";
   import Cards from "$lib/layout/Cards.svelte";
-  import Card from "$lib/layout/partial/Card.svelte";
+  import Card from "$lib/layout/Card.svelte";
   import BarChart from "$lib/charts/BarChart.svelte";
   import AreaMap from "$lib/charts/AreaMap.svelte";
   import ProfileChart from "$lib/charts/ProfileChart.svelte";

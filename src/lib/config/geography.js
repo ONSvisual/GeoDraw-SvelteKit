@@ -28,12 +28,12 @@ export const minzoom = 4;
 export const maxzoom = 14;
 export const drawtools = true
 export const location = {
-    bounds: [
-        [-5.816, 49.864],
-        [1.863, 55.872]
-    ], // England & Wales bounding box
+  bounds: [
+    [-5.816, 49.864],
+    [1.863, 55.872]
+  ], // England & Wales bounding box
 };
 export const maxbounds = [
-    [-11, 49.5],
-    [5.5, 61]
+  [-11, 49.5],
+  [5.5, 61]
 ];

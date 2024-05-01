@@ -4,31 +4,36 @@
 </script>
 
 <div class="title-block">
-	<h1>{title}</h1>
+  <h1>{title}</h1>
   {#if badge}
-  <!-- svelte-ignore security-anchor-rel-noreferrer -->
-  <a href="https://www.surveymonkey.co.uk/r/2SGF6X2" target="_blank" class="ons-phase-banner__badge" title="This is a new service. Share your feedback">
-    <h3>{badge}</h3>
-  </a>
+    <!-- svelte-ignore security-anchor-rel-noreferrer -->
+    <a
+      href="https://www.surveymonkey.co.uk/r/2SGF6X2"
+      target="_blank"
+      class="ons-phase-banner__badge"
+      title="This is a new service. Share your feedback"
+    >
+      <h3>{badge}</h3>
+    </a>
   {/if}
 </div>
 
 <style>
-	.title-block {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		color: white;
-		background-color: #206095;
-		height: 54px;
-	}
-	.title-block > h1 {
-		font-size: 1.44em;
-		margin: 0 0 3px 15px;
-	}
+  .title-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    background-color: #206095;
+    height: 54px;
+  }
+  .title-block > h1 {
+    font-size: 1.44em;
+    margin: 0 0 3px 15px;
+  }
   @media screen and (max-width: 420px) {
     .title-block > h1 {
-		font-size: 1.26em;
+      font-size: 1.26em;
     }
   }
   .ons-phase-banner__badge {
@@ -41,7 +46,7 @@
     color: #fff;
     font-size: 15.3px;
     line-height: 1em;
-    margin: 0 12px!important;
+    margin: 0 12px !important;
     padding: 0.4rem;
     text-transform: uppercase;
     margin-block-start: 1em;

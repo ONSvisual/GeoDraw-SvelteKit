@@ -1,12 +1,12 @@
 <script>
 	import { onMount } from "svelte";
-	
+
 	export let min = 0.2;
 	export let max = 10;
 	export let step = 0.1;
 	export let value = 5;
 	export let width = 200;
-	
+
 	let range, thumb, track;
 
 	const updateSlider = (value) => {
@@ -16,22 +16,31 @@
 			thumb.style.transform = `translate(-${percent}%, -50%)`;
 			track.style.width = `${percent}%`;
 		}
-	}
+	};
 
 	onMount(() => {
 		range.oninput = (e) => updateSlider(e.target.value);
-		updateSlider(value) // Init value
-	})
-	
+		updateSlider(value); // Init value
+	});
+
 	$: updateSlider(value);
 </script>
 
 <div class="wrap">
-  <input type="range" class="range" {min} {max} {step} bind:value bind:this={range} style:width="{width}px">
-  <div class="track">
-    <div class="track-inner" bind:this={track}/>
-  </div>
-  <div class="thumb" bind:this={thumb}/>
+	<input
+		type="range"
+		class="range"
+		{min}
+		{max}
+		{step}
+		bind:value
+		bind:this={range}
+		style:width="{width}px"
+	/>
+	<div class="track">
+		<div class="track-inner" bind:this={track} />
+	</div>
+	<div class="thumb" bind:this={thumb} />
 </div>
 
 <style>
@@ -48,7 +57,7 @@
 	.track {
 		width: 100%;
 		height: 4px;
-		background: #DDDDDD;
+		background: #dddddd;
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);

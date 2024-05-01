@@ -1,18 +1,14 @@
 <script>
   // imports
-  import maplibregl from 'maplibre-gl';
+  import maplibregl from "maplibre-gl";
 
   maplibregl.workerCount = 5;
   maplibregl.maxParallelImageRequests = 20;
 
-  import {onMount} from 'svelte';
-  import {initDraw} from '$lib/util/drawing-utils';
-  import {
-    mapsource,
-    maplayer,
-    mapObject
-  } from '$lib/stores/mapstore';
-  import {minzoom, maxzoom, maxbounds, mapstyle} from '$lib/config/geography';
+  import { onMount } from "svelte";
+  import { initDraw } from "$lib/util/drawing-utils";
+  import { mapsource, maplayer, mapObject } from "$lib/stores/mapstore";
+  import { minzoom, maxzoom, maxbounds, mapstyle } from "$lib/config/geography";
 
   const mapboxgl = maplibregl;
   let webglCanvas;
@@ -20,9 +16,9 @@
   export let drawingTools = false;
 
   /// MAP creation
-  async function init() {;
+  async function init() {
     $mapObject = new mapboxgl.Map({
-      container: 'mapcontainer',
+      container: "mapcontainer",
       style: mapstyle,
       minZoom: minzoom,
       maxZoom: maxzoom,
@@ -33,27 +29,27 @@
       hash: false, // set options in hash string
     });
 
-    document.querySelector('#mapcontainer div canvas').style.cursor = 'wait';
+    document.querySelector("#mapcontainer div canvas").style.cursor = "wait";
 
     // scale bar
     $mapObject.addControl(
       new mapboxgl.ScaleControl({
-        position: 'bottom-left',
-      })
+        position: "bottom-left",
+      }),
     );
 
     // navigation
-    $mapObject.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+    $mapObject.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
     //disable double click and rotation
     $mapObject.doubleClickZoom.disable();
     $mapObject.dragRotate.disable();
 
     // // correct error - ignore 403 missing tiles
-    $mapObject.on('error', (e) => {
+    $mapObject.on("error", (e) => {
       if (
         e.error.status != 403 &&
-        e.error.message != 'Failed to fetch' &&
+        e.error.message != "Failed to fetch" &&
         !/CORS/.test(e.error.message)
       ) {
         // console.error('--', e.error.status, e.error.message);
@@ -61,7 +57,7 @@
       }
     });
 
-    $mapObject.on('load', SetLayers);
+    $mapObject.on("load", SetLayers);
   }
 
   // onDestroy(() => {
