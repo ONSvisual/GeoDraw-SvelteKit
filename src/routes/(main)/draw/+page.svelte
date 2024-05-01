@@ -141,7 +141,7 @@
         var q = JSON.parse(localStorage.getItem('onsbuild')).properties;
         state.name = q.name;
 
-        if (!q.oa_all.length) {
+        if (!q?.oa_all?.length) {
           newselect();
           return 0;
         }
