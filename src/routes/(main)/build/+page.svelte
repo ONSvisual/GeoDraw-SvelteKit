@@ -93,7 +93,7 @@
 
     // in case we call for a pre loaded area as a hash string
     let hash = window.location.hash;
-    if (hash.match(/#[EW]\d{8}/)) {
+    if (hash.match(/#[EKNSW]\d{8}/)) {
       let code = hash.slice(1);
       try {
         const info = await getAreaData(code);

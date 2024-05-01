@@ -103,9 +103,7 @@
       };
 
       let hash = window.location.hash;
-      if (hash === '#undefined') {
-        hash = window.location.hash = '';
-      } else if (hash.length == 10) {
+      if (hash.match(/#[EKNSW]\d{8}/)) {
         let code = hash.slice(1);
         try {
           const res = await fetch(`${cdnbase}/${code.slice(0, 3)}/${code}.json`);
