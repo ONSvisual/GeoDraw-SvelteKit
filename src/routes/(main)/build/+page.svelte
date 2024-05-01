@@ -1,23 +1,23 @@
 <script>
-  import ONSloader from '$lib/ui/ONSloader.svelte';
-  import {goto} from '$app/navigation';
-  import {base} from '$app/paths';
-	import {flip} from 'svelte/animate';
-  import pym from 'pym.js';
-  import tooltip from '$lib/ui/tooltip';
-  import Notice from '$lib/ui/Notice.svelte';
-  import TopicItem from '$lib/ui/TopicItem.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
-  import Select from '$lib/ui/Select.svelte';
-  import topicsAll from '$lib/config/topics.json';
-  import {simplifyGeo, geoBlob} from '$lib/util/drawing-utils';
-  import getTable from '$lib/util/get-table';
-  import getParents from '$lib/util/get-parents';
-  import {cdnbase} from '$lib/config/geography';
-  import {download, clip} from '$lib/util/functions';
-  import {onMount} from 'svelte';
-  import {centroids} from '$lib/stores/mapstore';
-  import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
+  import ONSloader from "$lib/ui/ONSloader.svelte";
+  import { goto } from "$app/navigation";
+  import { base } from "$app/paths";
+  import { flip } from "svelte/animate";
+  import pym from "pym.js";
+  import tooltip from "$lib/ui/tooltip";
+  import Notice from "$lib/ui/Notice.svelte";
+  import TopicItem from "$lib/ui/TopicItem.svelte";
+  import Icon from "$lib/ui/Icon.svelte";
+  import Select from "$lib/ui/Select.svelte";
+  import topicsAll from "$lib/config/topics.json";
+  import { simplifyGeo, geoBlob } from "$lib/util/drawing-utils";
+  import getTable from "$lib/util/get-table";
+  import getParents from "$lib/util/get-parents";
+  import { cdnbase } from "$lib/config/geography";
+  import { download, clip } from "$lib/util/functions";
+  import { onMount } from "svelte";
+  import { centroids } from "$lib/stores/mapstore";
+  import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
   let isLoading = false;
   let pymParent; // Variabl for pym
   let embedHash; // Variable for embed hash string
@@ -29,20 +29,20 @@
   let topics = [...topicsAll]; // Topics might be filtered based on coverage
   let uploader; // DOM element for geojson file upload
 
-  let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
+  let topicsLookup = Object.fromEntries(topics.map((d) => [d.code, d]));
   // would this not be better off as a MAP and not a dict?
 
   let state = {
-    mode: 'move',
+    mode: "move",
     radius: 5,
-    select: 'add',
-    name: '',
+    select: "add",
+    name: "",
     showSave: false,
     showEmbed: false,
     topics: [topics[0]],
     topicsExpand: false,
-    topicsFilter: '',
-    comparison: null
+    topicsFilter: "",
+    comparison: null,
   };
 
   function filterTopics(topics, selected, regex) {
@@ -50,7 +50,9 @@
     let topicsStart = [];
     let topicsEnd = [];
     [...topics]
-      .filter(t => !t.coverage || t.coverage.every(c => coverage.includes(c)))
+      .filter(
+        (t) => !t.coverage || t.coverage.every((c) => coverage.includes(c)),
+      )
       .sort((a, b) => a.label.localeCompare(b.label))
       .forEach((topic) => {
         if (selected.includes(topic)) {
@@ -63,15 +65,13 @@
     return [...topicsStart, ...topicsEnd];
   }
   $: regex =
-    state.topicsFilter.length > 1 ? new RegExp(state.topicsFilter, 'i') : null;
+    state.topicsFilter.length > 1 ? new RegExp(state.topicsFilter, "i") : null;
 
   let store;
   let geojson;
 
   async function getAreaData(code, options = {}) {
-    const res = await fetch(
-      `${cdnbase}/${code.slice(0, 3)}/${code}.json`
-    );
+    const res = await fetch(`${cdnbase}/${code.slice(0, 3)}/${code}.json`);
     const data = await res.json();
     const compressed = data.properties.c21cds;
     return {
@@ -82,8 +82,8 @@
         name: data.properties.hclnm
           ? data.properties.hclnm
           : data.properties.areanm
-          ? data.properties.areanm
-          : code
+            ? data.properties.areanm
+            : code,
       },
     };
   }
@@ -97,24 +97,24 @@
       let code = hash.slice(1);
       try {
         const info = await getAreaData(code);
-        localStorage.setItem('onsbuild', JSON.stringify(info));
+        localStorage.setItem("onsbuild", JSON.stringify(info));
         analyticsEvent({
           event: "hashSelect",
           areaCode: code,
-          areaName: info.properties.name
+          areaName: info.properties.name,
         });
       } catch (err) {
         console.warn(`Requested GSS code ${code} is unavailable or invalid.`);
-        history.replaceState(null, '', ' ');
+        history.replaceState(null, "", " ");
       }
     }
 
     // resume as normal
-    store = JSON.parse(localStorage.getItem('onsbuild'));
+    store = JSON.parse(localStorage.getItem("onsbuild"));
 
     // console.debug('build-', store);
     if (!store) {
-      alert('Warning, no area selected! Redirecting to the drawing page.');
+      alert("Warning, no area selected! Redirecting to the drawing page.");
       goto(`${base}/draw/`);
     }
 
@@ -126,11 +126,13 @@
     state.name = props.name;
     state.codes = props.oa_all;
     state.compressed = props.compressed;
-    
+
     let par = await getParents(state.compressed);
     coverage = par.coverage;
     parents = par.parents;
-    topics = topicsAll.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
+    topics = topicsAll.filter(
+      (t) => !t.coverage || coverage.every((c) => t.coverage.includes(c)),
+    );
     state.comparison = parents[0];
 
     state.start = true;
@@ -155,52 +157,71 @@
         table = await getTable(data[i], state, comp);
         cache[comp][data[i].code] = table;
       }
-      tables.push({code: data[i].code, data: table});
+      tables.push({ code: data[i].code, data: table });
     }
     // console.log("tables", tables);
     return tables;
   }
 
-  async function updateProfile(start, name, comp, data, includemap, includecomp) {
+  async function updateProfile(
+    start,
+    name,
+    comp,
+    data,
+    includemap,
+    includecomp,
+  ) {
     if (start) {
-      var ls = JSON.parse(localStorage.getItem('onsbuild'));
+      var ls = JSON.parse(localStorage.getItem("onsbuild"));
       ls.properties.name = name;
-      localStorage.setItem('onsbuild', JSON.stringify(ls));
+      localStorage.setItem("onsbuild", JSON.stringify(ls));
 
       let codes = data.map((d) => d.code);
-      let compcds = comp?.codes ? comp.codes.join(";") : comp?.areacd || '';
-      tables = await getData(topics.filter((t) => codes.includes(t.code)), compcds);
+      let compcds = comp?.codes ? comp.codes.join(";") : comp?.areacd || "";
+      tables = await getData(
+        topics.filter((t) => codes.includes(t.code)),
+        compcds,
+      );
 
       embedHash = `#/?name=${btoa(name)}${
-        comp ? `&comp=${btoa(comp.areanm)}` : ''
+        comp ? `&comp=${btoa(comp.areanm)}` : ""
       }&tabs=${btoa(JSON.stringify(tables))}${
-        includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
+        includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ""
       }${
-        includemap && includecomp && comp?.geometry ? `&comppoly=${btoa(JSON.stringify(simplifyGeo(comp.geometry)))}` : ''
+        includemap && includecomp && comp?.geometry
+          ? `&comppoly=${btoa(JSON.stringify(simplifyGeo(comp.geometry)))}`
+          : ""
       }`;
 
       // alert(population)
 
       if (!pymParent) {
-        pymParent = new pym.Parent('embed', `${base}/embed/${embedHash}`, {
-          name: 'embed',
-          id: 'iframe',
-          title: 'Embedded area profile'
+        pymParent = new pym.Parent("embed", `${base}/embed/${embedHash}`, {
+          name: "embed",
+          id: "iframe",
+          title: "Embedded area profile",
         });
         isLoading = false;
       } else {
-        document.getElementById('iframe').contentWindow.location.hash =
+        document.getElementById("iframe").contentWindow.location.hash =
           embedHash;
       }
     }
   }
 
   function getName(mode = null) {
-    let name = state.name ? state.name : 'selected area';
+    let name = state.name ? state.name : "selected area";
     return mode === "capitalise" ? name[0].toUpperCase() + name.slice(1) : name;
   }
 
-  $: updateProfile(state.start, state.name, state.comparison, state.topics, includemap, includecomp);
+  $: updateProfile(
+    state.start,
+    state.name,
+    state.comparison,
+    state.topics,
+    includemap,
+    includecomp,
+  );
 
   function makeEmbed(embedHash) {
     let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embedHash}`;
@@ -213,8 +234,8 @@
     let csv = `"Custom area profile data for ${getName()}"\n`;
     csv += `"Source: Office for National Statistics - Census 2021"\n\n`;
     csv += `"Data generated by the Build a custom area profile tool on ${new Date().toLocaleDateString(
-      'en-GB',
-      {year: 'numeric', month: 'short', day: 'numeric'}
+      "en-GB",
+      { year: "numeric", month: "short", day: "numeric" },
     )}"\n`;
     csv += `"The data in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources."\n\n`;
     csv += `"Variable","Category","${getName("capitalise")}","${state.comparison.areanm}","Unit","Base population"\n`;
@@ -231,10 +252,13 @@
       }
     });
 
-    var file = new Blob([csv], {type: 'text/csv'});
-    download(file, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area_data'}.csv`);
-    let opts = state.name ? {areaName: state.name} : {};
-    analyticsEvent({event: "fileDownload", fileExtension: "csv", ...opts});
+    var file = new Blob([csv], { type: "text/csv" });
+    download(
+      file,
+      `${state.name ? state.name.replaceAll(" ", "_") : "custom_area_data"}.csv`,
+    );
+    let opts = state.name ? { areaName: state.name } : {};
+    analyticsEvent({ event: "fileDownload", fileExtension: "csv", ...opts });
   }
 
   function loadGeo() {
@@ -248,15 +272,16 @@
           // Read + simplify the boundary
           let b = JSON.parse(e.target.result);
 
-          if (b.type == 'FeatureCollection') {
+          if (b.type == "FeatureCollection") {
             b = b.features[0];
-          } else if (b.type == 'Geometry') {
-            b = {type: 'Feature', geometry: b};
+          } else if (b.type == "Geometry") {
+            b = { type: "Feature", geometry: b };
           }
           if (!b.properties) b.properties = {};
 
           if (!b?.properties?.codes_compressed && b?.geometry) {
-            if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplifyGeo(b.geometry, 10000);
+            if (JSON.stringify(b.geometry).length > 10000)
+              b.geometry = simplifyGeo(b.geometry, 10000);
             const oas = $centroids.contains(b);
             b.properties.codes_compressed = $centroids.compress([...oas.oa]);
           }
@@ -264,18 +289,29 @@
           if (b) {
             const props = b.properties;
             state.comparison = {
-              areanm: props.areanm ? props.areanm : props.name ? props.name : "Custom area",
-              areacd: props.areacd ? props.areacd : props.code ? props.code : "",
+              areanm: props.areanm
+                ? props.areanm
+                : props.name
+                  ? props.name
+                  : "Custom area",
+              areacd: props.areacd
+                ? props.areacd
+                : props.code
+                  ? props.code
+                  : "",
               group: "Uploaded area",
               geometry: b.geometry,
-              codes: b.properties.codes_compressed
-            }
-            analyticsEvent({event: "geoUpload", areaName: state.comparison.areanm});
+              codes: b.properties.codes_compressed,
+            };
+            analyticsEvent({
+              event: "geoUpload",
+              areaName: state.comparison.areanm,
+            });
           } else {
             alert("Please upload a valid GeoJSON file.");
           }
         } catch {
-          alert("Error. Please make sure you uploaded a valid GeoJSON file.")
+          alert("Error. Please make sure you uploaded a valid GeoJSON file.");
         }
       };
       reader.readAsText(file);
@@ -286,22 +322,19 @@
 <ONSloader {isLoading} />
 <nav>
   <div class="nav-left">
-    <button
-      class="text"
-      on:click={() => goto(`${base}/draw/`)}
-    >
+    <button class="text" on:click={() => goto(`${base}/draw/`)}>
       <Icon type="chevron" rotation={180} /><span>Edit area</span>
     </button>
   </div>
   <div class="nav-right">
     <button
-      title={state.showSave ? 'Close save options' : 'Save selected area'}
+      title={state.showSave ? "Close save options" : "Save selected area"}
       use:tooltip
       on:click={() => (state.showSave = !state.showSave)}
       class:active={state.showSave}
     >
       <Icon
-        type={state.showSave ? 'add' : 'download'}
+        type={state.showSave ? "add" : "download"}
         rotation={state.showSave ? 45 : 0}
       />
     </button>
@@ -311,15 +344,27 @@
   <nav class="tray">
     <div />
     <div class="save-buttons">
-      <input type="text" class="input-text" bind:value={state.name} placeholder="Type your area name" />
+      <input
+        type="text"
+        class="input-text"
+        bind:value={state.name}
+        placeholder="Type your area name"
+      />
       <button
         class="text"
         on:click={async () => {
           let blob = geoBlob(store);
-          download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.geojson`);
+          download(
+            blob,
+            `${state.name ? state.name.replaceAll(" ", "_") : "custom_area"}.geojson`,
+          );
           state.showSave = false;
-          let opts = state.name ? {areaName: state.name} : {};
-          analyticsEvent({event: "fileDownload", fileExtension: "json", ...opts});
+          let opts = state.name ? { areaName: state.name } : {};
+          analyticsEvent({
+            event: "fileDownload",
+            fileExtension: "json",
+            ...opts,
+          });
         }}
       >
         <Icon type="download" /><span>Save geography</span>
@@ -327,11 +372,11 @@
       <button
         class="text"
         on:click={() => {
-          var codes = store.properties.oa_all.join(',');
-          clip(codes, 'Copied output area codes to clipboard');
+          var codes = store.properties.oa_all.join(",");
+          clip(codes, "Copied output area codes to clipboard");
           state.showSave = false;
-          let opts = state.name ? {areaName: state.name} : {};
-          analyticsEvent({event: "geoCopy", ...opts});
+          let opts = state.name ? { areaName: state.name } : {};
+          analyticsEvent({ event: "geoCopy", ...opts });
         }}
       >
         <Icon type="copy" /><span>Copy area codes</span>
@@ -342,36 +387,55 @@
 <div class="container">
   <aside class="topics-box">
     <h2>Name your area</h2>
-    <input type="text" class="input-text" bind:value={state.name} placeholder="Type your area name" />
+    <input
+      type="text"
+      class="input-text"
+      bind:value={state.name}
+      placeholder="Type your area name"
+    />
 
     <label>
-      <input type="checkbox" bind:checked={includemap}/>
+      <input type="checkbox" bind:checked={includemap} />
       Include map
     </label>
-    
-    {#if parents}
-    <h2>Select comparison area</h2>
-    <div class="search">
-      <Select value={state.comparison} autoClear={false} isClearable on:select={(e) => state.comparison = e.detail} on:clear={() => state.comparison = null}/>
-      <button
-        title="Upload a saved area"
-        use:tooltip
-        on:click={() => uploader.click()}>
-        <Icon type="upload" />
-      </button>
-      <input
-        type="file"
-        accept=".geojson,.json"
-        style:display="none"
-        bind:this={uploader}
-        on:input={loadGeo}
-      />
-    </div>
 
-    <label class:label-disabled={!includemap || !state.comparison} style:margin-top="8px">
-      <input type="checkbox" bind:checked={includecomp} disabled={!includemap || !state.comparison} />
-      Show on map
-    </label>
+    {#if parents}
+      <h2>Select comparison area</h2>
+      <div class="search">
+        <Select
+          value={state.comparison}
+          autoClear={false}
+          isClearable
+          on:select={(e) => (state.comparison = e.detail)}
+          on:clear={() => (state.comparison = null)}
+        />
+        <button
+          title="Upload a saved area"
+          use:tooltip
+          on:click={() => uploader.click()}
+        >
+          <Icon type="upload" />
+        </button>
+        <input
+          type="file"
+          accept=".geojson,.json"
+          style:display="none"
+          bind:this={uploader}
+          on:input={loadGeo}
+        />
+      </div>
+
+      <label
+        class:label-disabled={!includemap || !state.comparison}
+        style:margin-top="8px"
+      >
+        <input
+          type="checkbox"
+          bind:checked={includecomp}
+          disabled={!includemap || !state.comparison}
+        />
+        Show on map
+      </label>
     {/if}
 
     <h2>Select topics</h2>
@@ -382,33 +446,55 @@
       bind:value={state.topicsFilter}
     />
     {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i (topic.code)}
-    <div animate:flip={{duration: 500}} style:z-index={state.topics.includes(topic) ? 10 : 0}>
-      <TopicItem {topic} {regex} show={state.topics.includes(topic) || i < 6 || state.topicsExpand} selected={state.topics.includes(topic)}>
-        <input
-          type="checkbox"
-          bind:group={state.topics}
-          name="topics"
-          value={topic}
-        />
-      </TopicItem>
-    </div>
+      <div
+        animate:flip={{ duration: 500 }}
+        style:z-index={state.topics.includes(topic) ? 10 : 0}
+      >
+        <TopicItem
+          {topic}
+          {regex}
+          show={state.topics.includes(topic) || i < 6 || state.topicsExpand}
+          selected={state.topics.includes(topic)}
+        >
+          <input
+            type="checkbox"
+            bind:group={state.topics}
+            name="topics"
+            value={topic}
+          />
+        </TopicItem>
+      </div>
     {/each}
     {#if !regex}
-      <button class="btn-link" style:margin="6px 0" on:click={() => (state.topicsExpand = !state.topicsExpand)}>
-        {state.topicsExpand ? 'Show fewer' : `Show ${state.topics.length > 6 ? topics.length - state.topics.length : topics.length - 6} more`}
+      <button
+        class="btn-link"
+        style:margin="6px 0"
+        on:click={() => (state.topicsExpand = !state.topicsExpand)}
+      >
+        {state.topicsExpand
+          ? "Show fewer"
+          : `Show ${state.topics.length > 6 ? topics.length - state.topics.length : topics.length - 6} more`}
       </button>
     {/if}
 
     <div class="related-content">
       <p><strong>Looking for another topic?</strong></p>
       <p>
-        Due to technical constraints, not all Census 2021 topics can be included in this tool.
+        Due to technical constraints, not all Census 2021 topics can be included
+        in this tool.
       </p>
       <p>
-        
-        Data for a wider range of topics can be found on <a href="https://www.nomisweb.co.uk/sources/census_2021" target="_blank" rel="noreferrer">Nomis</a>
-        <span style:font-size="0.8em" style:margin="0 2px"><Icon type="launch" /></span>.
-        Multi-variate data can be found via the <a href="https://www.ons.gov.uk/datasets/create" target="_blank">Create a custom dataset</a> service.
+        Data for a wider range of topics can be found on <a
+          href="https://www.nomisweb.co.uk/sources/census_2021"
+          target="_blank"
+          rel="noreferrer">Nomis</a
+        >
+        <span style:font-size="0.8em" style:margin="0 2px"
+          ><Icon type="launch" /></span
+        >. Multi-variate data can be found via the
+        <a href="https://www.ons.gov.uk/datasets/create" target="_blank"
+          >Create a custom dataset</a
+        > service.
       </p>
     </div>
   </aside>
@@ -417,51 +503,67 @@
 
     <div id="embed" />
     <Notice>
-      The data and boundaries displayed in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources.
+      The data and boundaries displayed in this profile are aggregated from
+      small areas on a best-fit basis, and therefore may differ slightly from
+      other sources.
     </Notice>
     <div class="embed-actions">
-      <button class="btn-link"
+      <button
+        class="btn-link"
         disabled={!state.topics}
-        on:click={() => document.getElementById('iframe').contentWindow.print()}>
+        on:click={() => document.getElementById("iframe").contentWindow.print()}
+      >
         Print profile
-      </button> |
-      <button class="btn-link" on:click={() => {
-        pymParent.sendMessage('makePNG', null);
-        let opts = state.name ? {areaName: state.name} : {};
-        analyticsEvent({event: "fileDownload", fileExtension: "png", ...opts});
-      }}>
+      </button>
+      |
+      <button
+        class="btn-link"
+        on:click={() => {
+          pymParent.sendMessage("makePNG", null);
+          let opts = state.name ? { areaName: state.name } : {};
+          analyticsEvent({
+            event: "fileDownload",
+            fileExtension: "png",
+            ...opts,
+          });
+        }}
+      >
         Save as image (PNG)
-      </button> |
-      <button class="btn-link"
-        disabled={!state.topics}
-        on:click={downloadData}>Download data (CSV)</button
-      > |
-      <button class="btn-link"
+      </button>
+      |
+      <button class="btn-link" disabled={!state.topics} on:click={downloadData}
+        >Download data (CSV)</button
+      >
+      |
+      <button
+        class="btn-link"
         on:click|preventDefault={() => {
           state.showEmbed = !state.showEmbed;
 
           setTimeout(() => {
-            const el = document.querySelector('textarea');
+            const el = document.querySelector("textarea");
             if (!el) return;
 
             el.scrollIntoView({
-              behavior: 'smooth',
+              behavior: "smooth",
             });
           });
         }}
       >
-        {state.showEmbed ? 'Hide embed code' : 'Show embed code'}
+        {state.showEmbed ? "Hide embed code" : "Show embed code"}
       </button>
       {#if embedHash && state.showEmbed}
         <p style:margin-bottom={0}>Embed code</p>
         <textarea rows="4" readonly>{makeEmbed(embedHash)}</textarea>
-        <button class="copy-embed"
+        <button
+          class="copy-embed"
           on:click={() => {
-            clip(makeEmbed(embedHash), 'Copied embed code to clipboard');
-            let opts = state.name ? {areaName: state.name} : {};
-            analyticsEvent({event: "embed", ...opts});
-          }}>
-          <Icon type="copy"/>
+            clip(makeEmbed(embedHash), "Copied embed code to clipboard");
+            let opts = state.name ? { areaName: state.name } : {};
+            analyticsEvent({ event: "embed", ...opts });
+          }}
+        >
+          <Icon type="copy" />
           <span>Copy embed code</span>
         </button>
       {/if}
@@ -470,7 +572,6 @@
 </div>
 
 <style>
-
   :global(#lmap) {
     filter: invert(0.9);
     opacity: 0.9;
@@ -483,7 +584,7 @@
     width: 0;
     display: none;
   }
-  input[type=checkbox] {
+  input[type="checkbox"] {
     margin-left: 1px;
   }
 </style>

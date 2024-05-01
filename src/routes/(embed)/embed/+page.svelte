@@ -1,14 +1,14 @@
 <script>
-  import {onMount} from 'svelte';
-  import pym from 'pym.js';
-  import html2canvas from 'html2canvas';
-  import topics from '$lib/config/topics.json';
-  import Cards from '$lib/layout/Cards.svelte';
-  import Card from '$lib/layout/partial/Card.svelte';
-  import BarChart from '$lib/charts/BarChart.svelte';
-  import AreaMap from '$lib/charts/AreaMap.svelte';
-  import ProfileChart from '$lib/charts/ProfileChart.svelte';
-  import BigNumber from '$lib/charts/BigNumber.svelte';
+  import { onMount } from "svelte";
+  import pym from "pym.js";
+  import html2canvas from "html2canvas";
+  import topics from "$lib/config/topics.json";
+  import Cards from "$lib/layout/Cards.svelte";
+  import Card from "$lib/layout/partial/Card.svelte";
+  import BarChart from "$lib/charts/BarChart.svelte";
+  import AreaMap from "$lib/charts/AreaMap.svelte";
+  import ProfileChart from "$lib/charts/ProfileChart.svelte";
+  import BigNumber from "$lib/charts/BigNumber.svelte";
 
   let pymChild, name, comp, geojson, compGeojson, tables, population;
   let stats = [];
@@ -16,7 +16,7 @@
 
   let topicsLookup = (() => {
     let lookup = {};
-    topics.forEach(t => lookup[t.code] = t);
+    topics.forEach((t) => (lookup[t.code] = t));
     return lookup;
   })();
 
@@ -26,27 +26,32 @@
     let def = topicsLookup[table.code];
     let data = [];
     let i = 0;
-    let names = table.data.length === def.categories.length ? [areaName] : [areaName, compName];
-    names.forEach(name => {
-      def.categories.forEach(cat => {
-        data.push({areanm: name, category: cat.label, value: table.data[i]})
-        i ++;
+    let names =
+      table.data.length === def.categories.length
+        ? [areaName]
+        : [areaName, compName];
+    names.forEach((name) => {
+      def.categories.forEach((cat) => {
+        data.push({ areanm: name, category: cat.label, value: table.data[i] });
+        i++;
       });
     });
     return data;
-  };
+  }
 
   function update() {
     let hash = document.location.hash;
 
-    if (hash && hash.includes('name=')) {
+    if (hash && hash.includes("name=")) {
       let props = {};
       let searchParams = new URLSearchParams(hash.slice(3));
 
       for (let pair of searchParams.entries()) {
-        if (['name', 'comp'].includes(pair[0])) {
+        if (["name", "comp"].includes(pair[0])) {
           props[pair[0]] = atob(pair[1]);
-        } else if (['tabs', 'poly', 'comppoly', 'population', 'stats'].includes(pair[0])) {
+        } else if (
+          ["tabs", "poly", "comppoly", "population", "stats"].includes(pair[0])
+        ) {
           props[pair[0]] = JSON.parse(atob(pair[1]));
         }
       }
@@ -66,31 +71,30 @@
     await sleep(100);
     let canvas = await html2canvas(document.body);
     const base64 = canvas.toDataURL();
-    let a = document.createElement('a');
+    let a = document.createElement("a");
     a.href = base64;
-    a.download = name.replace(/\s+/g, '_') + '.png';
+    a.download = name.replace(/\s+/g, "_") + ".png";
     a.click();
     hideTables = false;
   }
 
   onMount(() => {
-    pymChild = new pym.Child({id: 'embed', polling: 1000});
-    pymChild.onMessage('makePNG', makePNG);
+    pymChild = new pym.Child({ id: "embed", polling: 1000 });
+    pymChild.onMessage("makePNG", makePNG);
     update();
   });
 </script>
 
 <svelte:window on:hashchange={update} />
-  
-  
+
 <svelte:head>
-  <title>Area profile{name ? ` for ${name}` : ''}</title>
+  <title>Area profile{name ? ` for ${name}` : ""}</title>
   <meta name="googlebot" content="noindex,indexifembedded" />
 </svelte:head>
 
 {#if tables}
   {#if name && name !== "Selected area"}
-  <h1>{name}</h1>
+    <h1>{name}</h1>
   {/if}
   <Cards>
     {#if geojson}
@@ -101,26 +105,46 @@
     {#each tables || [] as tab}
       <Card title={topicsLookup[tab.code].label}>
         {#if topicsLookup[tab.code]?.chart === "number"}
-        <BigNumber
-          value={tab.data[0]}
-          unit={topicsLookup[tab.code].unit}
-          prefix={topicsLookup[tab.code].prefix}
-          description={comp ? `<mark>${tab.data[1].toLocaleString('en-GB')}</mark> ${topicsLookup[tab.code].unit} in ${comp}` : ''}
-          rounded={tab.data[0] > 1000 ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}` :
-          tab.data[0] > 100 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit}` :
-          null}
-        />
+          <BigNumber
+            value={tab.data[0]}
+            unit={topicsLookup[tab.code].unit}
+            prefix={topicsLookup[tab.code].prefix}
+            description={comp
+              ? `<mark>${tab.data[1].toLocaleString("en-GB")}</mark> ${topicsLookup[tab.code].unit} in ${comp}`
+              : ""}
+            rounded={tab.data[0] > 1000
+              ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}`
+              : tab.data[0] > 100
+                ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit}`
+                : null}
+          />
         {:else if topicsLookup[tab.code]?.chart === "profile"}
-        <ProfileChart xKey="category" yKey="value" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" table={!hideTables} />
+          <ProfileChart
+            xKey="category"
+            yKey="value"
+            zKey="areanm"
+            data={expandTable(tab, name, comp)}
+            base="% of {topicsLookup[tab.code].base}"
+            table={!hideTables}
+          />
         {:else}
-        <BarChart xKey="value" yKey="category" zKey="areanm" data={expandTable(tab, name, comp)} base="% of {topicsLookup[tab.code].base}" table={!hideTables} />
+          <BarChart
+            xKey="value"
+            yKey="category"
+            zKey="areanm"
+            data={expandTable(tab, name, comp)}
+            base="% of {topicsLookup[tab.code].base}"
+            table={!hideTables}
+          />
         {/if}
       </Card>
     {/each}
   </Cards>
 
-  <span class="footnote">Source: Office for National Statistics - Census 2021</span>
-  <div class="spacer"/>
+  <span class="footnote"
+    >Source: Office for National Statistics - Census 2021</span
+  >
+  <div class="spacer" />
 {/if}
 
 <style>
