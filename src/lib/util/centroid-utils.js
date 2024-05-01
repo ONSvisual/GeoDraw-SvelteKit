@@ -16,8 +16,8 @@ const parents = points.parents.map(key => ({
 }));
 
 // Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
-function filterGeo(geojson, area_sqm) {
-  const filterByArea = (coords) => area({type: "Polygon", coordinates: [coords]}) > (area_sqm / 1000);
+function filterGeo(geojson, areaSqm) {
+  const filterByArea = (coords) => area({type: "Polygon", coordinates: [coords]}) > (areaSqm / 1000);
   if (geojson.geometry.type === "Polygon") {
     geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => filterByArea(coords));
   }
@@ -46,9 +46,9 @@ class Centroids {
 
     let gjson = {type: 'FeatureCollection', features: []};
     let lkp = {};
-    let parent_ct = {};
-    let child_lookup = {"E92000001": []};
-    parents.forEach(p => parent_ct[p.key] = {});
+    let parentCt = {};
+    let childLookup = {"E92000001": []};
+    parents.forEach(p => parentCt[p.key] = {});
 
     arr.forEach (d => {
       lkp[d[code]] = d;
@@ -59,22 +59,22 @@ class Centroids {
       });
 
       parents.forEach(p => {
-        if (!parent_ct[p.key][d[p.code]]) {
-          parent_ct[p.key][d[p.code]] = 1;
-          child_lookup[d[p.code]] = [d[code]];
+        if (!parentCt[p.key][d[p.code]]) {
+          parentCt[p.key][d[p.code]] = 1;
+          childLookup[d[p.code]] = [d[code]];
         } else {
-          parent_ct[p.key][d[p.code]] += 1;
-          child_lookup[d[p.code]].push(d[code]);
+          parentCt[p.key][d[p.code]] += 1;
+          childLookup[d[p.code]].push(d[code]);
         }
       });
-      if (d[code][0] === "E") child_lookup["E92000001"].push(d[code]);
+      if (d[code][0] === "E") childLookup["E92000001"].push(d[code]);
     });
 
     this.sizes = arr.map (d => d.r);
     this.geojson = gjson;
     this.lookup = lkp;
-    this.child_lookup = child_lookup;
-    parents.forEach(p => this[`${p.key}_count`] = parent_ct[p.key]);
+    this.childLookup = childLookup;
+    parents.forEach(p => this[`${p.key}_count`] = parentCt[p.key]);
   }
 
   parent (oa) {
@@ -88,8 +88,8 @@ class Centroids {
 
   expand (codes) {
     return Array.isArray(codes) ?
-      codes.map(c => this.child_lookup[c] ? this.child_lookup[c] : c).flat() :
-      this.child_lookup[codes] ? this.child_lookup[codes] : [];
+      codes.map(c => this.childLookup[c] ? this.childLookup[c] : c).flat() :
+      this.childLookup[codes] ? this.childLookup[codes] : [];
   }
 
   bounds (oas) {
@@ -120,20 +120,20 @@ class Centroids {
     bounds = bboxPoly (bounds);
 
     let oas = inPoly (this.geojson, bounds);
-    oas = inPoly (oas, geo).features.map (oa => oa.properties[boundaries.id_key]);
+    oas = inPoly (oas, geo).features.map (oa => oa.properties[boundaries.idKey]);
 
     return {bbox: bounds, oa: new Set (oas)};
   }
 
-  compress (oa_all) {
+  compress (oaAll) {
     let all = {};
     let compressed = [];
-    all[key] = oa_all;
+    all[key] = oaAll;
     parents.forEach(p => {
-      all[p.key] = oa_all.map(oa => this.lookup[oa][p.code]);
+      all[p.key] = oaAll.map(oa => this.lookup[oa][p.code]);
     }); 
     const keys = Object.keys(all).reverse();
-    for (let i = 0; i < oa_all.length; i++) {
+    for (let i = 0; i < oaAll.length; i++) {
       if (parents.every(p => !compressed.includes(all[p.key][i]))) {
         for (let j = 0; j < keys.length; j ++) {
           let thiskey = keys[j];
@@ -155,31 +155,30 @@ class Centroids {
   async simplify (
     name = '',
     selected,
-    mapobject
-    // options = {simplify_geo: false},
+    mapObject
   ) {
-    const oa_all = Array.from (selected[key]);
+    const oaAll = Array.from (selected[key]);
 
     // compress the codes
-    const compressed = this.compress(oa_all);
-    const bbox = this.bounds(oa_all);
+    const compressed = this.compress(oaAll);
+    const bbox = this.bounds(oaAll);
     var merge = {};
     merge.properties = {
       name,
       // bbox,
       compressed,
-      oa_all,
-      original: oa_all.length,
+      oaAll,
+      original: oaAll.length,
     };
     /// geo
 
     // move map to selection
-    mapobject.fitBounds (bbox, {padding: 0, animate: false});
+    mapObject.fitBounds (bbox, {padding: 0, animate: false});
 
-    merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
-      var geometry = mapobject
+    merge.geojson = await new Promise(resolve => mapObject.once("idle", () => {
+      var geometry = mapObject
         .queryRenderedFeatures ({layers: ['bounds']})
-        .filter (e => selected[key].has(e.properties[boundaries.id_key]));
+        .filter (e => selected[key].has(e.properties[boundaries.idKey]));
 
       let geojson = {
         type: 'FeatureCollection',
@@ -198,8 +197,8 @@ class Centroids {
       if (len > 1 && len < 75) dissolved = buffer(dissolved, -10, {units: 'meters'});
       dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
       
-      let area_sqm = area(dissolved);
-      filterGeo(dissolved, area_sqm);
+      let areaSqm = area(dissolved);
+      filterGeo(dissolved, areaSqm);
       resolve(dissolved);
     }));
 
@@ -214,10 +213,10 @@ class Centroids {
     var lat = coords.map (p => +p[1]);
     var lng = coords.map (p => +p[0]);
 
-    var min_coords = [Math.min.apply (null, lng), Math.min.apply (null, lat)];
-    var max_coords = [Math.max.apply (null, lng), Math.max.apply (null, lat)];
+    var minCoords = [Math.min.apply (null, lng), Math.min.apply (null, lat)];
+    var maxCoords = [Math.max.apply (null, lng), Math.max.apply (null, lat)];
 
-    return [min_coords, max_coords];
+    return [minCoords, maxCoords];
   }
 
   population (oa) {

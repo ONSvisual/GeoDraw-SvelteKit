@@ -90,43 +90,43 @@ export function difference(setA, setB) {
 }
 
 export function groupData(data, key) {
-  let data_indexed = {};
+  let dataIndexed = {};
   let keys = [];
   for (const d of data) {
-    if (!data_indexed[d[key]]) {
-      data_indexed[d[key]] = {
+    if (!dataIndexed[d[key]]) {
+      dataIndexed[d[key]] = {
         label: d[key],
         values: []
       };
       keys.push(d[key]);
     }
-    data_indexed[d[key]].values.push(d);
+    dataIndexed[d[key]].values.push(d);
   }
   
-  let data_grouped = [];
+  let dataGrouped = [];
   keys.forEach(key => {
-    data_grouped.push(data_indexed[key]);
+    dataGrouped.push(dataIndexed[key]);
   });
   
-  return data_grouped;
+  return dataGrouped;
 }
 
 export function stackData(data, key) {
-  let data_indexed = {};
+  let dataIndexed = {};
   
   for (const d of data) {
-    if (!data_indexed[d[key]]) {
-      data_indexed[d[key]] = {
+    if (!dataIndexed[d[key]]) {
+      dataIndexed[d[key]] = {
         label: d[key],
         values: []
       };
     }
-    data_indexed[d[key]].values.push(d);
+    dataIndexed[d[key]].values.push(d);
   }
   
-  let data_stacked = [];
-  for (const key in data_indexed) {
-    data_stacked.push(data_indexed[key]);
+  let dataStacked = [];
+  for (const key in dataIndexed) {
+    dataStacked.push(dataIndexed[key]);
   }
-  return data_stacked;
+  return dataStacked;
 }

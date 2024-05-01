@@ -1,6 +1,6 @@
 <script>
   import '$lib/css/app.css';
-  import { onMount, setContext } from "svelte";
+  import { onMount } from "svelte";
   import { page } from '$app/stores';
   import { centroids } from '$lib/stores/mapstore.js';
   import { GetCentroids } from '$lib/util/centroid-utils.js';
@@ -13,8 +13,8 @@
 
   onMount(async () => {
     // calculate the centroids and simplifications.
-    var centroid_dummy = await GetCentroids();
-    centroids.set(centroid_dummy);
+    var centroidDummy = await GetCentroids();
+    centroids.set(centroidDummy);
     loaded = true;
   });
 

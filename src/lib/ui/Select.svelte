@@ -33,7 +33,7 @@
     {keys: ["E34", "K05", "W37", "E63", "K08", "W45"], label: "Built-up area"},
     {keys: ["E35", "K06", "W38"], label: "Built-up area, sub-division"}
   ];
-  export const geotypes_lookup = (() => {
+  export const geotypesLookup = (() => {
     let lookup = {};
     geotypes.forEach(g => g.keys.forEach(k => lookup[k] = g.label));
     return lookup;
@@ -51,7 +51,7 @@
     data.forEach(d => lookup[d.areacd] = d);
 		data.forEach(d => {
       let geocd = d.areacd.slice(0,3);
-      let geotype = geotypes_lookup[geocd];
+      let geotype = geotypesLookup[geocd];
       // Fix for 2025 parliamentary constituencies
       if (["E14", "W07"].includes(geocd)) {
         if (
@@ -70,8 +70,8 @@
 	export async function getPlace(code, group = "") {
     let geo;
     try {
-      let geo_raw = await fetch(`${cdnbase}/${code.slice(0,3)}/${code}.json`);
-      geo = await geo_raw.json();
+      let geoRaw = await fetch(`${cdnbase}/${code.slice(0,3)}/${code}.json`);
+      geo = await geoRaw.json();
     }
     catch(err) {
       // console.log(err);
@@ -92,7 +92,7 @@
       event: "searchSelect",
       areaCode: place.areacd,
       areaName: place.areanm,
-      areaType: geotypes_lookup[place.areacd.slice(0, 3)]
+      areaType: geotypesLookup[place.areacd.slice(0, 3)]
     });
 
     return place;

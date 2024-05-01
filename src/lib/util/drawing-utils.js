@@ -1,11 +1,11 @@
 import {get} from 'svelte/store';
 import {
-  mapobject,
+  mapObject,
   radiusInKm,
-  draw_type,
+  drawType,
   selected,
-  add_mode,
-  draw_enabled,
+  addMode,
+  drawEnabled,
   centroids,
 } from '$lib/stores/mapstore';
 import {boundaries} from '$lib/config/geography';
@@ -13,10 +13,10 @@ import {roundAll, extent, union, difference} from '$lib/util/functions';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
 import circle from '@turf/circle';
-import turf_simplify from '@turf/simplify';
+import turfSimplify from '@turf/simplify';
 import buffer from '@turf/buffer';
-// import turf_bbox from '@turf/bbox';
-// import turf_inpolygon from '@turf/boolean-point-in-polygon';
+// import turfBBOX from '@turf/bbox';
+// import turfInPolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/util/bundled/mapshaper';
 import bbox from '@turf/bbox';
 
@@ -24,15 +24,15 @@ const mzm = 10;
 export var Draw;
 export let coordinates = [];
 // keep track of coordinates of centre of radius drawing tool
-let radius_center = null;
+let radiusCenter = null;
 
 ////////////////////
 ///////////////////
 
 function cursor () {
   // A function to change the df.loc({rows:df.$index.slice(0,4)})ap cursor
-  const de = get (draw_enabled);
-  const dt = get (draw_type);
+  const de = get (drawEnabled);
+  const dt = get (drawType);
 
   // if (de | dt === undefined ){document.querySelector('#mapcontainer div canvas').style.cursor = 'no-drop';}
   let canvas = document.querySelector ('#mapcontainer div canvas');
@@ -53,8 +53,8 @@ function cursor () {
   }
 }
 
-export async function init_draw () {
-  const map = get (mapobject);
+export async function initDraw () {
+  const map = get (mapObject);
 
   map.addSource ('drawsrc', {
     type: 'geojson',
@@ -107,27 +107,27 @@ export async function init_draw () {
     var data = Draw.getAll ();
     var geo = await data.features[0];
     update (geo);
-    clearpoly ();
+    clearPoly ();
   }
   map.on ('zoomend', function () {
     const de = map.getZoom () < mzm;
-    draw_enabled.set (de);
+    drawEnabled.set (de);
     // cursor()
   });
 
   map.doubleClickZoom.enable ();
   // on move events
   map.on ('mousemove', 'bounds', function move (e) {
-    // console.log (e.lngLat, get (draw_type));
+    // console.log (e.lngLat, get (drawType));
 
-    if (get (draw_type) == 'radius') circle_fast (false, e.lngLat);
+    if (get (drawType) == 'radius') circleFast (false, e.lngLat);
   });
 
   // clear coordinates each time we change
-  draw_type.subscribe (dt => {
+  drawType.subscribe (dt => {
     coordinates = [];
-    add_mode.set (true);
-    circle_fast ((clear = get (draw_type) != 'radius'));
+    addMode.set (true);
+    circleFast ((clear = get (drawType) != 'radius'));
     Draw.deleteAll ();
     cursor ();
     if (dt === 'polygon') {
@@ -136,34 +136,34 @@ export async function init_draw () {
   });
 
   // set default
-  radius_center = null;
-  circle_fast ((clear = true));
-  draw_type.set ('move');
+  radiusCenter = null;
+  circleFast ((clear = true));
+  drawType.set ('move');
 
   // update circle tool each radius change
-  radiusInKm.subscribe (() => circle_fast ());
+  radiusInKm.subscribe (() => circleFast ());
 
-  function boundclick (e) {
-    switch (get (draw_type)) {
+  function boundClick (e) {
+    switch (get (drawType)) {
       case 'radius':
-        draw_radius (e.lngLat);
+        drawRadius (e.lngLat);
         break;
       case 'select':
-        draw_point (e);
+        drawPoint (e);
         break;
     }
   }
-  map.on ('click', 'bounds', boundclick); //mouse
-  map.on ('touchstart', 'bounds', boundclick); //touch
+  map.on ('click', 'bounds', boundClick); //mouse
+  map.on ('touchstart', 'bounds', boundClick); //touch
 
   let hovered;
 
-  function boundhover (e) {
+  function boundHover (e) {
     if (hovered) map.removeFeatureState(
       {source: "area", sourceLayer: boundaries.layer, id: hovered},
     );
-    if (e.features?.[0] && get(draw_type) === "select") {
-      hovered = e.features[0].properties[boundaries.id_key];
+    if (e.features?.[0] && get(drawType) === "select") {
+      hovered = e.features[0].properties[boundaries.idKey];
       map.setFeatureState(
         {source: "area", sourceLayer: boundaries.layer, id: hovered},
         {hovered: true}
@@ -172,19 +172,19 @@ export async function init_draw () {
       hovered = null;
     }
   }
-  map.on ('mousemove', 'bounds', boundhover); //hover
+  map.on ('mousemove', 'bounds', boundHover); //hover
 }
 
-export function simplify_geo (geometry, max_length = 3000) {
+export function simplifyGeo (geometry, maxLength = 3000) {
   // Simplifies a geojson geometry
   let simple;
-  let length = max_length;
+  let length = maxLength;
   let precision = 5;
 
   const _geometry = buffer(geometry, 0).geometry; // Fix invalid geometries
 
-  while (length >= max_length && precision >= 2) {
-    simple = turf_simplify (_geometry, {
+  while (length >= maxLength && precision >= 2) {
+    simple = turfSimplify (_geometry, {
       highQuality: true,
       tolerance: Math.pow (10, -precision),
     });
@@ -204,7 +204,7 @@ function makeBoundary (geojson, simplify = false) {
 
   let simple;
   if (simplify) {
-    simple = simplify_geo (dissolved.geometry);
+    simple = simplifyGeo (dissolved.geometry);
   } else {
     simple = dissolved.geometry;
     simple.coordinates = roundAll (simple.coordinates, 6);
@@ -215,7 +215,7 @@ function makeBoundary (geojson, simplify = false) {
 
 function clear () {
   coordinates = [];
-  change_data ('drawsrc', {
+  changeData ('drawsrc', {
     type: 'Feature',
     geometry: {
       type: 'Polygon',
@@ -224,14 +224,14 @@ function clear () {
   });
 }
 
-export function clearpoly () {
+export function clearPoly () {
   // clear()
   Draw.deleteAll ();
   Draw.changeMode ('draw_polygon', {});
 }
 
-export function change_data (layer, data) {
-  const map = get(mapobject);
+export function changeData (layer, data) {
+  const map = get(mapObject);
   if (map) map.getSource(layer).setData(data);
 }
 
@@ -249,7 +249,7 @@ export async function update (geo) {
   var last = current[current.length - 1];
   // console.debug ('update,last', last, current);
 
-  if (get (add_mode)) {
+  if (get (addMode)) {
     current.push ({
       oa: union(last.oa, new Set(features.oa)),
     });
@@ -259,16 +259,16 @@ export async function update (geo) {
     });
   }
 
-  updatelocal (current);
+  updateLocal (current);
   cursor ();
 }
 
-function draw_point (e) {
+function drawPoint (e) {
   // update using select tool
   let feature = e.features[0];
   if (feature) {
-    let code = feature.properties[boundaries.id_key];
-    let parentcd = feature.properties[boundaries.pt_key];
+    let code = feature.properties[boundaries.idKey];
+    let parentcd = feature.properties[boundaries.ptKey];
     let current = get (selected);
     let oas = current[current.length - 1].oa;
     if (oas.has(code) && parentcd) {
@@ -281,11 +281,11 @@ function draw_point (e) {
       oas = new Set ([...oas, code]);
     }
     current.push ({oa: oas});
-    updatelocal (current);
+    updateLocal (current);
   }
 }
 
-function updatelocal (current) {
+function updateLocal (current) {
   // limit our undo list to 20
   if (current.length >= 20) current = current.slice (current.length - 20, current.length);
 
@@ -303,7 +303,7 @@ function updatelocal (current) {
 // Circle Tools
 ////////////////////
 
-function draw_radius (center, points = 24) {
+function drawRadius (center, points = 24) {
   const options = {steps: points, units: 'kilometers'};
   let geo = circle ([center.lng, center.lat], +get (radiusInKm), options);
 
@@ -311,7 +311,7 @@ function draw_radius (center, points = 24) {
 }
 
 /// Fast Circle on-move Function
-function circle_fast (clear = false, center = radius_center) {
+function circleFast (clear = false, center = radiusCenter) {
   let geo;
   if (center && !clear) {
     const options = {steps: 24, units: 'kilometers'};
@@ -319,7 +319,7 @@ function circle_fast (clear = false, center = radius_center) {
   } else {
     geo = {type: 'Polygon', coordinates: []};
   }
-  change_data ('drawsrc', geo);
+  changeData ('drawsrc', geo);
   return geo;
 }
 
@@ -327,7 +327,7 @@ function circle_fast (clear = false, center = radius_center) {
 // Query
 ////////////////////
 
-export function geo_blob (q) {
+export function geoBlob (q) {
   const geojson = q.geojson;
   geojson.properties = {
     name: q.properties.name,

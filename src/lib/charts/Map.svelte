@@ -6,22 +6,22 @@
   maplibregl.maxParallelImageRequests = 20;
 
   import {onMount} from 'svelte';
-  import {init_draw} from '$lib/util/drawing-utils';
+  import {initDraw} from '$lib/util/drawing-utils';
   import {
     mapsource,
     maplayer,
-    mapobject
+    mapObject
   } from '$lib/stores/mapstore';
   import {minzoom, maxzoom, maxbounds, mapstyle} from '$lib/config/geography';
 
   const mapboxgl = maplibregl;
-  let webgl_canvas;
+  let webglCanvas;
 
-  export let drawing_tools = false;
+  export let drawingTools = false;
 
   /// MAP creation
   async function init() {;
-    $mapobject = new mapboxgl.Map({
+    $mapObject = new mapboxgl.Map({
       container: 'mapcontainer',
       style: mapstyle,
       minZoom: minzoom,
@@ -36,21 +36,21 @@
     document.querySelector('#mapcontainer div canvas').style.cursor = 'wait';
 
     // scale bar
-    $mapobject.addControl(
+    $mapObject.addControl(
       new mapboxgl.ScaleControl({
         position: 'bottom-left',
       })
     );
 
     // navigation
-    $mapobject.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+    $mapObject.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
     //disable double click and rotation
-    $mapobject.doubleClickZoom.disable();
-    $mapobject.dragRotate.disable();
+    $mapObject.doubleClickZoom.disable();
+    $mapObject.dragRotate.disable();
 
     // // correct error - ignore 403 missing tiles
-    $mapobject.on('error', (e) => {
+    $mapObject.on('error', (e) => {
       if (
         e.error.status != 403 &&
         e.error.message != 'Failed to fetch' &&
@@ -61,11 +61,11 @@
       }
     });
 
-    $mapobject.on('load', SetLayers);
+    $mapObject.on('load', SetLayers);
   }
 
   // onDestroy(() => {
-  //   if ($mapobject) $mapobject.remove();
+  //   if ($mapObject) $mapObject.remove();
   // });
 
   /// Set all Mapbox Parameters ///
@@ -75,28 +75,28 @@
     mapsource.subscribe(async () => {
       // set the sources
       for (const [key, value] of Object.entries($mapsource)) {
-        // if ($mapobject.getSource(key)) $mapobject.removeSource(key);
+        // if ($mapObject.getSource(key)) $mapObject.removeSource(key);
         // if (value.hasOwnProperty('data')) value.data = await value.data; // for async loads
-        if (!$mapobject.getSource(key)) $mapobject.addSource(key, value); // as it may nto be removable
+        if (!$mapObject.getSource(key)) $mapObject.addSource(key, value); // as it may nto be removable
       }
     });
 
     maplayer.subscribe(async () => {
       // set the layers
       for (const value of $maplayer) {
-        if ($mapobject.getLayer(value.id)) $mapobject.removeLayer(value.id);
-        $mapobject.addLayer(value, "small settlement names");
+        if ($mapObject.getLayer(value.id)) $mapObject.removeLayer(value.id);
+        $mapObject.addLayer(value, "small settlement names");
       }
     });
 
-    if (drawing_tools) await init_draw();
+    if (drawingTools) await initDraw();
   }
 
   /// main
   onMount(init);
 </script>
 
-<div tabindex="0" aria-label="Map" id="mapcontainer" bind:this={webgl_canvas} />
+<div tabindex="0" aria-label="Map" id="mapcontainer" bind:this={webglCanvas} />
 
 <style>
   #mapcontainer {

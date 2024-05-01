@@ -5,11 +5,11 @@
   import Select from "$lib/ui/Select.svelte";
   import Icon from "$lib/ui/Icon.svelte";
 
-  let pym_child;
+  let pymChild;
   let code = null;
 
   onMount(() => {
-    pym_child = new pym.Child({id: 'embed', polling: 1000});
+    pymChild = new pym.Child({id: 'embed', polling: 1000});
   });
 </script>
 

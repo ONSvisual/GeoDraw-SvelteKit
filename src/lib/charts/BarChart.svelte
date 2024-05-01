@@ -19,7 +19,7 @@
 	$: zDomain = data.map(d => d[zKey]).filter((v, i, a) => a.indexOf(v) === i);
 	
 	$: xScale = (value) => (value / xMax) * 100;
-	$: data_grouped = groupData(data, yKey);
+	$: dataGrouped = groupData(data, yKey);
 </script>
 
 {#if table}
@@ -38,7 +38,7 @@
 	</ul>
 	{/if}
 
-	{#each data_grouped as group}
+	{#each dataGrouped as group}
 	<div class="label-group">
 			{group.label}
 		<span class="nowrap">

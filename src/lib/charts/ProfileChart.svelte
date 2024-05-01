@@ -12,7 +12,7 @@
 	export let markerWidth = 2.5;
 	export let minmax = ["0 years", "85+"];
   export let base = null;
-  export let base_ext = ", 5 year age bands";
+  export let baseExt = ", 5 year age bands";
   export let suffix = "%";
   export let table = true;
 	
@@ -22,9 +22,9 @@
 	
 	$: yScale = (value) => Math.abs(value / yDomain[1]) * 100;
 	
-	$: data_stacked = stackData(data, zKey);
+	$: dataStacked = stackData(data, zKey);
 
-	$: console.log(data, data_stacked);
+	$: console.log(data, dataStacked);
 </script>
 
 {#if table}
@@ -44,12 +44,12 @@
 	</ul>
 
 	<div class="bar-group" style:height="{height}px">
-		{#each data_stacked as stack, i}
+		{#each dataStacked as stack, i}
 		{#if i == 0}
 		{#each stack.values as d, j}
 		<div
 			use:tooltip
-			title="{d[xKey]}: {formatTick(d[yKey])}{suffix}{zDomain[1] ? ` (${formatTick(data_stacked[i + 1].values[j][yKey])}${suffix})` : ''}"
+			title="{d[xKey]}: {formatTick(d[yKey])}{suffix}{zDomain[1] ? ` (${formatTick(dataStacked[i + 1].values[j][yKey])}${suffix})` : ''}"
 			class="bar"
 			style:bottom="0" style:height="{yScale(d[yKey])}%" style:left="calc({(j / xDomain.length) * 100}%)" style:right="calc({(1 - ((j + 1) / xDomain.length)) * 100}% + 2px)"/>
 		{/each}
@@ -69,7 +69,7 @@
 </div>
 
 {#if base}
-<small>{base}{base_ext}</small>
+<small>{base}{baseExt}</small>
 {/if}
 
 <style>

@@ -6,22 +6,22 @@
     export let yKey = "category";
     export let zKey = "areanm";
 
-    $: grouped_data = groupData(data, yKey);
-    $: console.log("grouped", grouped_data);
+    $: groupedData = groupData(data, yKey);
+    $: console.log("grouped", groupedData);
 </script>
 
-{#if grouped_data}
+{#if groupedData}
 <table class="visuallyhidden">
     <thead>
         <tr>
             <th>Category</th>
-            {#each grouped_data[0].values as val}
+            {#each groupedData[0].values as val}
             <td>{val[zKey]}</td>
             {/each}
         </tr>
     </thead>
     <tbody>
-        {#each grouped_data as row}
+        {#each groupedData as row}
         <tr>
             <td>{row.label}</td>
             {#each row.values as col}

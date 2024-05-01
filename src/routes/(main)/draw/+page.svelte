@@ -11,12 +11,12 @@
   import Map from '$lib/charts/Map.svelte';
   import '$lib/css/maplibre-gl.css';
   import {onMount} from 'svelte';
-  import {update, simplify_geo, geo_blob} from '$lib/util/drawing-utils';
+  import {update, simplifyGeo, geoBlob} from '$lib/util/drawing-utils';
   import {roundCount} from '$lib/util/functions';
   import {
-    mapobject,
-    draw_type,
-    add_mode,
+    mapObject,
+    drawType,
+    addMode,
     radiusInKm,
     selected,
     centroids
@@ -85,8 +85,8 @@
 
       // if (!items.oa.size) return;
       // console.debug('---recolour', items);
-      if ($mapobject.getLayer('bounds'))
-        $mapobject.setPaintProperty('bounds', 'fill-color', [
+      if ($mapObject.getLayer('bounds'))
+        $mapObject.setPaintProperty('bounds', 'fill-color', [
           'match',
           ['get', 'areacd'],
           ['literal', ...items.oa],
@@ -96,7 +96,7 @@
       if (selected.length > 1 && state.name) state.name = "";
     }
 
-    $mapobject.on('load', async () => {
+    $mapObject.on('load', async () => {
       newselect = function () {
         localStorage.clear();
         selected.set([{oa: new Set()}]);
@@ -121,7 +121,7 @@
             },
           ];
 
-          $mapobject.fitBounds(data.properties.bounds, {padding: 40});
+          $mapObject.fitBounds(data.properties.bounds, {padding: 40});
 
           state.name = data.properties.hclnm ? data.properties.hclnm :
             data.properties.areanm ? data.properties.areanm :
@@ -150,7 +150,7 @@
 
         var bbox = $centroids.bounds([...q.oa_all]);
 
-        $mapobject.fitBounds(bbox, {
+        $mapObject.fitBounds(bbox, {
           padding: 40,
           linear: true,
         });
@@ -170,7 +170,7 @@
 
         var bbox = $centroids.bounds([...q.oa]);
 
-        $mapobject.fitBounds(bbox, {
+        $mapObject.fitBounds(bbox, {
           padding: 40,
           linear: true,
         });
@@ -180,8 +180,8 @@
       }
 
       // Keep track of map zoom level
-      zoom = $mapobject.getZoom();
-      $mapobject.on('moveend', () => (zoom = $mapobject.getZoom()));
+      zoom = $mapObject.getZoom();
+      $mapObject.on('moveend', () => (zoom = $mapObject.getZoom()));
       isLoading = false;
     });
 
@@ -189,7 +189,7 @@
     recolour($selected);
   } //endinit
 
-  function load_geo() {
+  function loadGeo() {
     let file = uploader.files[0] ? uploader.files[0] : null;
 
     if (file) {
@@ -218,12 +218,12 @@
               oa: new Set(oa)
             },
           ];
-          $mapobject.fitBounds(bb, {padding: 40});
+          $mapObject.fitBounds(bb, {padding: 40});
         } else if (b.geometry) {
-          if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
+          if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplifyGeo(b.geometry, 10000);
           let bb = bbox(b);
           update(b.geometry);
-          $mapobject.fitBounds(bb, {padding: 40});
+          $mapObject.fitBounds(bb, {padding: 40});
         } else {
           b = null;
           alert('Invalid geography file. Must be geojson format.');
@@ -255,7 +255,7 @@ The save data and continue function
     document.querySelector('#mapcontainer div canvas').style.cursor = 'wait';
 
     return $centroids
-      .simplify(state.name, $selected[$selected.length - 1], $mapobject)
+      .simplify(state.name, $selected[$selected.length - 1], $mapObject)
 
       .then((q) => {
         if (q) {
@@ -280,16 +280,16 @@ The save data and continue function
   }
 
   function updateDrawMode(mode) {
-    let draw_type_new = mode === "move" ? null : mode;
-    if ($draw_type !== draw_type_new) {
-      $draw_type = draw_type_new;
+    let drawTypeNew = mode === "move" ? null : mode;
+    if ($drawType !== drawTypeNew) {
+      $drawType = drawTypeNew;
       state.select = "add";
     }
   }
   $: updateDrawMode(state.mode);
 
   function updateAddSubtract(select) {
-    $add_mode = select === "add" ? true : false;
+    $addMode = select === "add" ? true : false;
   }
   $: updateAddSubtract(state.select);
 
@@ -305,15 +305,15 @@ The save data and continue function
         $selected,
         { oa },
       ];
-      $mapobject.fitBounds(bbox, {padding: 40});
+      $mapObject.fitBounds(bbox, {padding: 40});
       state.name = e.detail.areanm;
     } else if (e.detail.type == 'postcode') {
 
       let center = e.detail.center;
-      $mapobject.flyTo({center: center, zoom: 14});
-      $mapobject.once('idle', () => {
-        let coords = $mapobject.project(center);
-        let features = $mapobject.queryRenderedFeatures(
+      $mapObject.flyTo({center: center, zoom: 14});
+      $mapObject.once('idle', () => {
+        let coords = $mapObject.project(center);
+        let features = $mapObject.queryRenderedFeatures(
           [coords.x, coords.y],
           {layers: ['bounds']}
         );
@@ -418,8 +418,8 @@ The save data and continue function
       <button
         class="text"
         on:click={async () => {
-          let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapobject);
-          let blob = geo_blob(data);
+          let data = await $centroids.simplify(state.name, $selected[$selected.length - 1], $mapObject);
+          let blob = geoBlob(data);
           download(blob, `${state.name ?state.name.replaceAll(' ', '_') : 'custom_area'}.geojson`);
           state.showSave = false;
           let opts = state.name ? {areaName: state.name} : {};
@@ -464,7 +464,7 @@ The save data and continue function
           name="select"
           value="add"
         />
-        <Icon type="select_add" />
+        <Icon type="selectAdd" />
       </label>
       <label
         class:active={state.select === 'subtract'}
@@ -477,13 +477,13 @@ The save data and continue function
           name="select"
           value="subtract"
         />
-        <Icon type="select_subtract" />
+        <Icon type="selectSubtract" />
       </label>
     </div>
   </nav>
 {/if}
 <div id="map">
-  <Map drawing_tools={true} />
+  <Map drawingTools={true} />
 </div>
 <aside class="info-box" style:top="{showTray || state.showSave ? 200 : 158}px">
   <div class="search">
@@ -502,7 +502,7 @@ The save data and continue function
       accept=".geojson,.json"
       style:display="none"
       bind:this={uploader}
-      on:input={load_geo}
+      on:input={loadGeo}
     />
   </div>
   {#if state.infoExpand}
@@ -515,7 +515,7 @@ The save data and continue function
           on:click={() => {
             let q = $selected[$selected.length - 1];
             let bbox = $centroids.bounds([...q.oa]);
-            $mapobject.fitBounds(bbox, {padding: 40});
+            $mapObject.fitBounds(bbox, {padding: 40});
           }}>click here</button
         > to return to the area you have drawn.
       {:else if !zoom || zoom < zoomstop}

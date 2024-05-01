@@ -3,7 +3,7 @@ import { boundaries, promoteId } from '$lib/config/geography';
 
 // global variables shared between units.
 export const centroids = writable();
-export const draw_type = writable(undefined); // drawing tool type
+export const drawType = writable(undefined); // drawing tool type
 export const selected = writable([{oa:new Set()}]); // which layers contain data e.g. ['centroids']
 export const mapsource = derived(centroids, ($centroids) => ({
     area: {
@@ -49,7 +49,7 @@ export const maplayer = readable([
         'circle-color': 'coral'
     }}
 ]); // layer list
-export const mapobject = writable(undefined); // the mapbox 'map' object
-export let add_mode = writable(true);
-export let draw_enabled = writable(false);
+export const mapObject = writable(undefined); // the mapbox 'map' object
+export let addMode = writable(true);
+export let drawEnabled = writable(false);
 export const radiusInKm = writable(1);

@@ -10,7 +10,7 @@
   import ProfileChart from '$lib/charts/ProfileChart.svelte';
   import BigNumber from '$lib/charts/BigNumber.svelte';
 
-  let pym_child, name, comp, geojson, comp_geojson, tables, population;
+  let pymChild, name, comp, geojson, compGeojson, tables, population;
   let stats = [];
   let hideTables = false;
 
@@ -54,7 +54,7 @@
       name = props.name || "Selected area";
       comp = props.comp || "";
       geojson = props.poly;
-      comp_geojson = props.comppoly;
+      compGeojson = props.comppoly;
       population = props.population;
       tables = props.tabs;
       stats = props.stats;
@@ -74,8 +74,8 @@
   }
 
   onMount(() => {
-    pym_child = new pym.Child({id: 'embed', polling: 1000});
-    pym_child.onMessage('makePNG', makePNG);
+    pymChild = new pym.Child({id: 'embed', polling: 1000});
+    pymChild.onMessage('makePNG', makePNG);
     update();
   });
 </script>
@@ -95,7 +95,7 @@
   <Cards>
     {#if geojson}
       <Card title="Area map">
-        <AreaMap {name} {comp} {geojson} {comp_geojson} />
+        <AreaMap {name} {comp} {geojson} {compGeojson} />
       </Card>
     {/if}
     {#each tables || [] as tab}

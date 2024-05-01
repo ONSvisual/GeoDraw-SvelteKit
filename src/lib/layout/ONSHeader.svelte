@@ -9,7 +9,7 @@
 
 	let primary = theme == "dark" ? "white" : filled ? "#003c57" : "#222222";
 	let secondary = theme == "dark" || filled ? "#a8bd3a" : "#222222";
-	let census_color = theme == "dark" ? "white" : "#902082";
+	let censusColor = theme == "dark" ? "white" : "#902082";
 </script>
 
 <div class="col-wide middle">
@@ -19,7 +19,7 @@
 		</a>
 		{#if census}
 		<a href="https://www.ons.gov.uk/census" class="logo" style:width="160px">
-			<CensusLogo color={census_color}/>
+			<CensusLogo color={censusColor}/>
 		</a>
 		{/if}
 	</div>

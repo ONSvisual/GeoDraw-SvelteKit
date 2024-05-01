@@ -9,7 +9,7 @@
 
 	export let name, comp;
 	export let geojson = null;
-	export let comp_geojson = null;
+	export let compGeojson = null;
 	export let config = {
 		boundary: {color: '#1f8ab0', lineWidth: 2.5, fillOpacity: 0.2},
 		comp: {color: 'rgba(0,0,0,0.5)', lineWidth: 1.5, fillOpacity: 0.1}
@@ -74,7 +74,7 @@
 
 	$: data = {
 		boundary: geojson ? geojson : {'type': 'Polygon', 'coordinates': []},
-		comp: comp_geojson ? comp_geojson : {'type': 'Polygon', 'coordinates': []}
+		comp: compGeojson ? compGeojson : {'type': 'Polygon', 'coordinates': []}
 	};
 	$: bounds = data ? bbox({type: "GeometryCollection", geometries: [data.boundary, data.comp]}) : [[-9, 49], [2, 61]];
 	$: w && fitBounds(bounds);
@@ -82,7 +82,7 @@
 	
 </script>
 
-{#if comp_geojson}
+{#if compGeojson}
 <ul class="legend-block">
 	{#each ["boundary", "comp"] as key}
 	<li>

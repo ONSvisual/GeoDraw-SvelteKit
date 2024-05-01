@@ -9,8 +9,8 @@
   import TopicItem from '$lib/ui/TopicItem.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import Select from '$lib/ui/Select.svelte';
-  import topics_all from '$lib/config/topics.json';
-  import {simplify_geo, geo_blob} from '$lib/util/drawing-utils';
+  import topicsAll from '$lib/config/topics.json';
+  import {simplifyGeo, geoBlob} from '$lib/util/drawing-utils';
   import getTable from '$lib/util/get-table';
   import getParents from '$lib/util/get-parents';
   import {cdnbase} from '$lib/config/geography';
@@ -19,14 +19,14 @@
   import {centroids} from '$lib/stores/mapstore';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
   let isLoading = false;
-  let pym_parent; // Variabl for pym
-  let embed_hash; // Variable for embed hash string
+  let pymParent; // Variabl for pym
+  let embedHash; // Variable for embed hash string
   let tables = []; // Array to hold table data
   let includemap = true;
   let includecomp = false;
   let parents;
   let coverage = ["E", "W"];
-  let topics = [...topics_all]; // Topics might be filtered based on coverage
+  let topics = [...topicsAll]; // Topics might be filtered based on coverage
   let uploader; // DOM element for geojson file upload
 
   let topicsLookup = Object.fromEntries(topics.map(d=>[d.code,d]))
@@ -47,20 +47,20 @@
 
   function filterTopics(topics, selected, regex) {
     /// display only those which exist
-    let topics_start = [];
-    let topics_end = [];
+    let topicsStart = [];
+    let topicsEnd = [];
     [...topics]
       .filter(t => !t.coverage || t.coverage.every(c => coverage.includes(c)))
       .sort((a, b) => a.label.localeCompare(b.label))
       .forEach((topic) => {
         if (selected.includes(topic)) {
-          topics_start.push(topic);
+          topicsStart.push(topic);
         } else {
-          topics_end.push(topic);
+          topicsEnd.push(topic);
         }
       });
-    if (regex) topics_end = topics_end.filter((t) => regex.test(t.label));
-    return [...topics_start, ...topics_end];
+    if (regex) topicsEnd = topicsEnd.filter((t) => regex.test(t.label));
+    return [...topicsStart, ...topicsEnd];
   }
   $: regex =
     state.topicsFilter.length > 1 ? new RegExp(state.topicsFilter, 'i') : null;
@@ -118,7 +118,7 @@
       goto(`${base}/draw/`);
     }
 
-    geojson = simplify_geo(store.geojson.geometry);
+    geojson = simplifyGeo(store.geojson.geometry);
 
     let props = store.properties;
     // console.log('props', props);
@@ -130,7 +130,7 @@
     let par = await getParents(state.compressed);
     coverage = par.coverage;
     parents = par.parents;
-    topics = topics_all.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
+    topics = topicsAll.filter(t => !t.coverage || coverage.every(c => t.coverage.includes(c)));
     state.comparison = parents[0];
 
     state.start = true;
@@ -143,7 +143,7 @@
   // Processing functions
   ////////////////////////////////////////////////////////////////
   let cache = {};
-  async function get_data(data, comp) {
+  async function getData(data, comp) {
     if (!state.start) return [];
     if (!cache[comp]) cache[comp] = {};
     let tables = [];
@@ -161,7 +161,7 @@
     return tables;
   }
 
-  async function update_profile(start, name, comp, data, includemap, includecomp) {
+  async function updateProfile(start, name, comp, data, includemap, includecomp) {
     if (start) {
       var ls = JSON.parse(localStorage.getItem('onsbuild'));
       ls.properties.name = name;
@@ -169,20 +169,20 @@
 
       let codes = data.map((d) => d.code);
       let compcds = comp?.codes ? comp.codes.join(";") : comp?.areacd || '';
-      tables = await get_data(topics.filter((t) => codes.includes(t.code)), compcds);
+      tables = await getData(topics.filter((t) => codes.includes(t.code)), compcds);
 
-      embed_hash = `#/?name=${btoa(name)}${
+      embedHash = `#/?name=${btoa(name)}${
         comp ? `&comp=${btoa(comp.areanm)}` : ''
       }&tabs=${btoa(JSON.stringify(tables))}${
         includemap ? `&poly=${btoa(JSON.stringify(geojson))}` : ''
       }${
-        includemap && includecomp && comp?.geometry ? `&comppoly=${btoa(JSON.stringify(simplify_geo(comp.geometry)))}` : ''
+        includemap && includecomp && comp?.geometry ? `&comppoly=${btoa(JSON.stringify(simplifyGeo(comp.geometry)))}` : ''
       }`;
 
       // alert(population)
 
-      if (!pym_parent) {
-        pym_parent = new pym.Parent('embed', `${base}/embed/${embed_hash}`, {
+      if (!pymParent) {
+        pymParent = new pym.Parent('embed', `${base}/embed/${embedHash}`, {
           name: 'embed',
           id: 'iframe',
           title: 'Embedded area profile'
@@ -190,7 +190,7 @@
         isLoading = false;
       } else {
         document.getElementById('iframe').contentWindow.location.hash =
-          embed_hash;
+          embedHash;
       }
     }
   }
@@ -200,10 +200,10 @@
     return mode === "capitalise" ? name[0].toUpperCase() + name.slice(1) : name;
   }
 
-  $: update_profile(state.start, state.name, state.comparison, state.topics, includemap, includecomp);
+  $: updateProfile(state.start, state.name, state.comparison, state.topics, includemap, includecomp);
 
-  function makeEmbed(embed_hash) {
-    let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embed_hash}`;
+  function makeEmbed(embedHash) {
+    let url = `https://www.ons.gov.uk/visualisations/customprofiles/embed/${embedHash}`;
     return `<div id="custom-profile"></div>
 <script src="https://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js"><\/script>
 <script>var pymParent = new pym.Parent("custom-profile", "${url}", {name: "custom-profile", title: "Embedded area profile"});<\/script>`;
@@ -237,7 +237,7 @@
     analyticsEvent({event: "fileDownload", fileExtension: "csv", ...opts});
   }
 
-  function load_geo() {
+  function loadGeo() {
     let file = uploader.files[0] ? uploader.files[0] : null;
 
     if (file) {
@@ -256,7 +256,7 @@
           if (!b.properties) b.properties = {};
 
           if (!b?.properties?.codes_compressed && b?.geometry) {
-            if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplify_geo(b.geometry, 10000);
+            if (JSON.stringify(b.geometry).length > 10000) b.geometry = simplifyGeo(b.geometry, 10000);
             const oas = $centroids.contains(b);
             b.properties.codes_compressed = $centroids.compress([...oas.oa]);
           }
@@ -315,7 +315,7 @@
       <button
         class="text"
         on:click={async () => {
-          let blob = geo_blob(store);
+          let blob = geoBlob(store);
           download(blob, `${state.name ? state.name.replaceAll(' ', '_') : 'custom_area'}.geojson`);
           state.showSave = false;
           let opts = state.name ? {areaName: state.name} : {};
@@ -364,7 +364,7 @@
         accept=".geojson,.json"
         style:display="none"
         bind:this={uploader}
-        on:input={load_geo}
+        on:input={loadGeo}
       />
     </div>
 
@@ -426,7 +426,7 @@
         Print profile
       </button> |
       <button class="btn-link" on:click={() => {
-        pym_parent.sendMessage('makePNG', null);
+        pymParent.sendMessage('makePNG', null);
         let opts = state.name ? {areaName: state.name} : {};
         analyticsEvent({event: "fileDownload", fileExtension: "png", ...opts});
       }}>
@@ -452,12 +452,12 @@
       >
         {state.showEmbed ? 'Hide embed code' : 'Show embed code'}
       </button>
-      {#if embed_hash && state.showEmbed}
+      {#if embedHash && state.showEmbed}
         <p style:margin-bottom={0}>Embed code</p>
-        <textarea rows="4" readonly>{makeEmbed(embed_hash)}</textarea>
+        <textarea rows="4" readonly>{makeEmbed(embedHash)}</textarea>
         <button class="copy-embed"
           on:click={() => {
-            clip(makeEmbed(embed_hash), 'Copied embed code to clipboard');
+            clip(makeEmbed(embedHash), 'Copied embed code to clipboard');
             let opts = state.name ? {areaName: state.name} : {};
             analyticsEvent({event: "embed", ...opts});
           }}>

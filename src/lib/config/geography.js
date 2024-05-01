@@ -14,12 +14,12 @@ export const boundaries = {
   key: "oa",
   layer: "boundaries",
   url: "https://cdn.ons.gov.uk/maptiles/administrative/2021/oa/v3/boundaries/{z}/{x}/{y}.pbf",
-  id_key: "areacd",
-  pt_key: "parentcd"
+  idKey: "areacd",
+  ptKey: "parentcd"
 };
 export const promoteId = (() => {
   const pId = {};
-  pId[boundaries.layer] = boundaries.id_key;
+  pId[boundaries.layer] = boundaries.idKey;
   return pId;
 })();
 
