@@ -1,7 +1,7 @@
 import { base } from "$app/paths";
 
 // data constants
-export const cdnbase = "https://ons-dp-prod-cdn.s3.eu-west-2.amazonaws.com/maptiles/ap-geos/v2";
+export const cdnbase = "https://ons-dp-prod-cdn.s3.eu-west-2.amazonaws.com/maptiles/ap-geos/v3";
 export const places = `${base}/data/places-list.csv`;
 export const mapstyle = `${base}/data/style.json`
 export const points = {

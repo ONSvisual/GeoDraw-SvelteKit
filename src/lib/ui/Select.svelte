@@ -13,8 +13,8 @@
     { keys: ["E00", "W00"], label: "Output area" },
     { keys: ["E01", "W01"], label: "LSOA" },
     { keys: ["E02", "W02"], label: "MSOA" },
-    { keys: ["E04"], label: "Parish" },
-    { keys: ["W04"], label: "Community" },
+    { keys: ["E04"], label: "Census merged parish" },
+    { keys: ["W04"], label: "Census merged community" },
     { keys: ["E05", "W05"], label: "Ward" },
     { keys: ["E06", "W06"], label: "Unitary authority" },
     { keys: ["E07"], label: "Non-metropolitan borough" },
@@ -56,14 +56,14 @@
       let geocd = d.areacd.slice(0, 3);
       let geotype = geotypesLookup[geocd];
       // Fix for 2025 parliamentary constituencies
-      if (["E14", "W07"].includes(geocd)) {
-        if (
-          (geocd === "E14" && +d.areacd.slice(3) > 1062) ||
-          (geocd === "W07" && +d.areacd.slice(3) > 80)
-        )
-          geotype = `Future ${geotype.toLowerCase()}`;
-        else geotype = `Current ${geotype.toLowerCase()}`;
-      }
+      // if (["E14", "W07"].includes(geocd)) {
+      //   if (
+      //     (geocd === "E14" && +d.areacd.slice(3) > 1062) ||
+      //     (geocd === "W07" && +d.areacd.slice(3) > 80)
+      //   )
+      //     geotype = `Future ${geotype.toLowerCase()}`;
+      //   else geotype = `Current ${geotype.toLowerCase()}`;
+      // }
       d.group = d.parentcd
         ? `${geotype} in ${lookup[d.parentcd].areanm}`
         : geotype;
