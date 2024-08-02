@@ -22,7 +22,8 @@
     add_mode,
     radiusInKm,
     selected,
-    centroids
+    centroids,
+    user_geometry
   } from '$lib/stores/mapstore';
   import {boundaries, cdnbase} from '$lib/config/geography';
   import {analyticsEvent} from '$lib/layout/AnalyticsBanner.svelte';
@@ -30,7 +31,7 @@
 
   const modelist = [
     {key: 'move', label: 'Pan and zoom'},
-    {key: 'select', label: 'Click to select'},
+    // {key: 'select', label: 'Click to select'},
     {key: 'polygon', label: 'Draw a polygon'},
     {key: 'radius', label: 'Draw a radius'},
   ];
@@ -110,16 +111,16 @@
           'fill-opacity': 1
         },
       },
-      {
-        id: 'bounds-line',
-        source: 'area',
-        'source-layer': boundaries.layer,
-        type: 'line',
-        paint: {
-          'line-color': 'steelblue',
-          'line-width': ['case', ['==', ['feature-state', 'hovered'], true], 2, 0.3]
-        },
-      },
+      // {
+      //   id: 'bounds-line',
+      //   source: 'area',
+      //   'source-layer': boundaries.layer,
+      //   type: 'line',
+      //   paint: {
+      //     'line-color': 'steelblue',
+      //     'line-width': ['case', ['==', ['feature-state', 'hovered'], true], 2, 0.3]
+      //   },
+      // },
       {
         id: 'cpt',
         source: 'points',
@@ -155,6 +156,9 @@
           'transparent',
         ]);
       if (selected.length > 1 && state.name) state.name = "";
+
+      // get last geometry from selected list and draw it on the map
+
     }
 
     $mapobject.on('load', async () => {
@@ -185,7 +189,10 @@
           
           $selected = [
             ...$selected,
-            { oa },
+            { oa,
+              geo:'geometry'
+            }
+
           ];
 
           $mapobject.fitBounds(data.properties.bounds, {padding: 40});
@@ -207,6 +214,7 @@
 
         history.replaceState(null, null, ' ');
       } else if (localStorage.getItem('onsbuild')) {
+        //coming from ELS straight to build page and then coming back to draw without a geometry being drawn
         var q = JSON.parse(localStorage.getItem('onsbuild')).properties;
         state.name = q.name;
 
@@ -224,7 +232,8 @@
 
         $selected = [
           {
-            oa: new Set(q.oa_all)
+            oa: new Set(q.oa_all),
+            geo:'geometry'
           },
         ];
       } else if (localStorage.getItem('draw_data') || false) {
@@ -282,7 +291,9 @@
           $selected = [
             $selected,
             {
-              oa: new Set(oa)
+              oa: new Set(oa),
+              geo:'geometry'
+
             },
           ];
           $mapobject.fitBounds(bb, {padding: 40});
@@ -360,7 +371,7 @@ The save data and continue function
   }
   $: updateAddSubtract(state.select);
 
-  // $: console.log('selected', $selected);
+  $: console.log('selected', $selected);
 </script>
 
 <ONSloader {isLoading} />

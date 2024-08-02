@@ -7,6 +7,7 @@ import {
   add_mode,
   draw_enabled,
   centroids,
+  user_geometry
 } from '$lib/stores/mapstore';
 import {boundaries} from '$lib/config/geography';
 import {roundAll, extent, union, difference} from '$lib/util/functions';
@@ -15,6 +16,10 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import circle from '@turf/circle';
 import turf_simplify from '@turf/simplify';
 import buffer from '@turf/buffer';
+import {intersect} from '@turf/intersect';
+import turfunion from '@turf/union';
+import turfdifference from '@turf/difference';
+import {featureCollection} from '@turf/helpers';
 // import turf_bbox from '@turf/bbox';
 // import turf_inpolygon from '@turf/boolean-point-in-polygon';
 import {dissolve} from '$lib/util/mapshaper';
@@ -55,7 +60,42 @@ function cursor () {
 
 export async function init_draw () {
   const map = get (mapobject);
+  //stuff for user generated area
+  map.addSource ('userGeo', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [],
+      },
+    },
+  });
 
+  map.addLayer ({
+    id: 'userGeo_layer',
+    type: 'fill',
+    source: 'userGeo',
+    paint: {
+      'fill-color': '#871A5B',
+      'fill-outline-color': '#871A5B',
+      'fill-opacity': 0.1,
+    },
+  });
+
+  map.addLayer ({
+    id: 'userGeo_outline',
+    type: 'line',
+    source: 'userGeo',
+    layout: {'line-cap': 'round', 'line-join': 'round'},
+    paint: {
+      'line-color': '#871A5B',
+      'line-dasharray': [0.2, 2],
+      'line-width': 2,
+    },
+  });
+
+  //stuff for drawing
   map.addSource ('drawsrc', {
     type: 'geojson',
     data: {
@@ -89,6 +129,7 @@ export async function init_draw () {
       'line-width': 2,
     },
   });
+
 
   Draw = new MapboxDraw ({
     draw: ['draw_polygon'],
@@ -242,7 +283,26 @@ export function change_data (layer, data) {
 export async function update (geo) {
   // update all polygon like draw items
   document.querySelector ('#mapcontainer div canvas').style.cursor = 'wait';
+      // store polygon and then render it on the map
+    if(check_geo_empty(await get(user_geometry))){ //check if there's an existing geometry in the store
+      change_data('userGeo',geo) // change the layer with the user drawn geometry
+      user_geometry.set(geo) // store it to the store
+    }else{
+      
+      let union = checkAndUnion(await get(user_geometry),geo) //if there's something there check it intersect and make a union
+      change_data ('userGeo',union) //update map
+      user_geometry.set(union) //update store
+    }
 
+    // handle if substract
+    if(get(add_mode)){
+
+    }
+ 
+    // add it to the history/local storage
+
+    
+    
   const features = await get (centroids).contains (geo);
 
   var current = get (selected);
@@ -252,10 +312,12 @@ export async function update (geo) {
   if (get (add_mode)) {
     current.push ({
       oa: union(last.oa, new Set(features.oa)),
+      geo:'geometry'
     });
   } else {
     current.push ({
       oa: difference(last.oa, new Set(features.oa)),
+      geo:'geometry'
     });
   }
 
@@ -280,7 +342,7 @@ function draw_point (e) {
     } else {
       oas = new Set ([...oas, code]);
     }
-    current.push ({oa: oas});
+    current.push ({oa: oas,boundary:'geojson'});
     updatelocal (current);
   }
 }
@@ -296,6 +358,7 @@ function updatelocal (current) {
     items,
     (_key, value) => (value instanceof Set ? [...value] : value)
   );
+  console.log(items)
   localStorage.setItem ('draw_data', items);
 }
 
@@ -326,6 +389,31 @@ function circle_fast (clear = false, center = radius_center) {
 ////////////////////
 // Query
 ////////////////////
+
+function check_geo_empty(feature){
+  if (!feature || !feature.geometry || !feature.geometry.coordinates) {
+    return true; // Handle cases where geometry or coordinates are missing
+  }
+  return feature.geometry.coordinates.length === 0;
+}
+
+function checkAndUnion(geojson1, geojson2) {
+  // Check for overlap using intersect
+  // const intersection = intersect(featureCollection([geojson1, geojson2]));
+  if(get(add_mode)){
+    return turfunion(featureCollection([geojson1, geojson2]));
+  }else{
+    return turfdifference(featureCollection([geojson1,geojson2]))
+  }
+  // if (intersection) {
+    // Overlap exists, perform union
+   
+  // } else {
+    // No overlap, return first geojson
+    // return geojson1;
+  // }
+}
+
 
 export function geo_blob (q) {
   const geojson = q.geojson;

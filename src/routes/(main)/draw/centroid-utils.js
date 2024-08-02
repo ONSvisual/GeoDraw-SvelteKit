@@ -228,6 +228,7 @@ class Centroids {
     // move map to selection
     mapobject.fitBounds (bbox, {padding: 0, animate: false});
 
+    //just use the boundary of the geometry so merge.geojson = selected.geo
     merge.geojson = await new Promise(resolve => mapobject.once("idle", () => {
       var geometry = mapobject
         .queryRenderedFeatures ({layers: ['bounds']})
@@ -243,6 +244,7 @@ class Centroids {
         })
       };
 
+//maybe don't need this bit either
       let len = geojson.features.length;
       if (len > 1 && len < 75) geojson = buffer(geojson, 10, {units: 'meters'});
       let dissolved = dissolve (geojson);

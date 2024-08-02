@@ -11,3 +11,10 @@ export let add_mode = writable(true);
 export let draw_enabled = writable(false);
 export const radiusInKm = writable(1);
 export const centroids = writable();
+export const user_geometry = writable({
+    type: 'Feature',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [],
+    },
+  });//store the polygon created by the user
