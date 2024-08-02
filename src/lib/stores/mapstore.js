@@ -54,3 +54,10 @@ export const mapObject = writable(undefined); // the mapbox 'map' object
 export let addMode = writable(true);
 export let drawEnabled = writable(false);
 export const radiusInKm = writable(1);
+export const user_geometry = writable({
+    type: 'Feature',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [],
+    },
+  });//store the polygon created by the user

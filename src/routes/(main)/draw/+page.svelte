@@ -11,7 +11,7 @@
   import Map from "$lib/charts/Map.svelte";
   import "$lib/css/maplibre-gl.css";
   import { onMount } from "svelte";
-  import { update, simplifyGeo, geoBlob } from "$lib/util/drawing-utils";
+  import { update, simplifyGeo, geoBlob, clearPoly } from "$lib/util/drawing-utils";
   import { roundCount } from "$lib/util/functions";
   import {
     mapObject,
@@ -26,7 +26,7 @@
 
   const modes = [
     { key: "move", label: "Pan and zoom" },
-    { key: "select", label: "Click to select" },
+    // { key: "select", label: "Click to select" },
     { key: "polygon", label: "Draw a polygon" },
     { key: "radius", label: "Draw a radius" },
   ];
@@ -98,6 +98,7 @@
 
     $mapObject.on("load", async () => {
       newselect = function () {
+        clearPoly();
         localStorage.clear();
         selected.set([{ oa: new Set() }]);
       };
