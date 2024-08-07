@@ -19,6 +19,7 @@ export const mapsource = derived(centroids, ($centroids) => ({
     },
 })); // source dictionary
 export const maplayer = readable([
+    // stuff for OA
     {
         id: 'bounds',
         source: 'area',

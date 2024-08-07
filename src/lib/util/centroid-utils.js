@@ -175,32 +175,35 @@ class Centroids {
     // move map to selection
     mapObject.fitBounds(bbox, { padding: 0, animate: false });
 
-    merge.geojson = await new Promise(resolve => mapObject.once("idle", () => {
-      var geometry = mapObject
-        .queryRenderedFeatures({ layers: ['bounds'] })
-        .filter(e => selected[key].has(e.properties[boundaries.idKey]));
+    merge.geojson = selected.geo
 
-      let geojson = {
-        type: 'FeatureCollection',
-        features: geometry.map(f => {
-          return {
-            type: f.type,
-            geometry: f.geometry,
-          };
-        })
-      };
+    // don't need these two bit below, just make merge.geojson=selected.geo
+    // merge.geojson = await new Promise(resolve => mapObject.once("idle", () => {
+    //   var geometry = mapObject
+    //     .queryRenderedFeatures({ layers: ['bounds'] })
+    //     .filter(e => selected[key].has(e.properties[boundaries.idKey]));
 
-      let len = geojson.features.length;
-      if (len > 1 && len < 75) geojson = buffer(geojson, 10, { units: 'meters' });
-      let dissolved = dissolve(geojson);
+    //   let geojson = {
+    //     type: 'FeatureCollection',
+    //     features: geometry.map(f => {
+    //       return {
+    //         type: f.type,
+    //         geometry: f.geometry,
+    //       };
+    //     })
+    //   };
 
-      if (len > 1 && len < 75) dissolved = buffer(dissolved, -10, { units: 'meters' });
-      dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
+    //   let len = geojson.features.length;
+    //   if (len > 1 && len < 75) geojson = buffer(geojson, 10, { units: 'meters' });
+    //   let dissolved = dissolve(geojson);
 
-      let areaSqm = area(dissolved);
-      filterGeo(dissolved, areaSqm);
-      resolve(dissolved);
-    }));
+    //   if (len > 1 && len < 75) dissolved = buffer(dissolved, -10, { units: 'meters' });
+    //   dissolved.geometry.coordinates = roundAll(dissolved.geometry.coordinates, 6);
+
+    //   let areaSqm = area(dissolved);
+    //   filterGeo(dissolved, areaSqm);
+    //   resolve(dissolved);
+    // }));
 
     // console.debug ('---merge---', merge);
     return merge;
