@@ -60,7 +60,7 @@ function cursor() {
 export async function initDraw() {
   const map = get(mapObject);
 
-   //stuff for user generated area
+   //map stuff for user generated area
    map.addSource ('userGeo', {
     type: 'geojson',
     data: {
@@ -95,7 +95,7 @@ export async function initDraw() {
     },
   });
 
-  //stuff for drawing
+  //map stuff for drawing
   map.addSource('drawsrc', {
     type: 'geojson',
     data: {
@@ -147,7 +147,7 @@ export async function initDraw() {
     var data = Draw.getAll();
     var geo = await data.features[0];
     update(geo);
-    clearPoly();
+    clearDraw();
   }
   map.on('zoomend', function () {
     const de = map.getZoom() < mzm;
@@ -196,22 +196,22 @@ export async function initDraw() {
   map.on('click', 'bounds', boundClick); //mouse
   map.on('touchstart', 'bounds', boundClick); //touch
 
-  let hovered;
+  // let hovered;
 
-  function boundHover(e) {
-    if (hovered) map.removeFeatureState(
-      { source: "area", sourceLayer: boundaries.layer, id: hovered },
-    );
-    if (e.features?.[0] && get(drawType) === "select") {
-      hovered = e.features[0].properties[boundaries.idKey];
-      map.setFeatureState(
-        { source: "area", sourceLayer: boundaries.layer, id: hovered },
-        { hovered: true }
-      );
-    } else {
-      hovered = null;
-    }
-  }
+  // function boundHover(e) {
+  //   if (hovered) map.removeFeatureState(
+  //     { source: "area", sourceLayer: boundaries.layer, id: hovered },
+  //   );
+  //   if (e.features?.[0] && get(drawType) === "select") {
+  //     hovered = e.features[0].properties[boundaries.idKey];
+  //     map.setFeatureState(
+  //       { source: "area", sourceLayer: boundaries.layer, id: hovered },
+  //       { hovered: true }
+  //     );
+  //   } else {
+  //     hovered = null;
+  //   }
+  // }
   // map.on('mousemove', 'bounds', boundHover); //hover
 }
 
@@ -264,7 +264,7 @@ function clear() {
   });
 }
 
-function clearGeo(){ //resets the user generated geometry
+export function clearGeo(){ //resets the user generated geometry
   let blank = {
     type: 'Feature',
     geometry: {
@@ -277,11 +277,9 @@ function clearGeo(){ //resets the user generated geometry
   user_geometry.set(blank)
 }
 
-export function clearPoly() {
-  clearGeo();
-
+export function clearDraw() {
   Draw.deleteAll();
-  // Draw.changeMode('draw_polygon', {});
+  Draw.changeMode('draw_polygon', {});
 }
 
 export function changeData(layer, data) {
@@ -296,7 +294,7 @@ export function changeData(layer, data) {
 export async function update(geo) {
   // update all polygon like draw items
   document.querySelector('#mapcontainer div canvas').style.cursor = 'wait';
-
+  // console.log('update',geo)
   if(check_geo_empty(await get(user_geometry))){ //check if there's an existing geometry in the store
     changeData('userGeo',geo) // change the layer with the user drawn geometry
     user_geometry.set(geo) // store it to the store
@@ -310,22 +308,21 @@ export async function update(geo) {
 
   var current = get(selected);
   var last = current[current.length - 1];
-  // console.debug ('update,last', last, current);
-
+  
   if (get(addMode)) {
     current.push({
       oa: union(last.oa, new Set(features.oa)),
-      geo:'geometry'
+      geo:await(get(user_geometry))
     });
   } else {
     current.push({
       oa: difference(last.oa, new Set(features.oa)),
-      geo:'geometry'
+      geo:await(get(user_geometry))
     });
   }
-
   updateLocal(current);
   cursor();
+
 }
 
 function drawPoint(e) {

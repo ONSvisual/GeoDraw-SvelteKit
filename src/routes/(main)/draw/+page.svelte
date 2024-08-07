@@ -11,7 +11,7 @@
   import Map from "$lib/charts/Map.svelte";
   import "$lib/css/maplibre-gl.css";
   import { onMount } from "svelte";
-  import { update, simplifyGeo, geoBlob, clearPoly } from "$lib/util/drawing-utils";
+  import { update, simplifyGeo, geoBlob, clearGeo, changeData } from "$lib/util/drawing-utils";
   import { roundCount } from "$lib/util/functions";
   import {
     mapObject,
@@ -66,10 +66,10 @@
     /* 
     A section to clear the local storage if past the last update date
     */
-    if (new Date(localStorage.getItem("lastdate")) < new Date("2022-18-18")) {
-      localStorage.clear();
-    }
-    localStorage.setItem("lastdate", +new Date());
+    // if (new Date(localStorage.getItem("lastdate")) < new Date("2022-18-18")) {
+    //   localStorage.clear();
+    // }
+    // localStorage.setItem("lastdate", +new Date());
 
     /* Initialisation function: This loads the map, any locally stored drawing and initialises the drawing tools */
     // console.clear();
@@ -93,12 +93,15 @@
           "rgba(32, 96, 149, 0.4)",
           "transparent",
         ]);
+
+      if(items.geo) changeData('userGeo',items.geo)
+
       if (selected.length > 1 && state.name) state.name = "";
     }
 
     $mapObject.on("load", async () => {
       newselect = function () {
-        clearPoly();
+        clearGeo();
         localStorage.clear();
         selected.set([{ oa: new Set() }]);
       };
@@ -119,6 +122,7 @@
             ...$selected,
             {
               oa: new Set($centroids.expand(data.properties.c21cds)),
+              geo:data.geometry
             },
           ];
 
@@ -160,25 +164,28 @@
         $selected = [
           {
             oa: new Set(q.oa_all),
+            geo:JSON.parse(localStorage.getItem("onsbuild")).geojson
           },
         ];
       } else if (localStorage.getItem("draw_data") || false) {
         var q = JSON.parse(localStorage.getItem("draw_data"));
-
         if (!q.oa.length) {
           newselect();
           return 0;
         }
-
-        var bbox = $centroids.bounds([...q.oa]);
-
+        // var bbox = $centroids.bounds([...q.oa]);
+        var bbox = getBounds(q.geo)
+        
         $mapObject.fitBounds(bbox, {
           padding: 40,
           linear: true,
         });
 
         q.oa = new Set(q.oa);
-        selected.set([q]);
+        selected.set([{
+          oa:q.oa,
+          geo:q.geo
+        }]);
       }
 
       // Keep track of map zoom level
@@ -190,6 +197,11 @@
     selected.subscribe(recolour);
     recolour($selected);
   } //endinit
+
+  function getBounds(geo){
+    return bbox(geo);
+  }
+
 
   function loadGeo() {
     let file = uploader.files[0] ? uploader.files[0] : null;
@@ -216,6 +228,7 @@
             $selected,
             {
               oa: new Set(oa),
+              geo:b
             },
           ];
           $mapObject.fitBounds(bb, { padding: 40 });
@@ -223,7 +236,7 @@
           if (JSON.stringify(b.geometry).length > 10000)
             b.geometry = simplifyGeo(b.geometry, 10000);
           let bb = bbox(b);
-          update(b.geometry);
+          update(b);
           $mapObject.fitBounds(bb, { padding: 40 });
         } else {
           b = null;
