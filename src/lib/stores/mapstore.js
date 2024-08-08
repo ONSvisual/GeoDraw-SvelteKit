@@ -4,7 +4,7 @@ import { boundaries, promoteId } from '$lib/config/geography';
 // global variables shared between units.
 export const centroids = writable();
 export const drawType = writable(undefined); // drawing tool type
-export const selected = writable([{ oa: new Set() }]); // which layers contain data e.g. ['centroids']
+export const selected = writable([{ oa: new Set(), geo:{type: 'Feature',geometry: {type: 'Polygon',coordinates: [],}} }]); // which layers contain data e.g. ['centroids']
 export const mapsource = derived(centroids, ($centroids) => ({
     area: {
         type: 'vector',

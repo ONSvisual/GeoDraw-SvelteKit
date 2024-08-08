@@ -53,6 +53,7 @@
 
   function setDrawData() {
     let items = $selected[$selected.length - 1];
+
     items = JSON.stringify(items, (_key, value) =>
       value instanceof Set ? [...value] : value,
     );
@@ -94,7 +95,7 @@
           "transparent",
         ]);
 
-      if(items.geo) changeData('userGeo',items.geo)
+        if(items.oa.size)changeData('userGeo',items.geo)
 
       if (selected.length > 1 && state.name) state.name = "";
     }
@@ -103,7 +104,7 @@
       newselect = function () {
         clearGeo();
         localStorage.clear();
-        selected.set([{ oa: new Set() }]);
+        selected.set([{ oa: new Set(), geo:{type: 'Feature',geometry: {type: 'Polygon',coordinates: [],}} }]);
       };
 
       let hash = window.location.hash;
@@ -115,7 +116,10 @@
           );
           const data = await res.json();
           newselect();
-          selected.set([{ oa: new Set() }]);
+          selected.set([{
+            oa: new Set(), 
+            geo:{type: 'Feature',geometry: {type: 'Polygon',coordinates: [],}}
+          }]);
           localStorage.clear();
 
           $selected = [
