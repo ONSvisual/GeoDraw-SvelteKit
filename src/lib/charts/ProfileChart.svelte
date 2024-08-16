@@ -27,8 +27,6 @@
 	$: yScale = (value) => Math.abs(value / yDomain[1]) * 100;
 
 	$: dataStacked = stackData(data, zKey);
-
-	$: console.log(data, dataStacked);
 </script>
 
 {#if table}

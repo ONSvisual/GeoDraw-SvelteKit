@@ -20,6 +20,7 @@
     radiusInKm,
     selected,
     centroids,
+    user_geometry
   } from "$lib/stores/mapstore";
   import { boundaries, cdnbase } from "$lib/config/geography";
   import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
@@ -48,6 +49,7 @@
   let zoom; // prop bound to map zoom level
   let uploader; // DOM element for geojson file upload
   let pselect = "0";
+  const blank_geo = {type: 'Feature',geometry: {type: 'Polygon',coordinates: [],}}
 
   $: showTray = ["polygon", "radius"].includes(state.mode);
 
@@ -76,6 +78,7 @@
     // console.clear();
 
     function recolour(selected) {
+      console.log('recolour')
       const items = selected[selected.length - 1];
 
       pselect = items.oa.size
@@ -95,7 +98,8 @@
           "transparent",
         ]);
 
-        if(items.oa.size)changeData('userGeo',items.geo)
+      if(items.geo){changeData('userGeo',items.geo)};
+      // this looks like a problem sometimes if the layer isn't there :\
 
       if (selected.length > 1 && state.name) state.name = "";
     }
@@ -104,7 +108,8 @@
       newselect = function () {
         clearGeo();
         localStorage.clear();
-        selected.set([{ oa: new Set(), geo:{type: 'Feature',geometry: {type: 'Polygon',coordinates: [],}} }]);
+        selected.set([{ oa: new Set(), geo: blank_geo }]);
+        user_geometry.set(blank_geo)
       };
 
       let hash = window.location.hash;
@@ -118,8 +123,9 @@
           newselect();
           selected.set([{
             oa: new Set(), 
-            geo:{type: 'Feature',geometry: {type: 'Polygon',coordinates: [],}}
+            geo:blank_geo
           }]);
+          user_geometry.set(blank_geo)
           localStorage.clear();
 
           $selected = [
@@ -129,6 +135,7 @@
               geo:data.geometry
             },
           ];
+          user_geometry.set(data.geometry)
 
           $mapObject.fitBounds(data.properties.bounds, { padding: 40 });
 
@@ -150,27 +157,29 @@
 
         history.replaceState(null, null, " ");
       } else if (localStorage.getItem("onsbuild")) {
-        var q = JSON.parse(localStorage.getItem("onsbuild")).properties;
-        state.name = q.name;
+        var q = JSON.parse(localStorage.getItem("onsbuild"));
+        state.name = q.properties.name;
 
-        if (!q?.oa_all?.length) {
+        if (!q.properties?.oaAll?.length) {
           newselect();
           return 0;
         }
+        
 
-        var bbox = $centroids.bounds([...q.oa_all]);
+        var bbox = $centroids.bounds([...q.properties.oaAll]);
 
         $mapObject.fitBounds(bbox, {
           padding: 40,
           linear: true,
         });
 
-        $selected = [
-          {
-            oa: new Set(q.oa_all),
-            geo:JSON.parse(localStorage.getItem("onsbuild")).geojson
-          },
-        ];
+        $selected = [{
+            oa: new Set(q.properties.oaAll),
+            geo:q.geojson
+          }];
+       
+        user_geometry.set(q.geojson)  
+        
       } else if (localStorage.getItem("draw_data") || false) {
         var q = JSON.parse(localStorage.getItem("draw_data"));
         if (!q.oa.length) {
@@ -190,6 +199,8 @@
           oa:q.oa,
           geo:q.geo
         }]);
+
+        user_geometry.set(q.geo)
       }
 
       // Keep track of map zoom level
@@ -235,6 +246,7 @@
               geo:b
             },
           ];
+          user_geometry.set(b)
           $mapObject.fitBounds(bb, { padding: 40 });
         } else if (b.geometry) {
           if (JSON.stringify(b.geometry).length > 10000)
@@ -282,7 +294,6 @@ The save data and continue function
           if (items.oa.size > 0) {
             if (q.error) return false;
 
-            console.debug("buildpage", q);
             localStorage.setItem("onsbuild", JSON.stringify(q));
             document.querySelector("#mapcontainer div canvas").style.cursor =
               "auto";

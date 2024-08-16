@@ -118,7 +118,7 @@
       goto(`${base}/draw/`);
     }
 
-    geojson = simplifyGeo(store.geojson.geometry);
+    geojson = simplifyGeo(store.geojson);
 
     let props = store.properties;
     // console.log('props', props);
