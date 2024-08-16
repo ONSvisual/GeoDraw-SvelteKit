@@ -7,7 +7,7 @@
 		"build": "vite build",
 		"build:prod": "cross-env APP_PATH=ons vite build && node ./scripts/js-fix",
 		"buildgit": "vite build && cp -r build docs",
-		"compress-oa-data": "node ./scripts/compress-oa-data",
+		"compress-data": "node ./scripts/compress-data",
 		"start": "vite preview",
 		"deploy": "netlify build && netlify deploy -p",
 		"push": "git add -A; git commit -m 'npm update';git push"
