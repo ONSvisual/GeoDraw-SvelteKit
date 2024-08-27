@@ -1,5 +1,5 @@
 import { readable, writable, derived } from 'svelte/store';
-import { boundaries, promoteId } from '$lib/config/geography';
+import { oaBoundaries, promoteId } from '$lib/config/geography';
 
 // global variables shared between units.
 export const centroids = writable();
@@ -10,7 +10,7 @@ export const mapsource = derived(centroids, ($centroids) => ({
         type: 'vector',
         maxzoom: 12, // IMPORTANT: This is the maximum zoom the tiles are available for, so they can over-zoom
         minzoom: 6, // IMPORTANT: This is the minimum zoom available
-        tiles: [boundaries.url],
+        tiles: [oaBoundaries.url],
         promoteId
     },
     points: {
@@ -23,7 +23,7 @@ export const maplayer = readable([
     {
         id: 'bounds',
         source: 'area',
-        'source-layer': boundaries.layer,
+        'source-layer': oaBoundaries.layer,
         type: 'fill',
         paint: {
             'fill-color': 'transparent',
@@ -33,7 +33,7 @@ export const maplayer = readable([
     {
         id: 'bounds-line',
         source: 'area',
-        'source-layer': boundaries.layer,
+        'source-layer': oaBoundaries.layer,
         type: 'line',
         paint: {
             'line-color': 'steelblue',

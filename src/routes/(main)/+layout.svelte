@@ -13,7 +13,7 @@
 
   onMount(async () => {
     // calculate the centroids and simplifications.
-    var centroidDummy = await GetCentroids();
+    var centroidDummy = await GetCentroids("oa");
     centroids.set(centroidDummy);
     loaded = true;
   });

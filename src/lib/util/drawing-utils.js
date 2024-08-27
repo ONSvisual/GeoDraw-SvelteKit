@@ -9,7 +9,7 @@ import {
   centroids,
   user_geometry
 } from '$lib/stores/mapstore';
-import { boundaries } from '$lib/config/geography';
+import { oaBoundaries } from '$lib/config/geography';
 import { roundAll, extent, union, difference } from '$lib/util/functions';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // import {bboxToTile} from '@mapbox/tilebelt';
@@ -329,8 +329,8 @@ function drawPoint(e) {
   // update using select tool
   let feature = e.features[0];
   if (feature) {
-    let code = feature.properties[boundaries.idKey];
-    let parentcd = feature.properties[boundaries.ptKey];
+    let code = feature.properties[oaBoundaries.idKey];
+    let parentcd = feature.properties[oaBoundaries.ptKey];
     let current = get(selected);
     let oas = current[current.length - 1].oa;
     if (oas.has(code) && parentcd) {

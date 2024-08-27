@@ -22,7 +22,7 @@
     centroids,
     user_geometry
   } from "$lib/stores/mapstore";
-  import { boundaries, cdnbase } from "$lib/config/geography";
+  import { oaBoundaries, cdnbase } from "$lib/config/geography";
   import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
 
   const modes = [
@@ -98,7 +98,7 @@
           "transparent",
         ]);
 
-      if(items.geo){changeData('userGeo',items.geo)};
+      if(items.geo && $mapObject.getLayer('userGeo')){changeData('userGeo',items.geo)};
       // this looks like a problem sometimes if the layer isn't there :\
 
       if (selected.length > 1 && state.name) state.name = "";
