@@ -17,6 +17,13 @@ export const boundaries = {
   idKey: "areacd",
   ptKey: "parentcd"
 };
+export const lsoaBoundaries = {
+  key: "lsoa",
+  layer: "boundaries",
+  url: "https://cdn.ons.gov.uk/maptiles/administrative/2021/lsoa/v3/boundaries/{z}/{x}/{y}.pbf",
+  idKey: "areacd",
+  ptKey: "parentcd"
+};
 export const promoteId = (() => {
   const pId = {};
   pId[boundaries.layer] = boundaries.idKey;

@@ -25,6 +25,14 @@ import turfdifference from '@turf/difference';
 import {featureCollection} from '@turf/helpers';
 
 const mzm = 10;
+const blank = {
+  type: 'Feature',
+  geometry: {
+    type: 'Polygon',
+    coordinates: [],
+  },
+}
+
 export var Draw;
 export let coordinates = [];
 // keep track of coordinates of centre of radius drawing tool
@@ -253,26 +261,12 @@ function makeBoundary(geojson, simplify = false) {
   return { type: 'Feature', geometry: simple };
 }
 
-function clear() {
+function clear() { //clears the drawing layers
   coordinates = [];
-  changeData('drawLayer', {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [],
-    },
-  });
+  changeData('drawLayer', blank);
 }
 
 export function clearGeo(){ //resets the user generated geometry
-  let blank = {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [],
-    },
-  }
-
   changeData('userGeo', blank);
   user_geometry.set(blank)
 }
@@ -306,6 +300,7 @@ export async function update(geo) {
 
   const features = await get(centroids).contains(geo);
 
+  console.log(features)
   var current = get(selected);
   var last = current[current.length - 1];
   

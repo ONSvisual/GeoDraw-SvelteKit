@@ -53,6 +53,8 @@
 
   $: showTray = ["polygon", "radius"].includes(state.mode);
 
+  $:console.log('selected',$selected)
+
   function setDrawData() {
     let items = $selected[$selected.length - 1];
 
@@ -98,7 +100,8 @@
           "transparent",
         ]);
 
-      if(items.geo){changeData('userGeo',items.geo)};
+      // if(items.geo){changeData('userGeo',items.geo)};
+      if($mapObject.getLayer("userGeo")){changeData('userGeo',items.geo)};
       // this looks like a problem sometimes if the layer isn't there :\
 
       if (selected.length > 1 && state.name) state.name = "";

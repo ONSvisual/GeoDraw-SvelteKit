@@ -6,7 +6,7 @@ import area from '@turf/area';
 import { decompressData } from "compress-csv-to-json";
 import { dissolve } from '$lib/util/bundled/mapshaper';
 import { roundAll } from '$lib/util/functions';
-import { points, boundaries } from '$lib/config/geography';
+import { points, boundaries, lsoaBoundaries } from '$lib/config/geography';
 
 const key = points.key;
 const code = `${points.key}${String(points.year).slice(2)}cd`;
@@ -121,8 +121,10 @@ class Centroids {
 
     let oas = inPoly(this.geojson, bounds);
     oas = inPoly(oas, geo).features.map(oa => oa.properties[boundaries.idKey]);
+    let lsoas = inPoly(this.geojson, bounds);
+    lsoas = inPoly(lsoas, geo).features.map(lsoa => lsoa.properties[lsoaBoundaries.idKey]);
 
-    return { bbox: bounds, oa: new Set(oas) };
+    return { bbox: bounds, oa: new Set(oas), lsoa: new Set(lsoas) };
   }
 
   compress(oaAll) {
