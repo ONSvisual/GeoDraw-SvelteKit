@@ -8,12 +8,13 @@
   import ONSHeader from "$lib/layout/ONSHeader.svelte";
   import ONSFooter from "$lib/layout/ONSFooter.svelte";
   import Title from "$lib/layout/Title.svelte";
+  import { points, lsoaPoints } from '$lib/config/geography';
 
   let loaded = false;
 
   onMount(async () => {
     // calculate the centroids and simplifications.
-    var centroidDummy = await GetCentroids();
+    var centroidDummy = await GetCentroids([points,lsoaPoints]);
     centroids.set(centroidDummy);
     loaded = true;
   });

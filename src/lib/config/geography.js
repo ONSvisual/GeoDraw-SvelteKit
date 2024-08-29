@@ -8,7 +8,32 @@ export const points = {
   key: "oa",
   url: `${base}/data/oa21-lookup.json`,
   parents: ["lsoa", "msoa", "ltla", "rgn"],
-  year: 2021
+  year: 2021,
+  decompressFunc: (columnData, rowNumber) => ({
+        oa21cd: columnData[0][rowNumber],
+        lsoa21cd: columnData[1][rowNumber],
+        msoa21cd: columnData[2][rowNumber],
+        ltla21cd: columnData[3][rowNumber],
+        rgn21cd: columnData[4][rowNumber],
+        lng: columnData[5][rowNumber],
+        lat: columnData[6][rowNumber],
+        population: columnData[7][rowNumber]
+      })
+};
+export const lsoaPoints = {
+  key: "lsoa",
+  url: `${base}/data/lsoa21-lookup.json`,
+  parents: ["msoa", "ltla", "rgn"],
+  year: 2021,
+  decompressFunc: (columnData, rowNumber) => ({
+    lsoa21cd: columnData[0][rowNumber],
+    msoa21cd: columnData[1][rowNumber],
+    ltla21cd: columnData[2][rowNumber],
+    rgn21cd: columnData[3][rowNumber],
+    lng: columnData[4][rowNumber],
+    lat: columnData[5][rowNumber],
+    population: columnData[6][rowNumber]
+  })
 };
 export const boundaries = {
   key: "oa",

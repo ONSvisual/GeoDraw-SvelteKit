@@ -6,98 +6,84 @@ import area from '@turf/area';
 import { decompressData } from "compress-csv-to-json";
 import { dissolve } from '$lib/util/bundled/mapshaper';
 import { roundAll } from '$lib/util/functions';
-import { points, boundaries, lsoaBoundaries } from '$lib/config/geography';
-
-const key = points.key;
-const code = `${points.key}${String(points.year).slice(2)}cd`;
-const parents = points.parents.map(key => ({
-  key,
-  code: `${key}${String(points.year).slice(2)}cd`
-}));
-
-// Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
-function filterGeo(geojson, areaSqm) {
-  const filterByArea = (coords) => area({ type: "Polygon", coordinates: [coords] }) > (areaSqm / 1000);
-  if (geojson.geometry.type === "Polygon") {
-    geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => filterByArea(coords));
-  }
-  if (geojson.geometry.type === "MultiPolygon") {
-    geojson.geometry.coordinates.forEach((poly, i) => {
-      geojson.geometry.coordinates[i] = poly.filter(coords => filterByArea(coords));
-    });
-    geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => coords[0]);
-  }
-}
-
+import { boundaries, lsoaBoundaries } from '$lib/config/geography';
 
 class Centroids {
+  constructor(sourceConfigs){
+    this.sourceConfigs = sourceConfigs;
+    this.data = {}; // Store fetched data for each source (key: sourceName, value: data)
+  } 
+
   async initialize() {
-    let res = await fetch(points.url);
-    let arr = decompressData(await res.json(), (columnData, rowNumber) => ({
-      oa21cd: columnData[0][rowNumber],
-      lsoa21cd: columnData[1][rowNumber],
-      msoa21cd: columnData[2][rowNumber],
-      ltla21cd: columnData[3][rowNumber],
-      rgn21cd: columnData[4][rowNumber],
-      lng: columnData[5][rowNumber],
-      lat: columnData[6][rowNumber],
-      population: columnData[7][rowNumber]
-    }));
+    for (const sourceConfig of this.sourceConfigs) {
+      const sourceName = sourceConfig.key;
+      this.data[sourceName] = await this._fetchDataForSource(sourceConfig);
+      // Process data for this source
+      this._processDataForSource(sourceConfig, this.data[sourceName], sourceName);
+    }
 
-    let gjson = { type: 'FeatureCollection', features: [] };
-    let lkp = {};
-    let parentCt = {};
-    let childLookup = { "E92000001": [] };
-    parents.forEach(p => parentCt[p.key] = {});
+    // Set common properties based on sourceConfigs
+    this.key = this.sourceConfigs[0].key; // Assume first source is primary
+    // ... other common properties
+  }
 
-    arr.forEach(d => {
-      lkp[d[code]] = d;
-      gjson.features.push({
+  async _fetchDataForSource(sourceConfig) {
+    const res = await fetch(sourceConfig.url);
+    return await res.json();
+  }
+
+  _processDataForSource(sourceConfig, data, sourceName) {
+    // ... data processing logic
+    const arr = decompressData(data, sourceConfig.decompressFunc)
+    const key = sourceConfig.key
+    const code = `${key}${String(sourceConfig.year).slice(2)}cd`;
+
+    this.data[sourceName].geojson = { type: 'FeatureCollection', features: [] };
+    this.data[sourceName].lookup = {}
+    this.data[sourceName].childLookup = { "E92000001": [] }
+    
+    this.data[sourceName].parents = sourceConfig.parents.map(key=>({key,code}))
+    let parentCt={};
+    this.data[sourceName].parents.forEach(p => parentCt[p.key] = {});
+
+    arr.forEach(d=>{
+      this.data[sourceName].lookup[d[code]]=d;
+      this.data[sourceName].geojson.features.push({
         type: 'Feature',
         properties: { areacd: d[code] },
         geometry: { type: 'Point', coordinates: [d.lng, d.lat] },
-      });
+      })
+      
+      this.data[sourceName].parents.forEach(p=>{
 
-      parents.forEach(p => {
         if (!parentCt[p.key][d[p.code]]) {
           parentCt[p.key][d[p.code]] = 1;
-          childLookup[d[p.code]] = [d[code]];
+          this.data[sourceName].childLookup[d[p.code]] = [d[code]];
         } else {
           parentCt[p.key][d[p.code]] += 1;
-          childLookup[d[p.code]].push(d[code]);
+          this.data[sourceName].childLookup[d[p.code]].push(d[code]);
         }
-      });
-      if (d[code][0] === "E") childLookup["E92000001"].push(d[code]);
-    });
+      })
+      if (d[code][0] === "E") this.data[sourceName].childLookup["E92000001"].push(d[code]);
+    })
 
-    this.sizes = arr.map(d => d.r);
-    this.geojson = gjson;
-    this.lookup = lkp;
-    this.childLookup = childLookup;
-    parents.forEach(p => this[`${p.key}_count`] = parentCt[p.key]);
+    this.data[sourceName].parents.forEach(p => this.data[sourceName][`${p.key}_count`] = parentCt[p.key]);
   }
 
-  parent(oa) {
-    // Return immediate parents for OAs
-    if (typeof oa === 'string') {
-      return this.lookup[oa][parents[0].code];
-    } else {
-      return oa.map(cd => this.lookup[cd][parents[0].code]);
-    }
-  }
+  // ... other methods like contains, parent, expand, bounds (implementation adjusted to handle multiple sources)
 
-  expand(codes) {
+  expand(codes,geo) {
     return Array.isArray(codes) ?
-      codes.map(c => this.childLookup[c] ? this.childLookup[c] : c).flat() :
-      this.childLookup[codes] ? this.childLookup[codes] : [];
+      codes.map(c => this.data[geo].childLookup[c] ? this.data[geo].childLookup[c] : c).flat() :
+      this.data[geo].childLookup[codes] ? this.data[geo].childLookup[codes] : [];
   }
 
-  bounds(oas) {
+  bounds(oas,geo) {
     // get a boundary for a list of OA codes
     let points = {
       type: 'GeometryCollection',
       geometries: oas.map(oa => {
-        let d = this.lookup[oa];
+        let d = this.data[geo].lookup[oa];
         return {
           type: 'Point',
           coordinates: [d.lng, d.lat]
@@ -110,18 +96,18 @@ class Centroids {
     return bounds;
   }
 
-  exists(oa) {
-    return this.lookup[oa] ? true : false;
-  }
+  // exists(oa) {
+  //   return this.lookup[oa] ? true : false;
+  // }
 
   contains(geo) {
     // Returns OA codes within the coordinates of a Polygon/MultiPolygon
     let bounds = bbox(geo);
     bounds = bboxPoly(bounds);
 
-    let oas = inPoly(this.geojson, bounds);
+    let oas = inPoly(this.data['oa'].geojson, bounds);
     oas = inPoly(oas, geo).features.map(oa => oa.properties[boundaries.idKey]);
-    let lsoas = inPoly(this.geojson, bounds);
+    let lsoas = inPoly(this.data['lsoa'].geojson, bounds);
     lsoas = inPoly(lsoas, geo).features.map(lsoa => lsoa.properties[lsoaBoundaries.idKey]);
 
     return { bbox: bounds, oa: new Set(oas), lsoa: new Set(lsoas) };
@@ -130,9 +116,9 @@ class Centroids {
   compress(oaAll) {
     let all = {};
     let compressed = [];
-    all[key] = oaAll;
-    parents.forEach(p => {
-      all[p.key] = oaAll.map(oa => this.lookup[oa][p.code]);
+    all[this.key] = oaAll;
+    this.data['oa'].parents.forEach(p => {
+      all[p.key] = oaAll.map(oa => this.data['oa'].lookup[oa][p.code]);
     });
     const keys = Object.keys(all).reverse();
     for (let i = 0; i < oaAll.length; i++) {
@@ -143,7 +129,7 @@ class Centroids {
             compressed.push(all[thiskey][i]);
           } else if (
             all[thiskey].filter(cd => all[thiskey][i] === cd).length ===
-            this[`${thiskey}_count`][all[thiskey][i]]
+            this.data['oa'][`${thiskey}_count`][all[thiskey][i]]
           ) {
             compressed.push(all[thiskey][i]);
             break;
@@ -230,8 +216,84 @@ class Centroids {
 }
 
 // asynchronous factory function
-export async function GetCentroids(kwargs) {
-  const c = new Centroids();
-  await c.initialize(kwargs);
+export async function GetCentroids(sourceConfigs) {
+  const c = new Centroids(sourceConfigs);
+  await c.initialize();
   return c;
 }
+
+// async initialize() {
+  //   let res = await fetch(points.url);
+  //   let arr = decompressData(await res.json(), (columnData, rowNumber) => ({
+  //     oa21cd: columnData[0][rowNumber],
+  //     lsoa21cd: columnData[1][rowNumber],
+  //     msoa21cd: columnData[2][rowNumber],
+  //     ltla21cd: columnData[3][rowNumber],
+  //     rgn21cd: columnData[4][rowNumber],
+  //     lng: columnData[5][rowNumber],
+  //     lat: columnData[6][rowNumber],
+  //     population: columnData[7][rowNumber]
+  //   }));
+
+  //   let gjson = { type: 'FeatureCollection', features: [] };
+  //   let lkp = {};
+  //   let parentCt = {};
+  //   let childLookup = { "E92000001": [] };
+  //   parents.forEach(p => parentCt[p.key] = {});
+
+  //   arr.forEach(d => {
+  //     lkp[d[code]] = d;
+  //     gjson.features.push({
+  //       type: 'Feature',
+  //       properties: { areacd: d[code] },
+  //       geometry: { type: 'Point', coordinates: [d.lng, d.lat] },
+  //     });
+
+  //     parents.forEach(p => {
+  //       if (!parentCt[p.key][d[p.code]]) {
+  //         parentCt[p.key][d[p.code]] = 1;
+  //         childLookup[d[p.code]] = [d[code]];
+  //       } else {
+  //         parentCt[p.key][d[p.code]] += 1;
+  //         childLookup[d[p.code]].push(d[code]);
+  //       }
+  //     });
+  //     if (d[code][0] === "E") childLookup["E92000001"].push(d[code]);
+  //   });
+
+  //   this.sizes = arr.map(d => d.r);
+  //   this.geojson = gjson;
+  //   this.lookup = lkp;
+  //   this.childLookup = childLookup;
+  //   parents.forEach(p => this[`${p.key}_count`] = parentCt[p.key]);
+  // }
+
+  // parent(oa) {
+  //   // Return immediate parents for OAs
+  //   if (typeof oa === 'string') {
+  //     return this.lookup[oa][parents[0].code];
+  //   } else {
+  //     return oa.map(cd => this.lookup[cd][parents[0].code]);
+  //   }
+  // }
+
+  // const key = points.key;
+// const code = `${points.key}${String(points.year).slice(2)}cd`;
+// const parents = points.parents.map(key => ({
+//   key,
+//   code: `${key}${String(points.year).slice(2)}cd`
+// }));
+
+// Take a geojson feature (Polygon or MultiPolygon) and remove polygon rings smaller than a given area
+// function filterGeo(geojson, areaSqm) {
+//   const filterByArea = (coords) => area({ type: "Polygon", coordinates: [coords] }) > (areaSqm / 1000);
+//   if (geojson.geometry.type === "Polygon") {
+//     geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => filterByArea(coords));
+//   }
+//   if (geojson.geometry.type === "MultiPolygon") {
+//     geojson.geometry.coordinates.forEach((poly, i) => {
+//       geojson.geometry.coordinates[i] = poly.filter(coords => filterByArea(coords));
+//     });
+//     geojson.geometry.coordinates = geojson.geometry.coordinates.filter(coords => coords[0]);
+//   }
+// }

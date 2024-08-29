@@ -320,27 +320,27 @@ export async function update(geo) {
 
 }
 
-function drawPoint(e) {
-  // update using select tool
-  let feature = e.features[0];
-  if (feature) {
-    let code = feature.properties[boundaries.idKey];
-    let parentcd = feature.properties[boundaries.ptKey];
-    let current = get(selected);
-    let oas = current[current.length - 1].oa;
-    if (oas.has(code) && parentcd) {
-      oas = difference(oas, new Set(get(centroids).expand([parentcd])));
-    } else if (oas.has(code)) {
-      oas = difference(oas, new Set([code]));
-    } else if (parentcd) {
-      oas = union(oas, new Set(get(centroids).expand([parentcd])));
-    } else {
-      oas = new Set([...oas, code]);
-    }
-    current.push({ oa: oas, boundary:'geometry' });
-    updateLocal(current);
-  }
-}
+// function drawPoint(e) {
+//   // update using select tool
+//   let feature = e.features[0];
+//   if (feature) {
+//     let code = feature.properties[boundaries.idKey];
+//     let parentcd = feature.properties[boundaries.ptKey];
+//     let current = get(selected);
+//     let oas = current[current.length - 1].oa;
+//     if (oas.has(code) && parentcd) {
+//       oas = difference(oas, new Set(get(centroids).expand([parentcd])));
+//     } else if (oas.has(code)) {
+//       oas = difference(oas, new Set([code]));
+//     } else if (parentcd) {
+//       oas = union(oas, new Set(get(centroids).expand([parentcd])));
+//     } else {
+//       oas = new Set([...oas, code]);
+//     }
+//     current.push({ oa: oas, boundary:'geometry' });
+//     updateLocal(current);
+//   }
+// }
 
 function updateLocal(current) {
   // limit our undo list to 20
