@@ -211,7 +211,7 @@ class Centroids {
   }
 
   population(oa) {
-    return this.lookup[oa].population;
+    return this.data['oa'].lookup[oa].population;
   }
 }
 

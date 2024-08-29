@@ -306,11 +306,13 @@ export async function update(geo) {
   
   if (get(addMode)) {
     current.push({
+      lsoa: union(last.lsoa, new Set(features.lsoa)),
       oa: union(last.oa, new Set(features.oa)),
       geo:await(get(user_geometry))
     });
   } else {
     current.push({
+      lsoa: difference(last.lsoa, new Set(features.lsoa)),
       oa: difference(last.oa, new Set(features.oa)),
       geo:await(get(user_geometry))
     });
