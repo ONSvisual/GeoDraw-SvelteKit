@@ -11,7 +11,7 @@ import { boundaries, lsoaBoundaries } from '$lib/config/geography';
 class Centroids {
   constructor(sourceConfigs){
     this.sourceConfigs = sourceConfigs;
-    this.data = {}; // Store fetched data for each source (key: sourceName, value: data)
+    this.data = {}; // Store fetched data for each source
   } 
 
   async initialize() {
@@ -28,8 +28,17 @@ class Centroids {
   }
 
   async _fetchDataForSource(sourceConfig) {
-    const res = await fetch(sourceConfig.url);
-    return await res.json();
+    try{
+      const res = await fetch(sourceConfig.url);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data from ${sourceConfig.url}: ${res.statusText}`);
+      }
+      return await res.json();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error; // Re-throw the error to handle it at a higher level
+    }
+    
   }
 
   _processDataForSource(sourceConfig, data, sourceName) {
