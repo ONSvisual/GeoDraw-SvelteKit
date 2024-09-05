@@ -22,7 +22,7 @@
     centroids,
     user_geometry
   } from "$lib/stores/mapstore";
-  import { boundaries, cdnbase } from "$lib/config/geography";
+  import { cdnbase } from "$lib/config/geography";
   import { analyticsEvent } from "$lib/layout/AnalyticsBanner.svelte";
 
   const modes = [

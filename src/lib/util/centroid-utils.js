@@ -1,11 +1,11 @@
 import bbox from '@turf/bbox';
 import bboxPoly from '@turf/bbox-polygon';
 import inPoly from '@turf/points-within-polygon';
-import buffer from '@turf/buffer';
-import area from '@turf/area';
+// import buffer from '@turf/buffer';
+// import area from '@turf/area';
 import { decompressData } from "compress-csv-to-json";
-import { dissolve } from '$lib/util/bundled/mapshaper';
-import { roundAll } from '$lib/util/functions';
+// import { dissolve } from '$lib/util/bundled/mapshaper';
+// import { roundAll } from '$lib/util/functions';
 import { boundaries, lsoaBoundaries } from '$lib/config/geography';
 
 class Centroids {
@@ -45,13 +45,17 @@ class Centroids {
     // ... data processing logic
     const arr = decompressData(data, sourceConfig.decompressFunc)
     const key = sourceConfig.key
-    const code = `${key}${String(sourceConfig.year).slice(2)}cd`;
+    this.data[sourceName].year = String(sourceConfig.year).slice(2)
+    const code = `${key}${this.data[sourceName].year}cd`;
 
     this.data[sourceName].geojson = { type: 'FeatureCollection', features: [] };
     this.data[sourceName].lookup = {}
     this.data[sourceName].childLookup = { "E92000001": [] }
     
-    this.data[sourceName].parents = sourceConfig.parents.map(key=>({key,code}))
+    this.data[sourceName].parents = sourceConfig.parents.map(key => {
+      const code = `${key}${this.data[sourceName].year}cd`;
+      return { key, code };
+    });
     let parentCt={};
     this.data[sourceName].parents.forEach(p => parentCt[p.key] = {});
 
@@ -64,7 +68,6 @@ class Centroids {
       })
       
       this.data[sourceName].parents.forEach(p=>{
-
         if (!parentCt[p.key][d[p.code]]) {
           parentCt[p.key][d[p.code]] = 1;
           this.data[sourceName].childLookup[d[p.code]] = [d[code]];
@@ -75,11 +78,8 @@ class Centroids {
       })
       if (d[code][0] === "E") this.data[sourceName].childLookup["E92000001"].push(d[code]);
     })
-
     this.data[sourceName].parents.forEach(p => this.data[sourceName][`${p.key}_count`] = parentCt[p.key]);
   }
-
-  // ... other methods like contains, parent, expand, bounds (implementation adjusted to handle multiple sources)
 
   expand(codes,geo) {
     return Array.isArray(codes) ?
@@ -131,7 +131,7 @@ class Centroids {
     });
     const keys = Object.keys(all).reverse();
     for (let i = 0; i < oaAll.length; i++) {
-      if (parents.every(p => !compressed.includes(all[p.key][i]))) {
+      if (this.data['oa'].parents.every(p => !compressed.includes(all[p.key][i]))) {
         for (let j = 0; j < keys.length; j++) {
           let thiskey = keys[j];
           if (j === keys.length - 1) {
@@ -154,16 +154,19 @@ class Centroids {
     selected,
     mapObject
   ) {
-    const oaAll = Array.from(selected[key]);
+    const oaAll = Array.from(selected[this.key]);
 
     // compress the codes
     const compressed = this.compress(oaAll);
-    const bbox = this.bounds(oaAll);
+    // Filter compressed to strip out OAs
+    const compressedToLsoa = compressed.filter(code => !code.startsWith('E00') && !code.startsWith('W00'));
+    const bbox = this.bounds(oaAll,'oa');
     var merge = {};
     merge.properties = {
       name,
       // bbox,
       compressed,
+      compressedToLsoa,
       oaAll,
       original: oaAll.length,
     };

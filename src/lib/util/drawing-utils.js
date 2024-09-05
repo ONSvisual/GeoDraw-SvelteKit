@@ -408,6 +408,7 @@ export function geoBlob(q) {
     bbox: bbox(geojson),
     codes: q.properties.oa_all,
     codes_compressed: q.properties.compressed,
+    codes_compressed_to_lsoa:q.properties.compressedToLsoa// add compressed to LSOA and above
   };
   return new Blob([JSON.stringify(geojson)], {
     type: 'application/json',
