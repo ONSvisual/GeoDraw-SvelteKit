@@ -300,7 +300,7 @@ export async function update(geo) {
 
   const features = await get(centroids).contains(geo);
 
-  console.log(features)
+  console.log(get(selected))
   var current = get(selected);
   var last = current[current.length - 1];
   

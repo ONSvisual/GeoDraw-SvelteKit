@@ -80,7 +80,6 @@
     // console.clear();
 
     function recolour(selected) {
-      console.log('recolour')
       const items = selected[selected.length - 1];
 
       pselect = items.oa.size
@@ -89,8 +88,6 @@
             .reduce((a, b) => a + b)
         : 0;
 
-      // if (!items.oa.size) return;
-      // console.debug('---recolour', items);
       if ($mapObject.getLayer("bounds"))
         $mapObject.setPaintProperty("bounds", "fill-color", [
           "match",
@@ -100,10 +97,10 @@
           "transparent",
         ]);
 
-      // if(items.geo){changeData('userGeo',items.geo)};
-      if($mapObject.getLayer("userGeo")){changeData('userGeo',items.geo)};
-      // this looks like a problem sometimes if the layer isn't there :\
 
+      if($mapObject.getLayer("userGeo")){changeData('userGeo',items.geo)};
+
+        
       if (selected.length > 1 && state.name) state.name = "";
     }
 
@@ -111,7 +108,7 @@
       newselect = function () {
         clearGeo();
         localStorage.clear();
-        selected.set([{ oa: new Set(), geo: blank_geo }]);
+        selected.set([{ oa: new Set(), lsoa: new Set(), geo: blank_geo }]);
         user_geometry.set(blank_geo)
       };
 
@@ -126,6 +123,7 @@
           newselect();
           selected.set([{
             oa: new Set(), 
+            lsoa: new Set(),
             geo:blank_geo
           }]);
           user_geometry.set(blank_geo)
@@ -135,6 +133,7 @@
             ...$selected,
             {
               oa: new Set($centroids.expand(data.properties.c21cds)),
+              lsoa: new Set($centroids.expand(data.properties.c21cds.filter(code => !code.startsWith('e00') && !code.startsWith('w00')))),
               geo:data.geometry
             },
           ];
@@ -169,7 +168,7 @@
         }
         
 
-        var bbox = $centroids.bounds([...q.properties.oaAll]);
+        var bbox = $centroids.bounds([...q.properties.oaAll],'oa');
 
         $mapObject.fitBounds(bbox, {
           padding: 40,
@@ -178,6 +177,7 @@
 
         $selected = [{
             oa: new Set(q.properties.oaAll),
+            lsoa: new Set($centroids.expand(q.properties.compressedToLsoa,'lsoa')),
             geo:q.geojson
           }];
        
@@ -197,9 +197,10 @@
           linear: true,
         });
 
-        q.oa = new Set(q.oa);
+        
         selected.set([{
-          oa:q.oa,
+          oa:new Set(q.oa),
+          lsoa:new Set(q.lsoa),
           geo:q.geo
         }]);
 
@@ -246,6 +247,7 @@
             $selected,
             {
               oa: new Set(oa),
+              lsoa: new Set($centroids.compress(oa,'lsoa')),
               geo:b
             },
           ];
@@ -554,7 +556,7 @@ The save data and continue function
           class="btn-link"
           on:click={() => {
             let q = $selected[$selected.length - 1];
-            let bbox = $centroids.bounds([...q.oa]);
+            let bbox = $centroids.bounds([...q.oa],'oa');
             $mapObject.fitBounds(bbox, { padding: 40 });
           }}>click here</button
         > to return to the area you have drawn.

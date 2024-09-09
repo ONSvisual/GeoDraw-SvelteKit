@@ -122,23 +122,25 @@ class Centroids {
     return { bbox: bounds, oa: new Set(oas), lsoa: new Set(lsoas) };
   }
 
-  compress(oaAll) {
+  compress(codes,geo) {
     let all = {};
     let compressed = [];
-    all[this.key] = oaAll;
-    this.data['oa'].parents.forEach(p => {
-      all[p.key] = oaAll.map(oa => this.data['oa'].lookup[oa][p.code]);
+    all[geo] = codes;
+
+    this.data[geo].parents.forEach(p => {
+      all[p.key] = codes.map(area => this.data[geo].lookup[area][p.code]);
     });
+
     const keys = Object.keys(all).reverse();
-    for (let i = 0; i < oaAll.length; i++) {
-      if (this.data['oa'].parents.every(p => !compressed.includes(all[p.key][i]))) {
+    for (let i = 0; i < codes.length; i++) {
+      if (this.data[geo].parents.every(p => !compressed.includes(all[p.key][i]))) {
         for (let j = 0; j < keys.length; j++) {
           let thiskey = keys[j];
           if (j === keys.length - 1) {
             compressed.push(all[thiskey][i]);
           } else if (
             all[thiskey].filter(cd => all[thiskey][i] === cd).length ===
-            this.data['oa'][`${thiskey}_count`][all[thiskey][i]]
+            this.data[geo][`${thiskey}_count`][all[thiskey][i]]
           ) {
             compressed.push(all[thiskey][i]);
             break;
@@ -146,6 +148,7 @@ class Centroids {
         }
       }
     }
+
     return compressed;
   }
 
@@ -154,12 +157,13 @@ class Centroids {
     selected,
     mapObject
   ) {
-    const oaAll = Array.from(selected[this.key]);
-
+    console.log(selected)
+    const oaAll = Array.from(selected['oa']);
+    const lsoaAll = Array.from(selected['lsoa']);
     // compress the codes
-    const compressed = this.compress(oaAll);
+    const compressed = this.compress(oaAll,'oa');
     // Filter compressed to strip out OAs
-    const compressedToLsoa = compressed.filter(code => !code.startsWith('E00') && !code.startsWith('W00'));
+    const compressedToLsoa = this.compress(lsoaAll,'lsoa');
     const bbox = this.bounds(oaAll,'oa');
     var merge = {};
     merge.properties = {
