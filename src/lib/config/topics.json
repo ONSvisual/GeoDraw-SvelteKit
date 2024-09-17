@@ -1143,5 +1143,64 @@
         "cells": [2]
       }
     ]
+  },
+  {
+    "code":"energy_efficiency_of_housing",
+    "label": "Energy efficiency of housing",
+    "desc":"The number of Energy Performance Certificates (EPCs) in each energy efficiency rating band up to the financial year ending 2023.",
+    "url":"peoplepopulationandcommunity/housing/methodologies/energyefficiencyofhousinginenglandandwalesqmi",
+    "tableCode":"NM_2401_1",
+    "cellCode":"ENERGY_EFFICIENCY_8",
+    "measures":20301,
+    "unit":"%",
+    "base":"dwellings",
+    "categories":[
+      {
+        "label":"Band A",
+        "cells":[1]
+      },
+      {
+        "label":"Band B",
+        "cells":[2]
+      },
+      {
+        "label":"Band C",
+        "cells":[3]
+      },
+      {
+        "label":"Band D",
+        "cells":[4]
+      },
+      {
+        "label":"Band E",
+        "cells":[5]
+      },
+      {
+        "label":"Band F",
+        "cells":[6]
+      },
+      {
+        "label":"Band G",
+        "cells":[7]
+      }
+    ]
+  },
+  {
+    "code":"residential_property_sales",
+    "label": "Residential property sales",
+    "desc":"Number of residential property sales in England and Wales.",
+    "url":"peoplepopulationandcommunity/housing/methodologies/housepricestatisticsforsmallareasqmi",
+    "tableCode":"NM_2402_1",
+    "cellCode":"SALES",
+    "chart": "number",
+    "measures":20100,
+    "unit":"sales",
+    "base":"all dwellings",
+    "categories":[
+      {
+        "label":"Residential property sales",
+        "cells":[0]
+      }
+    ]
   }
 ]
