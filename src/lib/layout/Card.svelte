@@ -6,6 +6,7 @@
   export let title = null;
   export let links = null;
   export let blank = false;
+  export let source 
 
   const { cols } = getContext("tiles");
 </script>
@@ -28,6 +29,12 @@
     </header>
   {/if}
   <slot />
+  {#if source}
+  <span class="footnote"
+  >Source: {@html source}</span
+>
+  {/if}
+
   {#if links && links[0]}
     <div class="margin-top--2">
       {#each links as link}
@@ -59,5 +66,11 @@
     margin: 4px 0 0 !important;
     display: block;
     page-break-inside: avoid;
+  }
+  .footnote{
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    color:#323132;
   }
 </style>
