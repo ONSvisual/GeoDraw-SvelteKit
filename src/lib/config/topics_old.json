@@ -12,13 +12,9 @@
     "categories": [
       {
         "label": "Population",
-        "cells": [
-          0
-        ]
+        "cells": [0]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "households",
@@ -33,13 +29,9 @@
     "categories": [
       {
         "label": "Total households",
-        "cells": [
-          0
-        ]
+        "cells": [0]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "resident_age",
@@ -55,115 +47,77 @@
     "categories": [
       {
         "label": "Aged 0 to 4",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Aged 5 to 9",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Aged 10 to 14",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Aged 15 to 19",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Aged 20 to 24",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       },
       {
         "label": "Aged 25 to 29",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       },
       {
         "label": "Aged 30 to 34",
-        "cells": [
-          7
-        ]
+        "cells": [7]
       },
       {
         "label": "Aged 35 to 39",
-        "cells": [
-          8
-        ]
+        "cells": [8]
       },
       {
         "label": "Aged 40 to 44",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       },
       {
         "label": "Aged 45 to 49",
-        "cells": [
-          10
-        ]
+        "cells": [10]
       },
       {
         "label": "Aged 50 to 54",
-        "cells": [
-          11
-        ]
+        "cells": [11]
       },
       {
         "label": "Aged 55 to 59",
-        "cells": [
-          12
-        ]
+        "cells": [12]
       },
       {
         "label": "Aged 60 to 64",
-        "cells": [
-          13
-        ]
+        "cells": [13]
       },
       {
         "label": "Aged 65 to 69",
-        "cells": [
-          14
-        ]
+        "cells": [14]
       },
       {
         "label": "Aged 70 to 74",
-        "cells": [
-          15
-        ]
+        "cells": [15]
       },
       {
         "label": "Aged 75 to 79",
-        "cells": [
-          16
-        ]
+        "cells": [16]
       },
       {
         "label": "Aged 80 to 84",
-        "cells": [
-          17
-        ]
+        "cells": [17]
       },
       {
         "label": "Aged 85 and over",
-        "cells": [
-          18
-        ]
+        "cells": [18]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "sex",
@@ -178,19 +132,13 @@
     "categories": [
       {
         "label": "Female",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Male",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "legal_partnership_status",
@@ -205,37 +153,25 @@
     "categories": [
       {
         "label": "Never married and never registered a civil partnership",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Married or in a registered civil partnership",
-        "cells": [
-          1001
-        ]
+        "cells": [1001]
       },
       {
         "label": "Separated, but still legally married or still legally in a civil partnership",
-        "cells": [
-          1004
-        ]
+        "cells": [1004]
       },
       {
         "label": "Divorced or civil partnership dissolved",
-        "cells": [
-          1005
-        ]
+        "cells": [1005]
       },
       {
         "label": "Widowed or surviving civil partnership partner",
-        "cells": [
-          1006
-        ]
+        "cells": [1006]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "country_of_birth",
@@ -250,25 +186,13 @@
     "categories": [
       {
         "label": "Born in the UK",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Born outside the UK",
-        "cells": [
-          1002,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11
-        ]
+        "cells": [1002, 6, 7, 8, 9, 10, 11]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "passports_all",
@@ -283,31 +207,17 @@
     "categories": [
       {
         "label": "UK passport",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Non-UK passport",
-        "cells": [
-          2,
-          1002,
-          1005,
-          1006,
-          1007,
-          24,
-          25
-        ]
+        "cells": [2, 1002, 1005, 1006, 1007, 24, 25]
       },
       {
         "label": "No passport held",
-        "cells": [
-          26
-        ]
+        "cells": [26]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "residence_length",
@@ -322,37 +232,25 @@
     "categories": [
       {
         "label": "Born in the UK",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "10 years or more",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "5 years or more, but less than 10 years",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "2 years or more, but less than 5 years",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Less than 2 years",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "hh_size",
@@ -367,35 +265,21 @@
     "categories": [
       {
         "label": "1 person in household",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "2 people in household",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "3 people in household",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "4 or more people in household",
-        "cells": [
-          5,
-          6,
-          7,
-          8,
-          9
-        ]
+        "cells": [5, 6, 7, 8, 9]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "hh_family_composition",
@@ -410,25 +294,17 @@
     "categories": [
       {
         "label": "One person household",
-        "cells": [
-          1001
-        ]
+        "cells": [1001]
       },
       {
         "label": "Single family household",
-        "cells": [
-          1002
-        ]
+        "cells": [1002]
       },
       {
         "label": "Other household types",
-        "cells": [
-          1007
-        ]
+        "cells": [1007]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "hh_deprivation",
@@ -443,37 +319,25 @@
     "categories": [
       {
         "label": "Household is not deprived in any dimension",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Household is deprived in one dimension",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Household is deprived in two dimensions",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Household is deprived in three dimensions",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Household is deprived in four dimensions",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "ethnic_group_tb",
@@ -488,37 +352,25 @@
     "categories": [
       {
         "label": "Asian, Asian British or Asian Welsh",
-        "cells": [
-          1001
-        ]
+        "cells": [1001]
       },
       {
         "label": "Black, Black British, Black Welsh, Caribbean or African",
-        "cells": [
-          1002
-        ]
+        "cells": [1002]
       },
       {
         "label": "Mixed or Multiple ethnic groups",
-        "cells": [
-          1003
-        ]
+        "cells": [1003]
       },
       {
         "label": "White",
-        "cells": [
-          1004
-        ]
+        "cells": [1004]
       },
       {
         "label": "Other ethnic group",
-        "cells": [
-          1005
-        ]
+        "cells": [1005]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "national_identity_all",
@@ -533,30 +385,17 @@
     "categories": [
       {
         "label": "One or more UK identity only",
-        "cells": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          9995
-        ]
+        "cells": [1, 2, 3, 4, 5, 9995]
       },
       {
         "label": "UK identity and non-UK identity",
-        "cells": [
-          9997
-        ]
+        "cells": [9997]
       },
       {
         "label": "Non-UK identity only",
-        "cells": [
-          9996
-        ]
+        "cells": [9996]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "religion_tb",
@@ -573,61 +412,41 @@
     "categories": [
       {
         "label": "No religion",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Christian",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Buddhist",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Hindu",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Jewish",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       },
       {
         "label": "Muslim",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       },
       {
         "label": "Sikh",
-        "cells": [
-          7
-        ]
+        "cells": [7]
       },
       {
         "label": "Other religion",
-        "cells": [
-          8
-        ]
+        "cells": [8]
       },
       {
         "label": "Not answered",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "health_in_general",
@@ -644,37 +463,25 @@
     "categories": [
       {
         "label": "Very good health",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Good health",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Fair health",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Bad health",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Very bad health",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "disability",
@@ -691,19 +498,13 @@
     "categories": [
       {
         "label": "Disabled under the Equality Act",
-        "cells": [
-          1001
-        ]
+        "cells": [1001]
       },
       {
         "label": "Not disabled under the Equality Act",
-        "cells": [
-          1002
-        ]
+        "cells": [1002]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "is_carer",
@@ -720,31 +521,21 @@
     "categories": [
       {
         "label": "Provides no unpaid care",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Provides 19 hours or less unpaid care a week",
-        "cells": [
-          101
-        ]
+        "cells": [101]
       },
       {
         "label": "Provides 20 to 49 hours unpaid care a week",
-        "cells": [
-          102
-        ]
+        "cells": [102]
       },
       {
         "label": "Provides 50 or more hours unpaid care a week",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "english_proficiency",
@@ -759,37 +550,25 @@
     "categories": [
       {
         "label": "Main language is English (English or Welsh in Wales)",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Can speak English very well",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Can speak English well",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Cannot speak English well",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Cannot speak English",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "welsh_skills_all",
@@ -801,37 +580,21 @@
     "measures": 20301,
     "unit": "%",
     "base": "people aged three years and over",
-    "coverage": [
-      "W"
-    ],
+    "coverage": ["W"],
     "categories": [
       {
         "label": "Can understand spoken Welsh only",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Can speak, read or write Welsh",
-        "cells": [
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8
-        ]
+        "cells": [2, 3, 4, 5, 6, 7, 8]
       },
       {
         "label": "No skills in Welsh",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "welsh_skills_speak",
@@ -843,25 +606,17 @@
     "measures": 20301,
     "unit": "%",
     "base": "people aged three years and over",
-    "coverage": [
-      "W"
-    ],
+    "coverage": ["W"],
     "categories": [
       {
         "label": "Cannot speak Welsh",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Can speak Welsh",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "accommodation_type",
@@ -876,30 +631,17 @@
     "categories": [
       {
         "label": "Whole house or bungalow",
-        "cells": [
-          1,
-          2,
-          3
-        ]
+        "cells": [1, 2, 3]
       },
       {
         "label": "Flat, maisonette or apartment",
-        "cells": [
-          4,
-          5,
-          6,
-          7
-        ]
+        "cells": [4, 5, 6, 7]
       },
       {
         "label": "A caravan or other mobile or temporary structure",
-        "cells": [
-          8
-        ]
+        "cells": [8]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "number_of_cars",
@@ -914,31 +656,21 @@
     "categories": [
       {
         "label": "No cars or vans in household",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "1 car or van in household",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "2 cars or vans in household",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "3 or more cars or vans in household",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "heating_type",
@@ -953,29 +685,13 @@
     "categories": [
       {
         "label": "Does not have central heating",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Does have central heating",
-        "cells": [
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12
-        ]
+        "cells": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "number_bedrooms",
@@ -990,31 +706,21 @@
     "categories": [
       {
         "label": "1 bedroom",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "2 bedrooms",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "3 bedrooms",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "4 or more bedrooms",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "occupancy_rating_bedrooms",
@@ -1029,37 +735,25 @@
     "categories": [
       {
         "label": "+2 or more",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "+1",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "0",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "-1",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "-2 or less",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "hh_tenure",
@@ -1074,35 +768,21 @@
     "categories": [
       {
         "label": "Owns outright",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Owns with a mortgage or loan or shared ownership",
-        "cells": [
-          2,
-          3
-        ]
+        "cells": [2, 3]
       },
       {
         "label": "Social rented",
-        "cells": [
-          4,
-          5
-        ]
+        "cells": [4, 5]
       },
       {
         "label": "Private rented or lives rent free",
-        "cells": [
-          6,
-          7,
-          8
-        ]
+        "cells": [6, 7, 8]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "alternative_address_indicator",
@@ -1117,25 +797,17 @@
     "categories": [
       {
         "label": "No second address",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Second address is in the UK",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Second address is outside the UK",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "workplace_travel",
@@ -1152,42 +824,25 @@
     "categories": [
       {
         "label": "Less than 10km",
-        "cells": [
-          1,
-          2,
-          3
-        ]
+        "cells": [1, 2, 3]
       },
       {
         "label": "10km to less than 30km",
-        "cells": [
-          4,
-          5
-        ]
+        "cells": [4, 5]
       },
       {
         "label": "30km and over",
-        "cells": [
-          6,
-          7,
-          8
-        ]
+        "cells": [6, 7, 8]
       },
       {
         "label": "Works mainly from home",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       },
       {
         "label": "Other",
-        "cells": [
-          10
-        ]
+        "cells": [10]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "transport_to_workplace",
@@ -1204,73 +859,49 @@
     "categories": [
       {
         "label": "Work mainly at or from home",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Underground, metro, light rail, tram",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Train",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Bus, minibus or coach",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Taxi",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       },
       {
         "label": "Motorcycle, scooter or moped",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       },
       {
         "label": "Driving a car or van",
-        "cells": [
-          7
-        ]
+        "cells": [7]
       },
       {
         "label": "Passenger in a car or van",
-        "cells": [
-          8
-        ]
+        "cells": [8]
       },
       {
         "label": "Bicycle",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       },
       {
         "label": "On foot",
-        "cells": [
-          10
-        ]
+        "cells": [10]
       },
       {
         "label": "Other method of travel to work",
-        "cells": [
-          11
-        ]
+        "cells": [11]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "economic_activity",
@@ -1287,27 +918,17 @@
     "categories": [
       {
         "label": "Economically active: In employment",
-        "cells": [
-          1002,
-          1007
-        ]
+        "cells": [1002, 1007]
       },
       {
         "label": "Economically active: Unemployed",
-        "cells": [
-          7,
-          14
-        ]
+        "cells": [7, 14]
       },
       {
         "label": "Economically inactive",
-        "cells": [
-          1011
-        ]
+        "cells": [1011]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "has_ever_worked",
@@ -1324,25 +945,17 @@
     "categories": [
       {
         "label": "Not in employment: Worked in the last 12 months",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Not in employment: Not worked in the last 12 months",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Not in employment: Never worked",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "occupation_current",
@@ -1359,61 +972,41 @@
     "categories": [
       {
         "label": "1. Managers, directors and senior officials",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "2. Professional occupations",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "3. Associate professional and technical occupations",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "4. Administrative and secretarial occupations",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "5. Skilled trades occupations",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       },
       {
         "label": "6. Caring, leisure and other service occupations",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       },
       {
         "label": "7. Sales and customer service occupations",
-        "cells": [
-          7
-        ]
+        "cells": [7]
       },
       {
         "label": "8. Process, plant and machine operatives",
-        "cells": [
-          8
-        ]
+        "cells": [8]
       },
       {
         "label": "9. Elementary occupations",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "ns_sec",
@@ -1430,61 +1023,41 @@
     "categories": [
       {
         "label": "L1, L2 and L3: Higher managerial, administrative and professional occupations",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "L4, L5 and L6: Lower managerial, administrative and professional occupations",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "L7: Intermediate occupations",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "L8 and L9: Small employers and own account workers",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "L10 and L11: Lower supervisory and technical occupations",
-        "cells": [
-          5
-        ]
+        "cells": [5]
       },
       {
         "label": "L12: Semi-routine occupations",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       },
       {
         "label": "L13: Routine occupations",
-        "cells": [
-          7
-        ]
+        "cells": [7]
       },
       {
         "label": "L14.1 and L14.2: Never worked and long-term unemployed",
-        "cells": [
-          8
-        ]
+        "cells": [8]
       },
       {
         "label": "L15: Full-time students",
-        "cells": [
-          9
-        ]
+        "cells": [9]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "hours_per_week_worked",
@@ -1501,31 +1074,21 @@
     "categories": [
       {
         "label": "Part-time: 15 hours or less worked",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Part-time: 16 to 30 hours worked",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       },
       {
         "label": "Full-time: 31 to 48 hours worked",
-        "cells": [
-          3
-        ]
+        "cells": [3]
       },
       {
         "label": "Full-time: 49 or more hours worked",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "highest_qualification",
@@ -1540,39 +1103,25 @@
     "categories": [
       {
         "label": "No qualifications",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Level 1, 2 or 3 qualifications",
-        "cells": [
-          2,
-          3,
-          5
-        ]
+        "cells": [2, 3, 5]
       },
       {
         "label": "Apprenticeship",
-        "cells": [
-          4
-        ]
+        "cells": [4]
       },
       {
         "label": "Level 4 qualifications and above",
-        "cells": [
-          6
-        ]
+        "cells": [6]
       },
       {
         "label": "Other qualifications",
-        "cells": [
-          7
-        ]
+        "cells": [7]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
     "code": "in_full_time_education",
@@ -1587,99 +1136,71 @@
     "categories": [
       {
         "label": "Student",
-        "cells": [
-          1
-        ]
+        "cells": [1]
       },
       {
         "label": "Not a student",
-        "cells": [
-          2
-        ]
+        "cells": [2]
       }
-    ],
-    "lowestGeography": "oa",
-    "source": "Office for National Statistics - Census 2021"
+    ]
   },
   {
-    "code": "energy_efficiency_of_housing",
+    "code":"energy_efficiency_of_housing",
     "label": "Energy efficiency of housing",
-    "desc": "The number of Energy Performance Certificates (EPCs) in each energy efficiency rating band up to the financial year ending 2023.",
-    "url": "peoplepopulationandcommunity/housing/methodologies/energyefficiencyofhousinginenglandandwalesqmi",
-    "tableCode": "NM_2401_1",
-    "cellCode": "ENERGY_EFFICIENCY_8",
-    "measures": 20301,
-    "unit": "%",
-    "base": "dwellings",
-    "categories": [
+    "desc":"The number of Energy Performance Certificates (EPCs) in each energy efficiency rating band up to the financial year ending 2023.",
+    "url":"peoplepopulationandcommunity/housing/methodologies/energyefficiencyofhousinginenglandandwalesqmi",
+    "tableCode":"NM_2401_1",
+    "cellCode":"ENERGY_EFFICIENCY_8",
+    "measures":20301,
+    "unit":"%",
+    "base":"dwellings",
+    "categories":[
       {
-        "label": "Band A",
-        "cells": [
-          1
-        ]
+        "label":"Band A",
+        "cells":[1]
       },
       {
-        "label": "Band B",
-        "cells": [
-          2
-        ]
+        "label":"Band B",
+        "cells":[2]
       },
       {
-        "label": "Band C",
-        "cells": [
-          3
-        ]
+        "label":"Band C",
+        "cells":[3]
       },
       {
-        "label": "Band D",
-        "cells": [
-          4
-        ]
+        "label":"Band D",
+        "cells":[4]
       },
       {
-        "label": "Band E",
-        "cells": [
-          5
-        ]
+        "label":"Band E",
+        "cells":[5]
       },
       {
-        "label": "Band F",
-        "cells": [
-          6
-        ]
+        "label":"Band F",
+        "cells":[6]
       },
       {
-        "label": "Band G",
-        "cells": [
-          7
-        ]
+        "label":"Band G",
+        "cells":[7]
       }
-    ],
-    "lowestGeography": "lsoa",
-    "source": "Energy Performance Certificate data on Open Data Communities from the Ministry of Housing, Communities and Local Government"
+    ]
   },
   {
-    "code": "residential_property_sales",
+    "code":"residential_property_sales",
     "label": "Residential property sales",
-    "desc": "Number of residential property sales in England and Wales.",
-    "url": "peoplepopulationandcommunity/housing/methodologies/housepricestatisticsforsmallareasqmi",
-    "tableCode": "NM_2402_1",
-    "cellCode": "SALES",
+    "desc":"Number of residential property sales in England and Wales.",
+    "url":"peoplepopulationandcommunity/housing/methodologies/housepricestatisticsforsmallareasqmi",
+    "tableCode":"NM_2402_1",
+    "cellCode":"SALES",
     "chart": "number",
-    "measures": 20100,
-    "unit": "sales",
-    "base": "all dwellings",
-    "categories": [
+    "measures":20100,
+    "unit":"sales",
+    "base":"all dwellings",
+    "categories":[
       {
-        "label": "Residential property sales",
-        "cells": [
-          0
-        ]
+        "label":"Residential property sales",
+        "cells":[0]
       }
-    ],
-    "lowestGeography": "lsoa",
-    "source": "HM Land Registry",
-    "doNotRound":true,
-    "timePeriod":"Quarterly rolling annual data"
+    ]
   }
 ]
