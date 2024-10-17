@@ -28,6 +28,7 @@
   let coverage = ["E", "W"];
   let topics = [...topicsAll]; // Topics might be filtered based on coverage
   let uploader; // DOM element for geojson file upload
+  let highestLevel='oa';
 
   let topicsLookup = Object.fromEntries(topics.map((d) => [d.code, d]));
   // would this not be better off as a MAP and not a dict?
@@ -45,11 +46,32 @@
     comparison: null,
   };
 
-  function filterTopics(topics, selected, regex) {
+  // Define geography levels from lowest to highest
+  const GEOGRAPHY_LEVELS = ['oa', 'lsoa', 'msoa', 'ltla'];
+
+  // Creates a geography filter function for use in a filter chain
+  const geographyFilter = (selectedGeography) => {
+    const selectedLevel = GEOGRAPHY_LEVELS.indexOf(selectedGeography.toLowerCase());
+    
+    // Return a filter function
+    return (topic) => {
+        // If selected level is lsoa or higher, keep all topics. this is hardcoded
+        if (selectedLevel >= GEOGRAPHY_LEVELS.indexOf('lsoa')) {
+            return true;
+        }
+        // For oa, only keep topics with lowestGeography === 'oa'
+        return topic.lowestGeography?.toLowerCase() === 'oa';
+    };
+  };
+
+  
+  function filterTopics(topics, selected, regex, highestLevel) {
     /// display only those which exist
     let topicsStart = [];
     let topicsEnd = [];
+
     [...topics]
+      .filter(geographyFilter(highestLevel))
       .filter(
         (t) => !t.coverage || t.coverage.every((c) => coverage.includes(c)),
       )
@@ -84,6 +106,7 @@
           : data.properties.areanm
             ? data.properties.areanm
             : code,
+        highestLevel: $centroids.identifyHighestGeography(compressed) 
       },
     };
   }
@@ -112,6 +135,7 @@
     // resume as normal
     store = JSON.parse(localStorage.getItem("onsbuild"));
 
+    highestLevel = store.properties.highestLevel;
     // console.debug('build-', store);
     if (!store) {
       alert("Warning, no area selected! Redirecting to the drawing page.");
@@ -445,7 +469,7 @@
       placeholder="Type to filter"
       bind:value={state.topicsFilter}
     />
-    {#each filterTopics(topics, state.topics, regex, state.topicsExpand) as topic, i (topic.code)}
+    {#each filterTopics(topics, state.topics, regex,highestLevel) as topic, i (topic.code)}
       <div
         animate:flip={{ duration: 500 }}
         style:z-index={state.topics.includes(topic) ? 10 : 0}

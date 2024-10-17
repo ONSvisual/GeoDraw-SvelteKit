@@ -103,7 +103,7 @@
       </Card>
     {/if}
     {#each tables || [] as tab}
-      <Card title={topicsLookup[tab.code].label}>
+      <Card title={topicsLookup[tab.code].label} source={topicsLookup[tab.code].source}>
         {#if topicsLookup[tab.code]?.chart === "number"}
           <BigNumber
             value={tab.data[0]}
@@ -112,7 +112,7 @@
             description={comp
               ? `<mark>${tab.data[1].toLocaleString("en-GB")}</mark> ${topicsLookup[tab.code].unit} in ${comp}`
               : ""}
-            rounded={tab.data[0] > 1000
+            rounded={topicsLookup[tab.code]?.doNotRound ? topicsLookup[tab.code]?.timePeriod : tab.data[0] > 1000
               ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}`
               : tab.data[0] > 100
                 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit}`
@@ -141,9 +141,9 @@
     {/each}
   </Cards>
 
-  <span class="footnote"
+  <!-- <span class="footnote"
     >Source: Office for National Statistics - Census 2021</span
-  >
+  > -->
   <div class="spacer" />
 {/if}
 
