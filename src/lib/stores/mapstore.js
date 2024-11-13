@@ -20,26 +20,26 @@ export const mapsource = derived(centroids, ($centroids) => ({
 })); // source dictionary
 export const maplayer = readable([
     // stuff for OA
-    // {
-    //     id: 'bounds',
-    //     source: 'area',
-    //     'source-layer': boundaries.layer,
-    //     type: 'fill',
-    //     paint: {
-    //         'fill-color': 'transparent',
-    //         'fill-opacity': 1
-    //     },
-    // },
-    // {
-    //     id: 'bounds-line',
-    //     source: 'area',
-    //     'source-layer': boundaries.layer,
-    //     type: 'line',
-    //     paint: {
-    //         'line-color': 'steelblue',
-    //         'line-width': ['case', ['==', ['feature-state', 'hovered'], true], 2, 0.3]
-    //     },
-    // },
+    {
+        id: 'bounds',
+        source: 'area',
+        'source-layer': boundaries.layer,
+        type: 'fill',
+        paint: {
+            'fill-color': 'transparent',
+            'fill-opacity': 1
+        },
+    },
+    {
+        id: 'bounds-line',
+        source: 'area',
+        'source-layer': boundaries.layer,
+        type: 'line',
+        paint: {
+            'line-color': 'transparent',
+            'line-width': ['case', ['==', ['feature-state', 'hovered'], true], 2, 0.3]
+        },
+    },
     {
         id: 'cpt',
         source: 'points',
