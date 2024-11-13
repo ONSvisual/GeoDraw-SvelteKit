@@ -105,6 +105,12 @@ class Centroids {
     return bounds;
   }
 
+  boundsFromGeometry(geometry){
+    let bounds = bbox(geometry)
+    bounds = [bounds[0] - 0.01, bounds[1] - 0.01, bounds[2] + 0.01, bounds[3] + 0.01];
+    return bounds;
+  }
+
   // exists(oa) {
   //   return this.lookup[oa] ? true : false;
   // }
