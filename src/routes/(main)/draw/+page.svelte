@@ -88,14 +88,15 @@
             .reduce((a, b) => a + b)
         : 0;
 
-      if ($mapObject.getLayer("bounds"))
-        $mapObject.setPaintProperty("bounds", "fill-color", [
-          "match",
-          ["get", "areacd"],
-          ["literal", ...items.oa],
-          "rgba(32, 96, 149, 0.4)",
-          "transparent",
-        ]);
+      // This makes the OA layer coloured in when selecting an area
+      // if ($mapObject.getLayer("bounds"))
+      //   $mapObject.setPaintProperty("bounds", "fill-color", [
+      //     "match",
+      //     ["get", "areacd"],
+      //     ["literal", ...items.oa],
+      //     "rgba(32, 96, 149, 0.4)",
+      //     "transparent",
+      //   ]);
 
 
       if($mapObject.getLayer("userGeo")){changeData('userGeo',items.geo)};
@@ -138,6 +139,7 @@
             },
           ];
           user_geometry.set(data.geometry)
+          changeData('userGeo',data.geometry)
 
           $mapObject.fitBounds(data.properties.bounds, { padding: 40 });
 
@@ -168,7 +170,7 @@
         }
         
 
-        var bbox = $centroids.bounds([...q.properties.oaAll],'oa');
+        var bbox = $centroids.boundsFromGeometry(q.geojson);
 
         $mapObject.fitBounds(bbox, {
           padding: 40,
@@ -182,6 +184,7 @@
           }];
        
         user_geometry.set(q.geojson)  
+        changeData('userGeo',q.geojson)
         
       } else if (localStorage.getItem("draw_data") || false) {
         var q = JSON.parse(localStorage.getItem("draw_data"));
@@ -190,7 +193,7 @@
           return 0;
         }
         // var bbox = $centroids.bounds([...q.oa]);
-        var bbox = getBounds(q.geo)
+        var bbox = $centroids.boundsFromGeometry(q.geo);
         
         $mapObject.fitBounds(bbox, {
           padding: 40,
@@ -205,6 +208,7 @@
         }]);
 
         user_geometry.set(q.geo)
+        changeData('userGeo',q.geo)
       }
 
       // Keep track of map zoom level
@@ -216,11 +220,6 @@
     selected.subscribe(recolour);
     recolour($selected);
   } //endinit
-
-  function getBounds(geo){
-    return bbox(geo);
-  }
-
 
   function loadGeo() {
     let file = uploader.files[0] ? uploader.files[0] : null;
@@ -252,12 +251,15 @@
             },
           ];
           user_geometry.set(b)
+          changeData('userGeo',b)
           $mapObject.fitBounds(bb, { padding: 40 });
         } else if (b.geometry) {
           if (JSON.stringify(b.geometry).length > 10000)
             b.geometry = simplifyGeo(b.geometry, 10000);
           let bb = bbox(b);
           update(b);
+          user_geometry.set(b)
+          changeData('userGeo',b)
           $mapObject.fitBounds(bb, { padding: 40 });
         } else {
           b = null;
@@ -492,7 +494,7 @@ The save data and continue function
       <div class="slider">
         <span>Radius</span>
         <Slider bind:value={$radiusInKm} />
-        <input type="text" class="input-text" bind:value={$radiusInKm} />km
+        <input type="number" class="input-text" bind:value={$radiusInKm} step="0.1" min="0" max="10"/>km
       </div>
     {/if}
     <div class="select-mode">
