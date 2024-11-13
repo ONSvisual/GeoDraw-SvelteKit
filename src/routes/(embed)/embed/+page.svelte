@@ -32,7 +32,7 @@
         : [areaName, compName];
     names.forEach((name) => {
       def.categories.forEach((cat) => {
-        data.push({ areanm: name, category: cat.label, value: table.data[i] });
+        data.push({ areanm: name, category: cat.label, value: def.code === "resident_age" ? table.data[i].percentage : table.data[i].value});
         i++;
       });
     });
@@ -106,15 +106,15 @@
       <Card title={topicsLookup[tab.code].label} source={topicsLookup[tab.code].source}>
         {#if topicsLookup[tab.code]?.chart === "number"}
           <BigNumber
-            value={tab.data[0]}
+            value={tab.data[0].count}
             unit={topicsLookup[tab.code].unit}
             prefix={topicsLookup[tab.code].prefix}
             description={comp
-              ? `<mark>${tab.data[1].toLocaleString("en-GB")}</mark> ${topicsLookup[tab.code].unit} in ${comp}`
+              ? `<mark>${tab.data[1].count.toLocaleString("en-GB")}</mark> ${topicsLookup[tab.code].unit} in ${comp}`
               : ""}
-            rounded={topicsLookup[tab.code]?.doNotRound ? topicsLookup[tab.code]?.timePeriod : tab.data[0] > 1000
+            rounded={topicsLookup[tab.code]?.doNotRound ? topicsLookup[tab.code]?.timePeriod : tab.data[0].value > 1000
               ? `Rounded to the nearest 100 ${topicsLookup[tab.code].unit}`
-              : tab.data[0] > 100
+              : tab.data[0].value > 100
                 ? `Rounded to the nearest 10 ${topicsLookup[tab.code].unit}`
                 : null}
           />
@@ -153,10 +153,10 @@
     margin: 0 0 -12px 0;
     font-weight: bold;
   }
-  h3 {
+  /* h3 {
     font-size: 1.3rem;
     font-weight: bold;
-  }
+  } */
   div.spacer {
     height: 10px;
   }
