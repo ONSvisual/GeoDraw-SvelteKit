@@ -5,7 +5,7 @@
     "desc": "The number of people on Census Day, 21 March 2021.",
     "tableCode": "NM_2028_1",
     "cellCode": "c_sex",
-    "measures": 20100,
+    "measures": "20100,20301",
     "chart": "number",
     "unit": "people",
     "base": "all people",
@@ -18,7 +18,7 @@
       }
     ],
     "lowestGeography": "oa",
-    "doNotRound":false,
+    "doNotRound": false,
     "source": "Office for National Statistics - Census 2021"
   },
   {
@@ -27,7 +27,7 @@
     "desc": "The number of households on Census Day, 21 March 2021.",
     "tableCode": "NM_2059_1",
     "cellCode": "c2021_hh_1",
-    "measures": 20100,
+    "measures": "20100,20301",
     "chart": "number",
     "unit": "households",
     "base": "all households",
@@ -40,32 +40,8 @@
       }
     ],
     "lowestGeography": "oa",
-    "doNotRound":false,
+    "doNotRound": false,
     "source": "Office for National Statistics - Census 2021"
-  },
-  {
-    "code": "residential_property_sales",
-    "label": "Residential property sales",
-    "desc": "Number of residential property sales in England and Wales.",
-    "url": "peoplepopulationandcommunity/housing/methodologies/housepricestatisticsforsmallareasqmi",
-    "tableCode": "NM_2402_1",
-    "cellCode": "SALES",
-    "chart": "number",
-    "measures": 20100,
-    "unit": "sales",
-    "base": "all dwellings",
-    "categories": [
-      {
-        "label": "Residential property sales",
-        "cells": [
-          0
-        ]
-      }
-    ],
-    "lowestGeography": "lsoa",
-    "source": "HM Land Registry",
-    "doNotRound":true,
-    "timePeriod":"Quarterly rolling annual data"
   },
   {
     "code": "resident_age",
@@ -74,7 +50,7 @@
     "url": "demographyvariablescensus2021/age",
     "tableCode": "NM_2020_1",
     "cellCode": "c2021_age_19",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "chart": "profile",
     "unit": "%",
     "base": "all people",
@@ -198,7 +174,7 @@
     "url": "demographyvariablescensus2021/sex",
     "tableCode": "NM_2028_1",
     "cellCode": "c_sex",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -225,7 +201,7 @@
     "url": "demographyvariablescensus2021/maritalandcivilpartnershipstatus",
     "tableCode": "NM_2022_1",
     "cellCode": "c2021_lpstat_12",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -270,7 +246,7 @@
     "url": "internationalmigrationvariablescensus2021/countryofbirth",
     "tableCode": "NM_2024_1",
     "cellCode": "c2021_cob_12",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -303,7 +279,7 @@
     "url": "internationalmigrationvariablescensus2021/passportsheld",
     "tableCode": "NM_2025_1",
     "cellCode": "c2021_pass_27",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -342,7 +318,7 @@
     "url": "internationalmigrationvariablescensus2021/lengthofresidenceintheuk",
     "tableCode": "NM_2036_1",
     "cellCode": "c2021_resuk_6",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -387,7 +363,7 @@
     "url": "demographyvariablescensus2021/householdsize",
     "tableCode": "NM_2037_1",
     "cellCode": "c2021_hhsize_10",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -430,7 +406,7 @@
     "url": "demographyvariablescensus2021/householdcomposition",
     "tableCode": "NM_2023_1",
     "cellCode": "c2021_hhcomp_15",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -463,7 +439,7 @@
     "url": "demographyvariablescensus2021/householddeprivation",
     "tableCode": "NM_2031_1",
     "cellCode": "c2021_dep_6",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -502,71 +478,13 @@
     "source": "Office for National Statistics - Census 2021"
   },
   {
-    "code": "energy_efficiency_of_housing",
-    "label": "Energy efficiency of housing",
-    "desc": "The number of Energy Performance Certificates (EPCs) in each energy efficiency rating band up to the financial year ending 2023.",
-    "url": "peoplepopulationandcommunity/housing/methodologies/energyefficiencyofhousinginenglandandwalesqmi",
-    "tableCode": "NM_2401_1",
-    "cellCode": "ENERGY_EFFICIENCY_8",
-    "measures": [20100,20301],
-    "unit": "%",
-    "base": "dwellings",
-    "categories": [
-      {
-        "label": "Band A",
-        "cells": [
-          1
-        ]
-      },
-      {
-        "label": "Band B",
-        "cells": [
-          2
-        ]
-      },
-      {
-        "label": "Band C",
-        "cells": [
-          3
-        ]
-      },
-      {
-        "label": "Band D",
-        "cells": [
-          4
-        ]
-      },
-      {
-        "label": "Band E",
-        "cells": [
-          5
-        ]
-      },
-      {
-        "label": "Band F",
-        "cells": [
-          6
-        ]
-      },
-      {
-        "label": "Band G",
-        "cells": [
-          7
-        ]
-      }
-    ],
-    "lowestGeography": "lsoa",
-    "source": "Office for National Statistics",
-    "timePeriod":"Financial year ending 2023"
-  },
-  {
     "code": "ethnic_group_tb",
     "label": "Ethnic group",
     "desc": "The ethnic group a person identifies with.",
     "url": "ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/ethnicgroup",
     "tableCode": "NM_2041_1",
     "cellCode": "c2021_eth_20",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -611,7 +529,7 @@
     "url": "ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/nationalidentity",
     "tableCode": "NM_2046_1",
     "cellCode": "c2021_natiduk_17",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -651,7 +569,7 @@
     "caveatUrl": "peoplepopulationandcommunity/culturalidentity/ethnicity/methodologies/ethnicgroupnationalidentitylanguageandreligionqualityinformationforcensus2021",
     "tableCode": "NM_2049_1",
     "cellCode": "c2021_religion_10",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -722,7 +640,7 @@
     "caveatUrl": "peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/healthdisabilityandunpaidcarequalityinformationforcensus2021",
     "tableCode": "NM_2055_1",
     "cellCode": "c2021_health_6",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -769,7 +687,7 @@
     "caveatUrl": "peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/healthdisabilityandunpaidcarequalityinformationforcensus2021",
     "tableCode": "NM_2056_1",
     "cellCode": "c2021_disability_5",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all people",
     "categories": [
@@ -798,7 +716,7 @@
     "caveatUrl": "peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/healthdisabilityandunpaidcarequalityinformationforcensus2021",
     "tableCode": "NM_2057_1",
     "cellCode": "c2021_carer_7",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged five years and over",
     "categories": [
@@ -837,7 +755,7 @@
     "url": "ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/proficiencyinenglishlanguage",
     "tableCode": "NM_2048_1",
     "cellCode": "c2021_engprf_6",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged three years and over",
     "categories": [
@@ -882,7 +800,7 @@
     "url": "ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/welshlanguageskills",
     "tableCode": "NM_2050_1",
     "cellCode": "c2021_wlang_9",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged three years and over",
     "coverage": [
@@ -924,7 +842,7 @@
     "url": "ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/welshspeakingability",
     "tableCode": "NM_2051_1",
     "cellCode": "c2021_wlangs_3",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged three years and over",
     "coverage": [
@@ -954,7 +872,7 @@
     "url": "housingvariablescensus2021/accommodationtype",
     "tableCode": "NM_2062_1",
     "cellCode": "c2021_acctype_9",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -992,7 +910,7 @@
     "url": "housingvariablescensus2021/numberofcarsorvans",
     "tableCode": "NM_2063_1",
     "cellCode": "c2021_cars_5",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -1031,7 +949,7 @@
     "url": "housingvariablescensus2021/typeofcentralheatinginhousehold",
     "tableCode": "NM_2064_1",
     "cellCode": "c2021_heating_13",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -1068,7 +986,7 @@
     "url": "housingvariablescensus2021/numberofbedrooms",
     "tableCode": "NM_2068_1",
     "cellCode": "c2021_bedrooms_5",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -1107,7 +1025,7 @@
     "url": "housingvariablescensus2021/occupancyratingforbedrooms",
     "tableCode": "NM_2070_1",
     "cellCode": "c2021_occrat_bedrooms_6",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -1152,7 +1070,7 @@
     "url": "housingvariablescensus2021/tenureofhousehold",
     "tableCode": "NM_2072_1",
     "cellCode": "c2021_tenure_9",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -1195,7 +1113,7 @@
     "url": "housingvariablescensus2021/secondaddressindicator",
     "tableCode": "NM_2074_1",
     "cellCode": "c2021_2addr_4",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "all households",
     "categories": [
@@ -1230,7 +1148,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/traveltoworkqualityinformationforcensus2021",
     "tableCode": "NM_2075_1",
     "cellCode": "c2021_ttwdist_11",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -1282,7 +1200,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/traveltoworkqualityinformationforcensus2021",
     "tableCode": "NM_2078_1",
     "cellCode": "c2021_ttwmeth_12",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -1365,7 +1283,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/earningsandworkinghours/methodologies/labourmarketqualityinformationforcensus2021",
     "tableCode": "NM_2083_1",
     "cellCode": "c2021_eastat_20",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -1402,7 +1320,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/earningsandworkinghours/methodologies/labourmarketqualityinformationforcensus2021",
     "tableCode": "NM_2082_1",
     "cellCode": "c2021_worked_4",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over not in employment",
     "categories": [
@@ -1437,7 +1355,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/earningsandworkinghours/methodologies/labourmarketqualityinformationforcensus2021",
     "tableCode": "NM_2080_1",
     "cellCode": "c2021_occ_10",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -1508,7 +1426,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/earningsandworkinghours/methodologies/labourmarketqualityinformationforcensus2021",
     "tableCode": "NM_2079_1",
     "cellCode": "c2021_nssec_10",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -1579,7 +1497,7 @@
     "caveatUrl": "employmentandlabourmarket/peopleinwork/earningsandworkinghours/methodologies/labourmarketqualityinformationforcensus2021",
     "tableCode": "NM_2076_1",
     "cellCode": "c2021_hours_5",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over in employment",
     "categories": [
@@ -1618,7 +1536,7 @@
     "url": "educationvariablescensus2021/highestlevelofqualification",
     "tableCode": "NM_2084_1",
     "cellCode": "c2021_hiqual_8",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged 16 years and over",
     "categories": [
@@ -1665,7 +1583,7 @@
     "url": "educationvariablescensus2021/schoolchildorfull-timestudentindicator",
     "tableCode": "NM_2085_1",
     "cellCode": "c2021_student_3",
-    "measures": [20100,20301],
+    "measures": "20100,20301",
     "unit": "%",
     "base": "people aged five years and over",
     "categories": [
@@ -1684,5 +1602,86 @@
     ],
     "lowestGeography": "oa",
     "source": "Office for National Statistics - Census 2021"
+  },
+  {
+    "code": "energy_efficiency_of_housing",
+    "label": "Energy efficiency of housing",
+    "desc": "The number of Energy Performance Certificates (EPCs) in each energy efficiency rating band up to the financial year ending 2023.",
+    "url": "peoplepopulationandcommunity/housing/methodologies/energyefficiencyofhousinginenglandandwalesqmi",
+    "tableCode": "NM_2401_1",
+    "cellCode": "ENERGY_EFFICIENCY_8",
+    "measures": "20100,20301",
+    "unit": "%",
+    "base": "dwellings",
+    "categories": [
+      {
+        "label": "Band A",
+        "cells": [
+          1
+        ]
+      },
+      {
+        "label": "Band B",
+        "cells": [
+          2
+        ]
+      },
+      {
+        "label": "Band C",
+        "cells": [
+          3
+        ]
+      },
+      {
+        "label": "Band D",
+        "cells": [
+          4
+        ]
+      },
+      {
+        "label": "Band E",
+        "cells": [
+          5
+        ]
+      },
+      {
+        "label": "Band F",
+        "cells": [
+          6
+        ]
+      },
+      {
+        "label": "Band G",
+        "cells": [
+          7
+        ]
+      }
+    ],
+    "lowestGeography": "lsoa",
+    "source": "Energy Performance Certificate data on Open Data Communities from the Ministry of Housing, Communities and Local Government"
+  },
+  {
+    "code": "residential_property_sales",
+    "label": "Residential property sales",
+    "desc": "Number of residential property sales in England and Wales.",
+    "url": "peoplepopulationandcommunity/housing/methodologies/housepricestatisticsforsmallareasqmi",
+    "tableCode": "NM_2402_1",
+    "cellCode": "SALES",
+    "chart": "number",
+    "measures": "20100,20301",
+    "unit": "sales",
+    "base": "all dwellings",
+    "categories": [
+      {
+        "label": "Residential property sales",
+        "cells": [
+          0
+        ]
+      }
+    ],
+    "lowestGeography": "lsoa",
+    "source": "HM Land Registry",
+    "doNotRound": true,
+    "timePeriod": "Quarterly rolling annual data"
   }
 ]
