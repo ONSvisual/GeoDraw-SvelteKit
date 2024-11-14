@@ -49,6 +49,8 @@
   // Define geography levels from lowest to highest
   const GEOGRAPHY_LEVELS = ['oa', 'lsoa', 'msoa', 'ltla'];
 
+  const geographyLookup ={"oa":"Output area", "lsoa":"Lower layer super output area", "msoa":"Middle layer super output area","ltla":"Lower tier local authority"}
+
   // Creates a geography filter function for use in a filter chain
   const geographyFilter = (selectedGeography) => {
     const selectedLevel = GEOGRAPHY_LEVELS.indexOf(selectedGeography.toLowerCase());
@@ -183,7 +185,7 @@
       }
       tables.push({ code: data[i].code, data: table });
     }
-    // console.log("tables", tables);
+    console.log('tables',tables)
     return tables;
   }
 
@@ -262,17 +264,21 @@
       { year: "numeric", month: "short", day: "numeric" },
     )}"\n`;
     csv += `"The data in this profile are aggregated from small areas on a best-fit basis, and therefore may differ slightly from other sources."\n\n`;
-    csv += `"Variable","Category","${getName("capitalise")}","${state.comparison.areanm}","Unit","Base population"\n`;
+    csv += `"Variable","Category","${getName("capitalise")}","${state.comparison.areanm}","Unit","${getName("capitalise")}","${state.comparison.areanm}","Unit","Base population","Source","Geography","Time period"\n`;
 
     tables.forEach((t) => {
       let meta = topicsLookup[t.code];
       let len = meta.categories.length;
       for (let i = 0; i < len; i++) {
         csv += `"${meta.label}","${meta.categories[i].label}",${
-          t.data[i] ? t.data[i] : "NA"
+          t.data[i].value ? t.data[i].value : "NA"
         },${
-          t.data[len + i] ? t.data[len + i] : "NA"
-        },"${meta.unit}","${meta.base}"\n`;
+          t.data[len + i].value ? t.data[len + i].value : "NA"
+        },"${
+        meta.unit}","${
+        t.data[i].percentage ? t.data[i].count : "NA"}","${
+        t.data[len + i].percentage ? t.data[len + i].count : "NA"}","${
+        meta.base.replace("all ","")}","${meta.base}","${meta.source}","${geographyLookup[meta.lowestGeography]}","${meta.timePeriod ? meta.timePeriod : "2021"}"\n`;
       }
     });
 

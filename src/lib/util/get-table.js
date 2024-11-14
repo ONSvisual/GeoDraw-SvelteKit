@@ -48,7 +48,7 @@ function processNomiswebData(data, table) {
     for(let i=1;i<data.length;i+=2){
       processedData.push({
         ...data[i],
-        count:data[i-1].value,
+        count: data[i-1].value,
         percentage:data[i].value,
         originalValue:data[i].value
       })
@@ -63,8 +63,9 @@ function processNomiswebData(data, table) {
         ? roundCount(count)
         : count;
   
-      return {
+      return { 
         ...d,
+        value:processedCount,
         count: processedCount,
         originalValue: count
       };
