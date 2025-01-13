@@ -1,24 +1,11 @@
 <script>
   import "$lib/css/app.css";
   import "@onsvisual/svelte-components/css/main.css";
-  import { onMount } from "svelte";
-  import { page } from "$app/stores";
-  import { centroids } from "$lib/stores/mapstore.js";
-  import { GetCentroids } from "$lib/util/centroid-utils.js";
   import AnalyticsBanner from "$lib/layout/AnalyticsBanner.svelte";
   import ONSHeader from "$lib/layout/ONSHeader.svelte";
   import ONSFooter from "$lib/layout/ONSFooter.svelte";
-  import Title from "$lib/layout/Title.svelte";
-  import { points, lsoaPoints } from '$lib/config/geography';
-
-  let loaded = false;
-
-  onMount(async () => {
-    // calculate the centroids and simplifications.
-    var centroidDummy = await GetCentroids([points,lsoaPoints]);
-    centroids.set(centroidDummy);
-    loaded = true;
-  });
+  // import Title from "$lib/layout/Title.svelte";
+  import { Footer } from "@onsvisual/svelte-components";
 
   // GOOGLE ANALYTICS
   // Settings for page analytics. Values must be shared with <AnalyticsBanner> component
@@ -62,14 +49,12 @@
 <main>
   <header>
     <ONSHeader />
-    <Title />
+    <!-- <Title /> -->
   </header>
 
-  {#if loaded}
+
     <slot />
-  {/if}
 </main>
 
-{#if $page.url.pathname.includes("build")}
-  <ONSFooter />
-{/if}
+<Footer />
+

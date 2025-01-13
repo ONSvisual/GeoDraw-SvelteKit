@@ -2,17 +2,20 @@
 	import { getContext } from "svelte";
 	import ONSLogo from "./ONSLogo.svelte";
 	import CensusLogo from "./CensusLogo.svelte";
+	import { PhaseBanner, Header } from "@onsvisual/svelte-components";
 
 	export let theme = "light";
 	export let filled = true;
-	export let census = true;
+	export let census = false;
 
 	let primary = theme == "dark" ? "white" : filled ? "#003c57" : "#222222";
 	let secondary = theme == "dark" || filled ? "#a8bd3a" : "#222222";
 	let censusColor = theme == "dark" ? "white" : "#902082";
 </script>
 
-<div class="col-wide middle">
+<PhaseBanner phase="alpha" />
+<Header compact />
+<!-- <div class="col-wide middle">
 	<div class="logo-block">
 		<a href="https://www.ons.gov.uk/" class="logo" style:width="270px">
 			<ONSLogo {primary} {secondary} />
@@ -27,7 +30,7 @@
 			</a>
 		{/if}
 	</div>
-</div>
+</div> -->
 
 <style>
 	.col-wide {

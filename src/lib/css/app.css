@@ -131,7 +131,7 @@ nav {
   justify-content: space-between;
   min-width: 100%;
   overflow-x: auto;
-  background-color: #333A45;
+  /* background-color: #333A45; */
   scrollbar-width: none;
 }
 
